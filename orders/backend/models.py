@@ -1,6 +1,8 @@
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.db import models
 
+from orders.backend.validators import check_username, check_password, check_email, check_phone
+
 
 class RoleChoices(models.TextChoices):
     ADMIN = "admin", "Admin"
