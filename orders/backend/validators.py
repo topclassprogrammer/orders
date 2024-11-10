@@ -1,4 +1,5 @@
 import re
+import requests
 from string import ascii_letters, digits, punctuation
 
 from django.core.exceptions import ValidationError
@@ -29,3 +30,14 @@ def check_phone(value):
     result = re.fullmatch(pattern, value)
     if not result:
         raise ValidationError("Incorrect phone number. Make sure it start with +")
+
+
+def check_url(value: str):
+    if value:
+        try:
+            if value.startswith("https://"):
+                requests.get(value)
+            else:
+                requests.get('https://' + value)
+        except requests.exceptions.RequestException:
+            raise ValidationError("Incorrect URL")
