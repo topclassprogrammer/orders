@@ -41,3 +41,10 @@ def check_url(value: str):
                 requests.get('https://' + value)
         except requests.exceptions.RequestException:
             raise ValidationError("Incorrect URL")
+
+
+def check_shop_role(value: int):
+    from models import User
+    user = User.objects.get(id=value)
+    if user.role != 'shop':
+        raise ValidationError(f"User {user} does not have shop rights")
