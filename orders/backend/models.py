@@ -47,5 +47,10 @@ class ConfirmRegistrationToken(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="confirm_registration_tokens")
 
 
+class PasswordResetToken(models.Model):
+    key = models.UUIDField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="password_reset_tokens")
+
 
 
