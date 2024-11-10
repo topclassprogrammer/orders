@@ -1,3 +1,4 @@
+import re
 from string import ascii_letters, digits, punctuation
 
 from django.core.exceptions import ValidationError
@@ -15,3 +16,9 @@ def check_password(value):
     if len(value) < 8 or any(char not in PASSWORD_CHARS for char in value):
         raise ValidationError("Not allowed char(s) in password field")
 
+
+def check_email(value):
+    pattern = re.compile(r"^[A-Za-z0-9._+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$")
+    result = re.fullmatch(pattern, value)
+    if not result:
+        raise ValidationError("Incorrect email address")
