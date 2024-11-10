@@ -41,3 +41,11 @@ class AuthToken(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="auth_tokens")
 
 
+class ConfirmRegistrationToken(models.Model):
+    key = models.UUIDField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="confirm_registration_tokens")
+
+
+
+
