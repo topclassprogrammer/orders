@@ -34,3 +34,10 @@ class Shop(models.Model):
     accept_orders = models.BooleanField(default=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="shop", validators=[check_shop_role])
 
+
+class AuthToken(models.Model):
+    key = models.UUIDField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="auth_tokens")
+
+
