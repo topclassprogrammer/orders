@@ -11,6 +11,17 @@ class RoleChoices(models.TextChoices):
     SHOP = "shop", "Shop"
 
 
+class CartChoices(models.TextChoices):
+    CART = "cart", "In cart"
+    NEW = "new", "Ordered"
+    PACKING = "packing", "Packing"
+    PACKED = "packed", "Packed"
+    DELIVERING = "delivering", "Delivering"
+    DELIVERED = "delivered", "Delivered"
+    CANCELED = "сanceled", "Сanceled"
+    RECEIVED = "received", "Received"
+
+
 class Role(models.Model):
     name = models.CharField(choices=RoleChoices, unique=True)
 
