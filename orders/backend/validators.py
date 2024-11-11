@@ -29,7 +29,7 @@ def check_phone(value):
     pattern = re.compile(r"^\+[0-9]{11,18}$")
     result = re.fullmatch(pattern, value)
     if not result:
-        raise ValidationError("Incorrect phone number. Make sure it start with +")
+        raise ValidationError("Incorrect phone number. Make sure it starts with +")
 
 
 def check_url(value: str):
