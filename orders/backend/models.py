@@ -121,6 +121,11 @@ class Details(models.Model):
     year = models.PositiveSmallIntegerField(null=True, blank=True)
 
 
+class Brand(models.Model):
+    name = models.CharField(max_length=32)
+
+
+
 
 
 
