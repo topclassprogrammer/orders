@@ -1,5 +1,8 @@
+import uuid
+
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.db import models
+from django.utils.text import slugify
 
 from orders.backend.validators import check_username, check_password, check_email, check_phone, check_url, \
     check_shop_role
@@ -96,5 +99,12 @@ class Item(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
     quantity = models.PositiveSmallIntegerField(default=0)
     slug = models.SlugField(max_length=64, unique=True, blank=True)
+
+    def clean(self):
+        super().clean()
+        self.slug = slugify(self.brand.name + self.model.name)
+        if Item.objects.filter(slug=self.slug):
+            self.slug += str(uuid.uuid4())
+
 
 
