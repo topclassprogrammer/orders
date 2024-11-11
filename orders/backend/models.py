@@ -4,7 +4,7 @@ from django.contrib.auth.base_user import AbstractBaseUser
 from django.db import models
 from django.utils.text import slugify
 
-from orders.backend.validators import check_username, check_password, check_email, check_phone, check_url, \
+from backend.validators import check_username, check_password, check_email, check_phone, check_url, \
     check_shop_role
 
 
