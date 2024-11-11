@@ -25,10 +25,6 @@ class CartChoices(models.TextChoices):
     RECEIVED = "received", "Received"
 
 
-class Role(models.Model):
-    name = models.CharField(choices=RoleChoices, unique=True)
-
-
 class User(AbstractBaseUser):
     USERNAME_FIELD = "username"
 
@@ -40,6 +36,10 @@ class User(AbstractBaseUser):
     phone = models.CharField(max_length=19, validators=[check_phone])
     role = models.ForeignKey("Role", on_delete=models.CASCADE, related_name="users")
     created_at = models.DateTimeField(auto_now_add=True)
+
+
+class Role(models.Model):
+    name = models.CharField(choices=RoleChoices, unique=True)
 
 
 class Shop(models.Model):
