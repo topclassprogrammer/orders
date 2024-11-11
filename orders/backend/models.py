@@ -45,7 +45,7 @@ class Role(models.Model):
 
 class Shop(models.Model):
     name = models.CharField(max_length=64, unique=True)
-    url = models.URLField(max_length=256, null=True, validators=[check_url])
+    url = models.URLField(max_length=256, blank=True, validators=[check_url])
     accept_orders = models.BooleanField(default=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="shop", validators=[check_shop_role])
 
