@@ -39,6 +39,12 @@ class User(AbstractBaseUser):
     is_active = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def clean(self):
+        super().clean()
+        password_bytes = self.password.encode()
+        password = bcrypt.hashpw(password_bytes, bcrypt.gensalt())
+        self.password = password.decode()
+
 
 class Role(models.Model):
     name = models.CharField(choices=RoleChoices, unique=True)
