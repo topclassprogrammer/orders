@@ -33,14 +33,14 @@ def check_phone(value):
 
 
 def check_url(value: str):
-    if value:
-        try:
-            if value.startswith("https://"):
-                requests.get(value)
-            else:
-                requests.get('https://' + value)
-        except requests.exceptions.RequestException:
-            raise ValidationError("Incorrect URL")
+    if not value.startswith("https://"):
+        raise ValidationError("URL should start with prefix 'https://'")
+    try:
+        response = requests.get(value)
+        if response.status_code in range(500, 599):
+            raise ValidationError(f"Server is down")
+    except requests.exceptions.RequestException as err:
+        raise ValidationError(f"URL is not reachable: {err}")
 
 
 def check_shop_role(value: int):
