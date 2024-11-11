@@ -87,3 +87,14 @@ class Address(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="addresses")
 
 
+class Item(models.Model):
+    brand = models.ForeignKey("Brand", on_delete=models.CASCADE, related_name="items")
+    model = models.ForeignKey("Model", on_delete=models.CASCADE, related_name="items")
+    category = models.ForeignKey("Category", on_delete=models.CASCADE, related_name="items")
+    details = models.OneToOneField("Details", on_delete=models.CASCADE, related_name="item")
+    shop = models.ForeignKey(Shop, on_delete=models.CASCADE, related_name="items")
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    quantity = models.PositiveSmallIntegerField(default=0)
+    slug = models.SlugField(max_length=64, unique=True, blank=True)
+
+
