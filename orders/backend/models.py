@@ -35,6 +35,7 @@ class User(AbstractBaseUser):
     email = models.CharField(max_length=320, unique=True, validators=[check_email])
     phone = models.CharField(max_length=19, validators=[check_phone])
     role = models.ForeignKey("Role", on_delete=models.CASCADE, related_name="users")
+    is_active = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
 
