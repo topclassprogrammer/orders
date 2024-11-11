@@ -1,5 +1,6 @@
 import uuid
 
+import bcrypt
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.db import models
 from django.utils.text import slugify
@@ -31,7 +32,7 @@ class User(AbstractBaseUser):
     first_name = models.CharField(max_length=32)
     last_name = models.CharField(max_length=32)
     username = models.CharField(max_length=32, unique=True, validators=[check_username])
-    password = models.CharField(max_length=32, validators=[check_password])
+    password = models.CharField(max_length=128, validators=[check_password])
     email = models.CharField(max_length=320, unique=True, validators=[check_email])
     phone = models.CharField(max_length=19, validators=[check_phone])
     role = models.ForeignKey("Role", on_delete=models.CASCADE, related_name="users")
