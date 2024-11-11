@@ -107,4 +107,20 @@ class Item(models.Model):
             self.slug += str(uuid.uuid4())
 
 
+class Details(models.Model):
+    description = models.TextField(null=True, blank=True)
+    image = models.ImageField(upload_to="images", null=True, blank=True)
+    display_diagonal = models.DecimalField(max_digits=4, decimal_places=2, null=True, blank=True)
+    display_resolution = models.CharField(max_length=24, null=True, blank=True)
+    camera_back = models.DecimalField(max_digits=3, decimal_places=1, null=True, blank=True)
+    camera_front = models.DecimalField(max_digits=3, decimal_places=1, null=True, blank=True)
+    cpu_cores = models.PositiveSmallIntegerField(default=1, null=True, blank=True)
+    battery = models.PositiveSmallIntegerField(null=True, blank=True)
+    memory = models.PositiveSmallIntegerField(null=True, blank=True)
+    color = models.CharField(max_length=32, null=True, blank=True)
+    year = models.PositiveSmallIntegerField(null=True, blank=True)
+
+
+
+
 
