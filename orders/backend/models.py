@@ -77,3 +77,13 @@ class OrderItems(models.Model):
     quantity = models.PositiveSmallIntegerField(default=0)
 
 
+class Address(models.Model):
+    country = models.CharField(max_length=64)
+    region = models.CharField(max_length=64)
+    city = models.CharField(max_length=64)
+    street = models.CharField(max_length=64)
+    house = models.PositiveSmallIntegerField()
+    apartment = models.PositiveSmallIntegerField(null=True, blank=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="addresses")
+
+
