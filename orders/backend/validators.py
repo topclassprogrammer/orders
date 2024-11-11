@@ -44,7 +44,7 @@ def check_url(value: str):
 
 
 def check_shop_role(value: int):
-    from models import User
+    from backend.models import User
     user = User.objects.get(id=value)
-    if user.role != 'shop':
+    if user.role.name != 'shop':
         raise ValidationError(f"User {user} does not have shop rights")
