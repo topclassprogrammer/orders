@@ -5,7 +5,7 @@ from string import ascii_letters, digits, punctuation
 from django.core.exceptions import ValidationError
 
 USERNAME_CHARS = ascii_letters + digits + "-_ "
-PASSWORD_CHARS = ascii_letters + digits + punctuation
+PASSWORD_CHARS = ascii_letters + digits + punctuation + " "
 
 
 def check_username(value):
