@@ -62,3 +62,4 @@ class Command(BaseCommand):
             raise ValidationError(f"Объект уже существует: {err}")
         except TypeError as err:
             raise ValidationError(f"Поле модели не существует: {err}")
+
