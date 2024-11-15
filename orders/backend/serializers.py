@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from backend.models import User
+from backend.validators import check_password
 
 
 class CreateAccountSerializer(serializers.ModelSerializer):
@@ -13,3 +14,14 @@ class CreateAccountSerializer(serializers.ModelSerializer):
         }
 
 
+class LogInSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(max_length=128, validators=[check_password])
+
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'password']
+        read_only_fields = ['id']
+        extra_kwargs = {
+            'username': {'write_only': True},
+            'password': {'write_only': True}
+        }
