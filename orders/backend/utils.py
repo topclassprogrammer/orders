@@ -8,3 +8,9 @@ def hash_password(value):
     return password
 
 
+def check_hashed_passwords(password, stored_hash):
+    password = password.encode()
+    stored_hash = stored_hash.encode()
+    return bcrypt.checkpw(password, stored_hash)
+
+
