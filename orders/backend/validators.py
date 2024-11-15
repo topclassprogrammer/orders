@@ -1,7 +1,9 @@
 import re
-import requests
+import uuid
+
 from string import ascii_letters, digits, punctuation
 
+import requests
 from django.core.exceptions import ValidationError
 
 USERNAME_CHARS = ascii_letters + digits + "-_ "
@@ -52,3 +54,12 @@ def check_shop_role(value: int):
     user = User.objects.get(id=value)
     if user.role.name != 'shop':
         raise ValidationError(f"User {user} does not have shop rights")
+
+
+def check_uuid_token(value: str):
+    try:
+        uuid.UUID(value)
+    except ValueError:
+        return False
+    else:
+        return True
