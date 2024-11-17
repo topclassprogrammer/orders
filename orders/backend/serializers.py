@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from backend.models import User
+from backend.models import User, ActivationToken
 from backend.validators import check_password
 
 
@@ -24,4 +24,14 @@ class LogInSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'username': {'write_only': True},
             'password': {'write_only': True}
+        }
+
+
+class ActivationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ActivationToken
+        fields = ['id', 'key', 'created_at', 'user']
+        read_only_fields = ['id', 'created_at', 'user']
+        extra_kwargs = {
+            'key': {'write_only': True}
         }
