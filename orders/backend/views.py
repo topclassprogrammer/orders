@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 
 from backend.auth import TokenAuthentication
-from backend.models import ConfirmRegistrationToken, User, AuthToken, ActivationToken
+from backend.models import User, AuthToken, ActivationToken
 from backend.serializers import CreateAccountSerializer, LogInSerializer, ActivationSerializer
 from backend.utils import hash_password, check_hashed_passwords
 
@@ -19,7 +19,7 @@ class Account(ViewSet):
         if serializer.is_valid():
             hashed_password = hash_password(request.data['password'])
             user = serializer.save(password=hashed_password)
-            ConfirmRegistrationToken.objects.create(key=uuid.uuid4(), user=user)
+            ActivationToken.objects.create(key=uuid.uuid4(), user=user)
             return Response({"status": True, "message": f"You successfully created account: {serializer.data}"}, status=status.HTTP_201_CREATED)
         return Response({"status": False, "message": f"Incorrect registration data: {serializer.errors}"}, status.HTTP_400_BAD_REQUEST)
 
