@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from backend.models import User, ActivationToken, PasswordResetToken
+from backend.models import User, ActivationToken, PasswordResetToken, Role
 from backend.validators import check_password
 
 
@@ -50,3 +50,8 @@ class PasswordResetSerializer(serializers.ModelSerializer):
         }
 
 
+class RoleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Role
+        fields = ['id', 'name']
+        read_only_fields = ['id']
