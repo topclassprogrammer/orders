@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 
 from backend.auth import TokenAuthentication
-from backend.models import User, AuthToken, ActivationToken
+from backend.models import User, AuthToken, ActivationToken, PasswordResetToken
 from backend.serializers import CreateAccountSerializer, LogInSerializer, ActivationSerializer
 from backend.utils import hash_password, check_hashed_passwords
 
@@ -71,3 +71,10 @@ class Account(ViewSet):
             registration_token.delete()
             return Response({"status": True, "message": "Account successfully activated"}, status=status.HTTP_200_OK)
         return Response({"status": False, "message": f"Incorrect activation data: {serializer.errors}"}, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(methods=['POST'], authentication_classes=[TokenAuthentication], detail=False, url_path='password-reset-request')
+    def password_reset_request(self, request):
+        user = self.request.user
+        PasswordResetToken.objects.create(key=uuid.uuid4(), user=user)
+        return Response({"status": True, "message": "Password reset request successfully completed"}, status=status.HTTP_200_OK)
+
