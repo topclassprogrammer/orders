@@ -8,7 +8,7 @@ from rest_framework.viewsets import ViewSet
 
 from backend.auth import TokenAuthentication
 from backend.models import User, AuthToken, ActivationToken, PasswordResetToken
-from backend.serializers import CreateAccountSerializer, LogInSerializer, ActivationSerializer
+from backend.serializers import CreateAccountSerializer, LogInSerializer, ActivationSerializer, PasswordResetSerializer
 from backend.utils import hash_password, check_hashed_passwords
 
 
@@ -78,3 +78,19 @@ class Account(ViewSet):
         PasswordResetToken.objects.create(key=uuid.uuid4(), user=user)
         return Response({"status": True, "message": "Password reset request successfully completed"}, status=status.HTTP_200_OK)
 
+    @action(methods=['POST'], authentication_classes=[TokenAuthentication], detail=False, url_path='password-reset-response')
+    def password_reset_response(self, request):
+        serializer = PasswordResetSerializer(data=request.data)
+        if serializer.is_valid():
+            key = request.data['key']
+            user = request.user
+            password = request.data['password']
+            try:
+                reset_token = PasswordResetToken.objects.get(key=uuid.UUID(key))
+            except PasswordResetToken.DoesNotExist:
+                return Response({"status": False, "message": "PasswordResetToken key not found in DB"}, status=status.HTTP_404_NOT_FOUND)
+            user.password = hash_password(password)
+            user.save()
+            reset_token.delete()
+            return Response({"status": True, "message": "Password successfully changed"}, status=status.HTTP_200_OK)
+        return Response({"status": False, "message": f"Incorrect key or/and password provided: {serializer.errors}"}, status=status.HTTP_400_BAD_REQUEST)
