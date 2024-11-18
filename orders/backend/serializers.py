@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from backend.models import User, ActivationToken
+from backend.models import User, ActivationToken, PasswordResetToken
 from backend.validators import check_password
 
 
@@ -35,3 +35,18 @@ class ActivationSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'key': {'write_only': True}
         }
+
+
+class PasswordResetSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(max_length=128, validators=[check_password])
+
+    class Meta:
+        model = PasswordResetToken
+        fields = ['id', 'key', 'created_at', 'password']
+        read_only_fields = ['id', 'created_at']
+        extra_kwargs = {
+            'key': {'write_only': True},
+            'password': {'write_only': True}
+        }
+
+
