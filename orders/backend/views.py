@@ -7,9 +7,10 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 
 from backend.auth import TokenAuthentication
-from backend.models import User, AuthToken, ActivationToken, PasswordResetToken
-from backend.permissions import IsOwner
-from backend.serializers import CreateAccountSerializer, LogInSerializer, ActivationSerializer, PasswordResetSerializer
+from backend.models import User, AuthToken, ActivationToken, PasswordResetToken, Role
+from backend.permissions import IsOwner, IsAdmin
+from backend.serializers import CreateAccountSerializer, LogInSerializer, ActivationSerializer, PasswordResetSerializer, \
+    RoleSerializer
 from backend.utils import hash_password, check_hashed_passwords
 
 
@@ -100,5 +101,20 @@ class Account(ViewSet):
         if self.action in ['partial_update', 'destroy']:
             return [IsOwner()]
         return []
+
+
+class RoleView(ViewSet):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAdmin]
+
+    def list(self, request):
+        queryset = Role.objects.all()
+        serializer = RoleSerializer(queryset, many=True)
+        return Response({"status": True, "message": serializer.data}, status=status.HTTP_200_OK)
+
+
+
+
+
 
 
