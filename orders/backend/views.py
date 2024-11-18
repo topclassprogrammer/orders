@@ -112,8 +112,13 @@ class RoleView(ViewSet):
         serializer = RoleSerializer(queryset, many=True)
         return Response({"status": True, "message": serializer.data}, status=status.HTTP_200_OK)
 
-
-
+    def retrieve(self, request, pk=None):
+        try:
+            instance = Role.objects.get(id=pk)
+        except Role.DoesNotExist:
+            return Response({"status": False, "message": f"Role with id {pk} does not exist"}, status=status.HTTP_404_NOT_FOUND)
+        serializer = RoleSerializer(instance)
+        return Response({"status": True, "message": serializer.data}, status=status.HTTP_200_OK)
 
 
 
