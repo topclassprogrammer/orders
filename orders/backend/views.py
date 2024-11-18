@@ -8,6 +8,7 @@ from rest_framework.viewsets import ViewSet
 
 from backend.auth import TokenAuthentication
 from backend.models import User, AuthToken, ActivationToken, PasswordResetToken
+from backend.permissions import IsOwner
 from backend.serializers import CreateAccountSerializer, LogInSerializer, ActivationSerializer, PasswordResetSerializer
 from backend.utils import hash_password, check_hashed_passwords
 
@@ -94,3 +95,10 @@ class Account(ViewSet):
             reset_token.delete()
             return Response({"status": True, "message": "Password successfully changed"}, status=status.HTTP_200_OK)
         return Response({"status": False, "message": f"Incorrect key or/and password provided: {serializer.errors}"}, status=status.HTTP_400_BAD_REQUEST)
+
+    def get_permissions(self):
+        if self.action in ['partial_update', 'destroy']:
+            return [IsOwner()]
+        return []
+
+
