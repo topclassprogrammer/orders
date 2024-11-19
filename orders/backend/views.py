@@ -133,7 +133,7 @@ class RoleView(ViewSet):
     def list(self, request):
         queryset = Role.objects.all()
         serializer = RoleSerializer(queryset, many=True)
-        return Response({"status": True, "message": serializer.data}, status=status.HTTP_200_OK)
+        return Response(get_success_response(self.action, serializer), status=status.HTTP_200_OK)
 
     def retrieve(self, request, pk=None):
         try:
