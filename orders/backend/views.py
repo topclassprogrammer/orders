@@ -10,7 +10,7 @@ from rest_framework.viewsets import ViewSet
 from backend.auth import TokenAuthentication
 from backend.models import User, AuthToken, ActivationToken, PasswordResetToken, Role, Shop, RoleChoices
 from backend.permissions import IsOwner, IsAdmin, HasShop
-from backend.serializers import CreateAccountSerializer, LogInSerializer, ActivationSerializer, PasswordResetSerializer, \
+from backend.serializers import LogInSerializer, ActivationSerializer, PasswordResetSerializer, \
     RoleSerializer, ShopSerializer, UserSerializer
 from backend.utils import hash_password, check_hashed_passwords, get_success_response, get_fail_response, get_object, \
     get_auth_token
@@ -57,10 +57,9 @@ class UserView(ViewSet):
                 user = User.objects.get(username=username)
             except User.DoesNotExist:
                 return Response({"status": False, "message": "Username or/and password not found in DB"}, status=status.HTTP_404_NOT_FOUND)
-            else:
-                user_password = user.password
-                if not check_hashed_passwords(password, user_password):
-                    return Response({"status": False, "message": "Username or/and password not found in DB"}, status=status.HTTP_404_NOT_FOUND)
+            user_password = user.password
+            if not check_hashed_passwords(password, user_password):
+                return Response({"status": False, "message": "Username or/and password not found in DB"}, status=status.HTTP_404_NOT_FOUND)
             AuthToken.objects.create(key=uuid.uuid4(), user=user)
             user.last_login = datetime.datetime.now()
             user.save()
