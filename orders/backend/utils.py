@@ -12,10 +12,10 @@ def hash_password(value):
     return password
 
 
-def check_hashed_passwords(password, stored_hash):
+def check_passwords(password, saved_password):
     password = password.encode()
-    stored_hash = stored_hash.encode()
-    return bcrypt.checkpw(password, stored_hash)
+    saved_password = saved_password.encode()
+    return bcrypt.checkpw(password, saved_password)
 
 
 def get_auth_token(request):
