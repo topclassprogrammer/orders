@@ -73,6 +73,9 @@ class AuthToken(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="auth_tokens")
 
+    def clean(self):
+        super().clean()
+        self.key = uuid.uuid4()
 
 class ActivationToken(models.Model):
     key = models.UUIDField()
