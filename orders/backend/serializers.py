@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from backend.models import User, ActivationToken, PasswordResetToken, Role, Shop
-from backend.validators import check_password
+from backend.validators import check_password, check_username
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -15,7 +15,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class LogInSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(max_length=128, validators=[check_password])
+    username = serializers.CharField(max_length=128, validators=[check_username])
 
     class Meta:
         model = User
