@@ -1,6 +1,7 @@
 import uuid
 
 import bcrypt
+from django.http import Http404
 from rest_framework.exceptions import ValidationError
 
 
@@ -29,5 +30,13 @@ def get_auth_token(request):
     except AuthToken.DoesNotExist:
         raise ValidationError("Your token does not exist in DB")
     return auth_token
+
+
+def get_object(model, pk=None):
+    try:
+        obj = model.objects.get(id=pk)
+    except model.DoesNotExist:
+        raise Http404({"status": False, "message": f"Object of model {model.__name__} with id {pk} does not exist in DB"})
+    return obj
 
 
