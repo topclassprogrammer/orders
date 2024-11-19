@@ -92,7 +92,7 @@ class UserView(ViewSet):
             return Response({"status": True, "message": "Account successfully activated"}, status=status.HTTP_200_OK)
         return Response(get_fail_response(self.action, serializer), status=status.HTTP_400_BAD_REQUEST)
 
-    @action(methods=['POST'], authentication_classes=[TokenAuthentication], detail=False, url_path='password-reset-request')
+    @action(methods=['POST'], detail=False, url_path='password-reset-request')
     def password_reset_request(self, request):
         user = self.request.user
         PasswordResetToken.objects.create(key=uuid.uuid4(), user=user)
