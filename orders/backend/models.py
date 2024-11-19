@@ -112,6 +112,11 @@ class Address(models.Model):
     apartment = models.PositiveSmallIntegerField(null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="addresses")
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['country', 'region', 'city', 'street', 'house', 'apartment', 'user'], name='unique_address'),
+        ]
+
 
 class Item(models.Model):
     brand = models.ForeignKey("Brand", on_delete=models.CASCADE, related_name="items")
