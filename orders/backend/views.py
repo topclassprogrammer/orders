@@ -98,7 +98,7 @@ class UserView(ViewSet):
         PasswordResetToken.objects.create(key=uuid.uuid4(), user=user)
         return Response({"status": True, "message": "Password reset request successfully completed"}, status=status.HTTP_200_OK)
 
-    @action(methods=['POST'], authentication_classes=[TokenAuthentication], detail=False, url_path='password-reset-response')
+    @action(methods=['POST'], detail=False, url_path='password-reset-response')
     def password_reset_response(self, request):
         serializer = PasswordResetSerializer(data=request.data)
         if serializer.is_valid():
