@@ -147,6 +147,10 @@ class PropertyValue(models.Model):
         ]
 
 
+class PropertyName(models.Model):
+    name = models.CharField(max_length=32, choices=PropertyNameChoices, unique=True)
+
+
 class Brand(models.Model):
     name = models.CharField(max_length=32)
 
