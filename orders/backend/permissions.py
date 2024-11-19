@@ -15,7 +15,7 @@ class IsOwner(BasePermission):
 class IsAdmin(BasePermission):
     def has_permission(self, request, view):
         if request.user.role.name != models.RoleChoices.ADMIN:
-            raise PermissionDenied('You cannot get or modify any roles because you do not have admin role')
+            raise PermissionDenied('You cannot get or modify this object because you do not have admin role')
         return True
 
 
