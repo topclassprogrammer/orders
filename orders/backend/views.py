@@ -11,7 +11,7 @@ from backend.models import User, AuthToken, ActivationToken, PasswordResetToken,
 from backend.permissions import IsOwner, IsAdmin
 from backend.serializers import CreateAccountSerializer, LogInSerializer, ActivationSerializer, PasswordResetSerializer, \
     RoleSerializer
-from backend.utils import hash_password, check_hashed_passwords, get_success_response, get_fail_response
+from backend.utils import hash_password, check_hashed_passwords, get_success_response, get_fail_response, get_object
 
 
 class Account(ViewSet):
@@ -127,4 +127,10 @@ class RoleView(ViewSet):
             return Response(get_success_response(self.action, serializer), status=status.HTTP_201_CREATED)
         return Response(get_fail_response(self.action, serializer), status=status.HTTP_400_BAD_REQUEST)
 
-
+    def partial_update(self, request, pk=None):
+        obj = get_object(Role, pk)
+        serializer = RoleSerializer(obj, request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(get_success_response(self.action, serializer), status=status.HTTP_206_PARTIAL_CONTENT)
+        return Response(get_fail_response(self.action, serializer), status=status.HTTP_400_BAD_REQUEST)
