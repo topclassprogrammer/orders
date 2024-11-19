@@ -8,7 +8,7 @@ from rest_framework.viewsets import ViewSet
 
 from backend.auth import TokenAuthentication
 from backend.models import User, AuthToken, ActivationToken, PasswordResetToken, Role, Shop
-from backend.permissions import IsOwner, IsAdmin
+from backend.permissions import IsOwner, IsAdmin, HasShop
 from backend.serializers import CreateAccountSerializer, LogInSerializer, ActivationSerializer, PasswordResetSerializer, \
     RoleSerializer, ShopSerializer
 from backend.utils import hash_password, check_hashed_passwords, get_success_response, get_fail_response, get_object, \
@@ -187,3 +187,11 @@ class ShopView(ViewSet):
             shop.accept_orders = True
         shop.save()
         return Response({"status": True, "message": f"Accept orders was changed from {not shop.accept_orders} to {shop.accept_orders}"}, status=status.HTTP_200_OK)
+
+    def get_permissions(self):
+        if self.action in ['partial_update', 'destroy']:
+            return [IsOwner()]
+        if self.action == 'accept_orders':
+            return [HasShop()]
+        return []
+
