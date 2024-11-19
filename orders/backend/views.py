@@ -7,10 +7,10 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 
 from backend.auth import TokenAuthentication
-from backend.models import User, AuthToken, ActivationToken, PasswordResetToken, Role
+from backend.models import User, AuthToken, ActivationToken, PasswordResetToken, Role, Shop
 from backend.permissions import IsOwner, IsAdmin
 from backend.serializers import CreateAccountSerializer, LogInSerializer, ActivationSerializer, PasswordResetSerializer, \
-    RoleSerializer
+    RoleSerializer, ShopSerializer
 from backend.utils import hash_password, check_hashed_passwords, get_success_response, get_fail_response, get_object
 
 
@@ -139,4 +139,14 @@ class RoleView(ViewSet):
         obj = get_object(Role, pk)
         obj.delete()
         return Response(get_success_response(self.action, pk=pk), status=status.HTTP_204_NO_CONTENT)
+
+
+class ShopView(ViewSet):
+    authentication_classes = [TokenAuthentication]
+
+    def list(self, request):
+        queryset = Shop.objects.all()
+        serializer = ShopSerializer(queryset, many=True)
+        return Response(get_success_response(self.action, serializer), status=status.HTTP_200_OK)
+
 
