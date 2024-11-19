@@ -5,6 +5,7 @@ from django.contrib.auth.base_user import AbstractBaseUser
 from django.db import models
 from django.utils.text import slugify
 
+from backend.utils import hash_password
 from backend.validators import check_username, check_password, check_email, check_phone, check_url, \
     check_shop_role
 
@@ -51,11 +52,9 @@ class User(AbstractBaseUser):
     is_active = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    def clean(self):
+    def clean(self):  # Вызывается при добавлении записей через фикстуры или формы. Если нужно, чтобы вызывалось при отправке запроса на API-эндпойнт, то нужно в сериализаторе переопределять методы create() и update()
         super().clean()
-        password_bytes = self.password.encode()
-        password = bcrypt.hashpw(password_bytes, bcrypt.gensalt())
-        self.password = password.decode()
+        self.password = hash_password(self.password)
 
 
 class Role(models.Model):
