@@ -72,7 +72,7 @@ class UserView(ViewSet):
         auth_token.delete()
         return Response({"status": True, "message": "You just logged out"}, status=status.HTTP_200_OK)
 
-    @action(methods=['POST'], authentication_classes=[TokenAuthentication], detail=False, url_path='activate')
+    @action(methods=['POST'], detail=False, url_path='activate')
     def activate(self, request):
         serializer = ActivationSerializer(data=request.data)
         if serializer.is_valid():
@@ -85,12 +85,12 @@ class UserView(ViewSet):
             if registration_token.user != user:
                 return Response({"status": False, "message": "You cannot activate account that does not belong to you"}, status=status.HTTP_403_FORBIDDEN)
             if user.is_active:
-                return Response({"status": False, "message": "User is already activated"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"status": False, "message": "Account is already activated"}, status=status.HTTP_400_BAD_REQUEST)
             user.is_active = True
             user.save()
             registration_token.delete()
             return Response({"status": True, "message": "Account successfully activated"}, status=status.HTTP_200_OK)
-        return Response({"status": False, "message": f"Incorrect activation data: {serializer.errors}"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(get_fail_response(self.action, serializer), status=status.HTTP_400_BAD_REQUEST)
 
     @action(methods=['POST'], authentication_classes=[TokenAuthentication], detail=False, url_path='password-reset-request')
     def password_reset_request(self, request):
