@@ -27,6 +27,11 @@ class UserView(ViewSet):
             return Response(get_success_response(self.action, serializer), status=status.HTTP_201_CREATED)
         return Response(get_fail_response(self.action, serializer), status=status.HTTP_400_BAD_REQUEST)
 
+    def retrieve(self, request, pk=None):
+        obj = get_object(User, pk)
+        serializer = UserSerializer(obj)
+        return Response(get_success_response(self.action, serializer, pk), status=status.HTTP_200_OK)
+
     @action(methods=['POST'], detail=False, url_path="log-in")
     def log_in(self, request):
         serializer = LogInSerializer(data=request.data)
