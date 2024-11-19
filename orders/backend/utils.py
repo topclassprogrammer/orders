@@ -40,3 +40,12 @@ def get_object(model, pk=None):
     return obj
 
 
+def get_success_response(action, serializer=None, pk=None):
+    if action in ['list', 'retrieve']:
+        return {"status": True, "message": serializer.data}
+    if action in ['create', 'partial_update']:
+        action = (action.lstrip('partial_') + 'd').capitalize()
+        obj = serializer.Meta.model.__name__.lower()
+        return {"status": True, "message": f"{action} {obj}: {serializer.data}"}
+    if action == 'destroy':
+        return {"status": True, "message": f"Deleted object with id {pk}"}
