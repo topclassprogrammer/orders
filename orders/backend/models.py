@@ -58,7 +58,7 @@ class User(AbstractBaseUser):
 
 
 class Role(models.Model):
-    name = models.CharField(choices=RoleChoices, unique=True)
+    name = models.CharField(max_length=32, unique=True)
 
 
 class Shop(models.Model):
