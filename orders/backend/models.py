@@ -136,7 +136,10 @@ class Item(models.Model):
             self.slug += str(uuid.uuid4())
 
 
-
+class PropertyValue(models.Model):
+    item = models.ForeignKey(Item, on_delete=models.CASCADE, related_name="property_value")
+    property_name = models.ForeignKey("PropertyName", on_delete=models.CASCADE, related_name="property_value")
+    value = models.CharField(max_length=32)
 
 
 class Brand(models.Model):
