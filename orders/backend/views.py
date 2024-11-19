@@ -3,6 +3,7 @@ import uuid
 
 from rest_framework import status
 from rest_framework.decorators import action
+from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 
@@ -194,4 +195,12 @@ class ShopView(ViewSet):
         if self.action == 'accept_orders':
             return [HasShop()]
         return []
+
+    def perform_create(self, serializer):
+        queryset = Shop.objects.filter(user=self.request.user)
+        if queryset.exists():
+            raise ValidationError({"status": False, "message": f"Cannot create shop because you already have it"}, code=status.HTTP_400_BAD_REQUEST)
+        serializer.save(user=self.request.user)
+
+
 
