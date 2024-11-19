@@ -16,7 +16,7 @@ from backend.utils import hash_password, check_hashed_passwords, get_success_res
     get_auth_token
 
 
-class Account(ViewSet):
+class UserView(ViewSet):
     @action(methods=['POST'], detail=False, url_path="create-account")
     def create_account(self, request):
         serializer = CreateAccountSerializer(data=request.data)
