@@ -77,6 +77,7 @@ class AuthToken(models.Model):
         super().clean()
         self.key = uuid.uuid4()
 
+
 class ActivationToken(models.Model):
     key = models.UUIDField()
     created_at = models.DateTimeField(auto_now_add=True)
@@ -96,7 +97,7 @@ class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="orders")
 
 
-class OrderItems(models.Model):
+class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="order_items")
     item = models.ForeignKey("Item", on_delete=models.CASCADE, related_name="order_items")
     quantity = models.PositiveSmallIntegerField(default=0)
