@@ -141,6 +141,11 @@ class PropertyValue(models.Model):
     property_name = models.ForeignKey("PropertyName", on_delete=models.CASCADE, related_name="property_value")
     value = models.CharField(max_length=32)
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['item', 'property_name'], name='unique_property_value'),
+        ]
+
 
 class Brand(models.Model):
     name = models.CharField(max_length=32)
