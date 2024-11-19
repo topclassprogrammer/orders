@@ -66,14 +66,11 @@ class UserView(ViewSet):
             return Response({"status": True, "message": "You just logged in"}, status=status.HTTP_200_OK)
         return Response({"status": False, "message": f"Incorrect username or/and password: {serializer.errors}"}, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(methods=['POST'], authentication_classes=[TokenAuthentication], detail=False, url_path='log-out')
+    @action(methods=['POST'], detail=False, url_path='log-out')
     def log_out(self, request):
-        token_header = request.META.get('HTTP_AUTHORIZATION')
-        token_list = token_header.split(" ")
-        token = token_list[1]
-        auth_token = AuthToken.objects.get(key=uuid.UUID(token))
+        auth_token = get_auth_token(request)
         auth_token.delete()
-        return Response({"status": True, "message": "You just logged out"})
+        return Response({"status": True, "message": "You just logged out"}, status=status.HTTP_200_OK)
 
     @action(methods=['POST'], authentication_classes=[TokenAuthentication], detail=False, url_path='activate')
     def activate(self, request):
