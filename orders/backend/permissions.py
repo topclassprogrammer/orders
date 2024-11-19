@@ -19,3 +19,10 @@ class IsAdmin(BasePermission):
             raise PermissionDenied('You cannot get or modify any roles because you do not have admin role')
         return True
 
+
+class HasShop(BasePermission):
+    def has_permission(self, request, view):
+        if not hasattr(request.user, 'shop'):
+            raise PermissionDenied('You do not have shop')
+        return True
+
