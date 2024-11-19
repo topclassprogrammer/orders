@@ -120,6 +120,11 @@ class UserView(ViewSet):
             return [IsOwner()]
         return []
 
+    def get_authenticators(self):
+        if self.request.method not in ['POST', 'log_in']:
+            return [TokenAuthentication()]
+        return []
+
 
 class RoleView(ViewSet):
     authentication_classes = [TokenAuthentication]
