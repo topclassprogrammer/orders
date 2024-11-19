@@ -153,3 +153,16 @@ class ShopView(ViewSet):
         obj = get_object(Shop, pk)
         serializer = ShopSerializer(obj)
         return Response(get_success_response(self.action, serializer), status=status.HTTP_200_OK)
+
+    def create(self, request):
+        serializer = ShopSerializer(data=request.data)
+        if serializer.is_valid():
+            self.perform_create(serializer)
+            return Response(get_success_response(self.action, serializer), status=status.HTTP_201_CREATED)
+        return Response(get_fail_response(self.action, serializer), status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+
+
