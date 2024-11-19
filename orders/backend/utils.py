@@ -49,3 +49,10 @@ def get_success_response(action, serializer=None, pk=None):
         return {"status": True, "message": f"{action} {obj}: {serializer.data}"}
     if action == 'destroy':
         return {"status": True, "message": f"Deleted object with id {pk}"}
+
+
+def get_fail_response(action, serializer):
+    action = (action.lstrip('partial_').rstrip('e') + 'ing').capitalize()
+    obj = serializer.Meta.model.__name__.lower()
+    return {"status": False, "message": f"{action} {obj} failed: {serializer.errors}"}
+
