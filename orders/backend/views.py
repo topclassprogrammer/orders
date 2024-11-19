@@ -11,7 +11,7 @@ from backend.models import User, AuthToken, ActivationToken, PasswordResetToken,
 from backend.permissions import IsOwner, IsAdmin
 from backend.serializers import CreateAccountSerializer, LogInSerializer, ActivationSerializer, PasswordResetSerializer, \
     RoleSerializer
-from backend.utils import hash_password, check_hashed_passwords
+from backend.utils import hash_password, check_hashed_passwords, get_success_response, get_fail_response
 
 
 class Account(ViewSet):
@@ -120,6 +120,11 @@ class RoleView(ViewSet):
         serializer = RoleSerializer(instance)
         return Response({"status": True, "message": serializer.data}, status=status.HTTP_200_OK)
 
-
+    def create(self, request):
+        serializer = RoleSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(get_success_response(self.action, serializer), status=status.HTTP_201_CREATED)
+        return Response(get_fail_response(self.action, serializer), status=status.HTTP_400_BAD_REQUEST)
 
 
