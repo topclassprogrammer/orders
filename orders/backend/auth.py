@@ -10,11 +10,11 @@ from backend.validators import check_uuid_token
 class TokenAuthentication(BaseAuthentication):
     def authenticate(self, request):
         token_str = request.META.get('HTTP_AUTHORIZATION')
-        if not token_str or not token_str.startswith('Token '):
-            raise exceptions.AuthenticationFailed('No token provided')
+        if not token_str:
+            raise exceptions.AuthenticationFailed('You must log in before proceeding')
 
         token_list = token_str.split(" ")
-        if len(token_list) != 2:
+        if len(token_list) != 2 or not token_str.startswith('Token '):
             raise exceptions.AuthenticationFailed('Incorrect token string')
         token = token_list[1]
         if not check_uuid_token(token):
