@@ -8,24 +8,24 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 
 from backend.auth import TokenAuthentication
-from backend.models import User, AuthToken, ActivationToken, PasswordResetToken, Role, Shop
+from backend.models import User, AuthToken, ActivationToken, PasswordResetToken, Role, Shop, RoleChoices
 from backend.permissions import IsOwner, IsAdmin, HasShop
 from backend.serializers import CreateAccountSerializer, LogInSerializer, ActivationSerializer, PasswordResetSerializer, \
-    RoleSerializer, ShopSerializer
+    RoleSerializer, ShopSerializer, UserSerializer
 from backend.utils import hash_password, check_hashed_passwords, get_success_response, get_fail_response, get_object, \
     get_auth_token
 
 
 class UserView(ViewSet):
-    @action(methods=['POST'], detail=False, url_path="create-account")
-    def create_account(self, request):
-        serializer = CreateAccountSerializer(data=request.data)
+    def create(self, request):
+        serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
             hashed_password = hash_password(request.data['password'])
-            user = serializer.save(password=hashed_password)
+            role = Role.objects.get(name=RoleChoices.CLIENT)
+            user = serializer.save(password=hashed_password, role=role)
             ActivationToken.objects.create(key=uuid.uuid4(), user=user)
-            return Response({"status": True, "message": f"You successfully created account: {serializer.data}"}, status=status.HTTP_201_CREATED)
-        return Response({"status": False, "message": f"Incorrect registration data: {serializer.errors}"}, status.HTTP_400_BAD_REQUEST)
+            return Response(get_success_response(self.action, serializer), status=status.HTTP_201_CREATED)
+        return Response(get_fail_response(self.action, serializer), status=status.HTTP_400_BAD_REQUEST)
 
     @action(methods=['POST'], detail=False, url_path="log-in")
     def log_in(self, request):
