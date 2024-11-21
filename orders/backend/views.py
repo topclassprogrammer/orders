@@ -232,5 +232,8 @@ class AddressView(ViewSet):
         serializer = AddressSerializer(queryset, many=True)
         return Response(get_success_response(self.action, serializer), status=status.HTTP_200_OK)
 
-
-
+    def retrieve(self, request, pk=None):
+        obj = get_object(Address, pk)
+        self.check_object_permissions(request, obj)
+        serializer = AddressSerializer(obj)
+        return Response(get_success_response(self.action, serializer), status=status.HTTP_200_OK)
