@@ -8,10 +8,10 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 
 from backend.auth import TokenAuthentication
-from backend.models import User, AuthToken, ActivationToken, PasswordResetToken, Role, Shop, RoleChoices
+from backend.models import User, AuthToken, ActivationToken, PasswordResetToken, Role, Shop, RoleChoices, Address
 from backend.permissions import IsOwner, IsAdmin, HasShop
 from backend.serializers import LogInSerializer, ActivationSerializer, PasswordResetSerializer, \
-    RoleSerializer, ShopSerializer, UserSerializer
+    RoleSerializer, ShopSerializer, UserSerializer, AddressSerializer
 from backend.utils import hash_password, check_hashed_passwords, get_success_response, get_fail_response, get_object, \
     get_auth_token
 
@@ -222,6 +222,15 @@ class ShopView(ViewSet):
         if queryset.exists():
             raise ValidationError({"status": False, "message": f"Cannot create shop because you already have it"}, code=status.HTTP_400_BAD_REQUEST)
         serializer.save(user=self.request.user)
+
+
+class AddressView(ViewSet):
+    authentication_classes = [TokenAuthentication]
+
+    def list(self, request):
+        queryset = Address.objects.all()
+        serializer = AddressSerializer(queryset, many=True)
+        return Response(get_success_response(self.action, serializer), status=status.HTTP_200_OK)
 
 
 
