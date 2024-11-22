@@ -267,4 +267,8 @@ class AddressView(ViewSet):
             return [IsOwner()]
         return []
 
-
+    def perform_create(self, serializer):
+        queryset = Address.objects.filter(**self.request.data, user=self.request.user)
+        if queryset.exists():
+            raise ValidationError({"status": False, "message": f"Cannot create it because such {Address.__name__.lower()} already exists in DB"}, code=status.HTTP_400_BAD_REQUEST)
+        serializer.save(user=self.request.user)
