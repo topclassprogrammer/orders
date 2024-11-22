@@ -254,3 +254,12 @@ class AddressView(ViewSet):
             return Response(get_success_response(self.action, serializer, pk), status=status.HTTP_206_PARTIAL_CONTENT)
         return Response(get_fail_response(self.action, serializer), status=status.HTTP_400_BAD_REQUEST)
 
+    def destroy(self, request, pk=None):
+        obj = get_object(Address, pk)
+        self.check_object_permissions(request, obj)
+        obj.delete()
+        return Response(get_success_response(self.action, pk=pk), status=status.HTTP_204_NO_CONTENT)
+
+
+
+
