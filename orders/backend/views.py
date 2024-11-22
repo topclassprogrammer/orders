@@ -260,6 +260,11 @@ class AddressView(ViewSet):
         obj.delete()
         return Response(get_success_response(self.action, pk=pk), status=status.HTTP_204_NO_CONTENT)
 
-
+    def get_permissions(self):
+        if self.action == "list":
+            return [IsAdmin()]
+        elif self.action in ["retrieve", "partial_update", "destroy"]:
+            return [IsOwner()]
+        return []
 
 
