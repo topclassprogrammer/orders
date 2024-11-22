@@ -237,3 +237,13 @@ class AddressView(ViewSet):
         self.check_object_permissions(request, obj)
         serializer = AddressSerializer(obj)
         return Response(get_success_response(self.action, serializer), status=status.HTTP_200_OK)
+
+    def create(self, request):
+        serializer = AddressSerializer(data=request.data)
+        if serializer.is_valid():
+            self.perform_create(serializer)
+            return Response(get_success_response(self.action, serializer), status=status.HTTP_201_CREATED)
+        return Response(get_fail_response(self.action, serializer), status=status.HTTP_400_BAD_REQUEST)
+
+
+
