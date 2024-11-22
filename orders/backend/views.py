@@ -245,5 +245,12 @@ class AddressView(ViewSet):
             return Response(get_success_response(self.action, serializer), status=status.HTTP_201_CREATED)
         return Response(get_fail_response(self.action, serializer), status=status.HTTP_400_BAD_REQUEST)
 
-
+    def partial_update(self, request, pk=None):
+        obj = get_object(Address, pk)
+        self.check_object_permissions(request, obj)
+        serializer = AddressSerializer(obj, request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(get_success_response(self.action, serializer, pk), status=status.HTTP_206_PARTIAL_CONTENT)
+        return Response(get_fail_response(self.action, serializer), status=status.HTTP_400_BAD_REQUEST)
 
