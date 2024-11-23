@@ -5,13 +5,13 @@ from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
-from rest_framework.viewsets import ViewSet
+from rest_framework.viewsets import ViewSet, ModelViewSet
 
 from backend.auth import TokenAuthentication
-from backend.models import User, AuthToken, ActivationToken, PasswordResetToken, Role, Shop, RoleChoices, Address
+from backend.models import User, AuthToken, ActivationToken, PasswordResetToken, Role, Shop, RoleChoices, Address, Brand
 from backend.permissions import IsOwner, IsAdmin, HasShop
 from backend.serializers import LogInSerializer, ActivationSerializer, PasswordResetSerializer, \
-    RoleSerializer, ShopSerializer, UserSerializer, AddressSerializer
+    RoleSerializer, ShopSerializer, UserSerializer, AddressSerializer, BrandSerializer
 from backend.utils import hash_password, check_hashed_passwords, get_success_response, get_fail_response, get_object, \
     get_auth_token
 
@@ -272,3 +272,20 @@ class AddressView(ViewSet):
         if queryset.exists():
             raise ValidationError({"status": False, "message": f"Cannot create it because such {Address.__name__.lower()} already exists in DB"}, code=status.HTTP_400_BAD_REQUEST)
         serializer.save(user=self.request.user)
+
+
+class BrandView(ModelViewSet):
+    queryset = Brand.objects.all()
+    serializer_class = BrandSerializer
+    authentication_classes = [TokenAuthentication]
+
+    def get_permissions(self):
+        if self.request.user.role.name == RoleChoices.ADMIN:
+            return []
+        elif self.action == 'create':
+            return [HasShop()]
+        elif self.action in ['partial_update', 'destroy']:
+            return [IsAdmin()]
+        return []
+
+
