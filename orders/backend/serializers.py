@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from backend.models import User, ActivationToken, PasswordResetToken, Role, Shop, Address
+from backend.models import User, ActivationToken, PasswordResetToken, Role, Shop, Address, Brand
 from backend.validators import check_password, check_username
 
 
@@ -69,5 +69,13 @@ class AddressSerializer(serializers.ModelSerializer):
         model = Address
         fields = ['id', 'country', 'region', 'city', 'street', 'house', 'apartment', 'user']
         read_only_fields = ['id', 'user']
+
+
+class BrandSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Brand
+        fields = ['id', 'name']
+        read_only_fields = ['id']
+
 
 
