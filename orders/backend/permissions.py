@@ -2,6 +2,13 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import BasePermission
 
 from backend import models
+from backend.auth import perform_authentication
+
+
+class IsAuthenticated(BasePermission):
+    def has_permission(self, request, view):
+        request = perform_authentication(request)
+        return request.user.is_authenticated
 
 
 class IsOwner(BasePermission):
