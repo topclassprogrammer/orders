@@ -24,3 +24,12 @@ class TokenAuthentication(BaseAuthentication):
         except AuthToken.DoesNotExist:
             raise exceptions.AuthenticationFailed('No token found for this user in DB')
         return token_in_db.user, token_in_db
+
+
+def perform_authentication(request):
+    user, _ = TokenAuthentication().authenticate(request)
+    if user:
+        request.user = user
+        return request
+
+
