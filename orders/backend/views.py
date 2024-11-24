@@ -166,11 +166,13 @@ class ShopView(ModelViewSet):
             return Response(get_success_response(self.action, serializer), status=status.HTTP_201_CREATED)
         return Response(get_fail_response(self.action, serializer), status=status.HTTP_400_BAD_REQUEST)
 
-    def destroy(self, request, pk=None):
-        obj = get_object(Shop, pk)
-        self.check_object_permissions(request, obj)
+    def destroy(self, request, *args, **kwargs):
+        obj = self.get_object()
         obj.delete()
-        return Response(get_success_response(self.action, pk), status=status.HTTP_204_NO_CONTENT)
+        user = request.user
+        user.role = Role.objects.get(name=RoleChoices.CLIENT)
+        user.save()
+        return Response(get_success_response(self.action, obj.id), status=status.HTTP_204_NO_CONTENT)
 
     @action(methods=['POST'], detail=False, url_path="accept-orders")
     def accept_orders(self, request):
