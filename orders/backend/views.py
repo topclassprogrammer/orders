@@ -174,16 +174,12 @@ class ShopView(ModelViewSet):
         user.save()
         return Response(get_success_response(self.action, obj.id), status=status.HTTP_204_NO_CONTENT)
 
-    @action(methods=['POST'], detail=False, url_path="accept-orders")
-    def accept_orders(self, request):
-        auth_token = get_auth_token(request)
-        shop = Shop.objects.get(user__auth_tokens__in=[auth_token])
-        if shop.accept_orders:
-            shop.accept_orders = False
-        else:
-            shop.accept_orders = True
-        shop.save()
-        return Response({"status": True, "message": f"Accept orders was changed from {not shop.accept_orders} to {shop.accept_orders}"}, status=status.HTTP_200_OK)
+    @action(methods=['POST'], detail=True, url_path="accept-orders")
+    def accept_orders(self, request, pk=None):
+        obj = self.get_object()
+        obj.accept_orders = not obj.accept_orders
+        obj.save()
+        return Response({"status": True, "message": f"Accept orders changed from {not obj.accept_orders} to {obj.accept_orders}"}, status=status.HTTP_200_OK)
 
     def get_permissions(self):
         if self.action in ['partial_update', 'destroy']:
