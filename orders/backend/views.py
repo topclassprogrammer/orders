@@ -10,10 +10,11 @@ from rest_framework.viewsets import ViewSet, ModelViewSet
 
 from backend.auth import TokenAuthentication
 from backend.models import User, AuthToken, ActivationToken, PasswordResetToken, Role, Shop, RoleChoices, Address, \
-    Brand, Model
+    Brand, Model, Category
 from backend.permissions import IsOwner, IsAdmin, HasShop
 from backend.serializers import LogInSerializer, ActivationSerializer, PasswordResetSerializer, \
-    RoleSerializer, ShopSerializer, UserSerializer, AddressSerializer, BrandSerializer, ModelSerializer
+    RoleSerializer, ShopSerializer, UserSerializer, AddressSerializer, BrandSerializer, ModelSerializer, \
+    CategorySerializer
 from backend.utils import hash_password, check_hashed_passwords, get_success_response, get_fail_response, get_object, \
     get_auth_token, check_request_fields, get_model_fields
 
@@ -332,4 +333,20 @@ class ModelView(ModelViewSet):
         elif self.action in ['partial_update', 'destroy']:
             return [IsAdmin()]
         return []
+
+
+class CategoryView(ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    authentication_classes = [TokenAuthentication]
+
+    def get_permissions(self):
+        if self.request.user.role.name == RoleChoices.ADMIN:
+            return []
+        elif self.action == 'create':
+            return [HasShop()]
+        elif self.action in ['partial_update', 'destroy']:
+            return [IsAdmin()]
+        return []
+
 
