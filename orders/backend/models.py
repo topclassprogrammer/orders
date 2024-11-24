@@ -1,6 +1,5 @@
 import uuid
 
-import bcrypt
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.db import models
 from django.utils.text import slugify
@@ -25,18 +24,6 @@ class CartChoices(models.TextChoices):
     DELIVERED = "delivered", "Delivered"
     CANCELED = "сanceled", "Сanceled"
     RECEIVED = "received", "Received"
-
-
-class PropertyNameChoices(models.TextChoices):
-    DISPLAY_DIAGONAL = "display_diagonal", "DISPLAY_DIAGONAL"
-    DISPLAY_RESOLUTION = "display_resolution", "DISPLAY_RESOLUTION"
-    CAMERA_BACK = "camera_back", "CAMERA_BACK"
-    CAMERA_FRONT = "camera_front", "CAMERA_FRONT"
-    CPU_CORES = "cpu_cores", "CPU_CORES"
-    BATTERY = "battery", "BATTERY"
-    MEMORY = "memory", "MEMORY"
-    COLOR = "color", "COLOR"
-    YEAR = "year", "YEAR"
 
 
 class User(AbstractBaseUser):
