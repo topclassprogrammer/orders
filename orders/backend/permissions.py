@@ -13,8 +13,15 @@ class IsAuthenticated(BasePermission):
 
 class IsOwner(BasePermission):
     def has_object_permission(self, request, view, obj):
-        if (hasattr(obj, 'user') and obj.user != request.user) or \
-                (not hasattr(obj, 'user') and obj != request.user):
+        conditions = {
+            'shop': 'obj.user != request.user',
+            'user': 'obj != request.user',
+            'address': 'obj.user != request.user',
+            'item': 'obj.shop.user != request.user',
+            'propertyvalue': 'obj.item.shop.user != request.user'
+        }
+        model_name = obj._meta.model.__name__.lower()
+        if eval(conditions[model_name]):
             raise PermissionDenied('You cannot get or modify object that does not belong to you')
         return True
 
