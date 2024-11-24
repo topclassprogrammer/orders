@@ -1,6 +1,7 @@
 import datetime
 import uuid
 
+from django.db import IntegrityError
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
@@ -8,12 +9,13 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet, ModelViewSet
 
 from backend.auth import TokenAuthentication
-from backend.models import User, AuthToken, ActivationToken, PasswordResetToken, Role, Shop, RoleChoices, Address, Brand
+from backend.models import User, AuthToken, ActivationToken, PasswordResetToken, Role, Shop, RoleChoices, Address, \
+    Brand, Model
 from backend.permissions import IsOwner, IsAdmin, HasShop
 from backend.serializers import LogInSerializer, ActivationSerializer, PasswordResetSerializer, \
-    RoleSerializer, ShopSerializer, UserSerializer, AddressSerializer, BrandSerializer
+    RoleSerializer, ShopSerializer, UserSerializer, AddressSerializer, BrandSerializer, ModelSerializer
 from backend.utils import hash_password, check_hashed_passwords, get_success_response, get_fail_response, get_object, \
-    get_auth_token
+    get_auth_token, check_request_fields, get_model_fields
 
 
 class UserView(ViewSet):
@@ -287,5 +289,22 @@ class BrandView(ModelViewSet):
         elif self.action in ['partial_update', 'destroy']:
             return [IsAdmin()]
         return []
+
+
+class ModelView(ModelViewSet):
+    queryset = Model.objects.all()
+    serializer_class = ModelSerializer
+    authentication_classes = [TokenAuthentication]
+
+    def create(self, request, *args, **kwargs):
+        field = check_request_fields(request, Model)
+        if field:
+            return Response(get_fail_response(self.action, field=field), status=status.HTTP_400_BAD_REQUEST)
+        try:
+            obj = Model.objects.create(**get_model_fields(self.get_serializer_class(), request))
+        except IntegrityError as err:
+            return Response(get_fail_response(self.action, err=err), status=status.HTTP_400_BAD_REQUEST)
+        return Response(get_success_response(self.action, obj=obj), status=status.HTTP_201_CREATED)
+
 
 
