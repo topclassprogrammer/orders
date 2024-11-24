@@ -42,7 +42,7 @@ class UserView(ViewSet):
     def partial_update(self, request, pk=None):
         obj = get_object(User, pk)
         self.check_object_permissions(request, obj)
-        serializer = UserSerializer(obj, request.data, partial=True)
+        serializer = self.get_serializer_class()(obj, request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(get_success_response(self.action, serializer), status=status.HTTP_206_PARTIAL_CONTENT)
