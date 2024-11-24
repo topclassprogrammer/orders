@@ -10,13 +10,13 @@ from rest_framework.viewsets import ViewSet, ModelViewSet
 
 from backend.auth import TokenAuthentication
 from backend.models import User, AuthToken, ActivationToken, PasswordResetToken, Role, Shop, RoleChoices, Address, \
-    Brand, Model, Category, Item, PropertyName
+    Brand, Model, Category, Item, PropertyName, PropertyValue
 from backend.permissions import IsOwner, IsAdmin, HasShop
 from backend.serializers import LogInSerializer, ActivationSerializer, PasswordResetSerializer, \
     RoleSerializer, ShopSerializer, UserSerializer, AddressSerializer, BrandSerializer, ModelSerializer, \
-    CategorySerializer, ItemSerializer, PropertyNameSerializer
+    CategorySerializer, ItemSerializer, PropertyNameSerializer, PropertyValueSerializer
 from backend.utils import hash_password, check_hashed_passwords, get_success_response, get_fail_response, get_object, \
-    get_auth_token, check_request_fields, get_model_fields, check_model_in_brand, slugify_item
+    get_auth_token, check_request_fields, get_model_fields, check_model_in_brand, slugify_item, check_item_owner
 
 
 class UserView(ViewSet):
@@ -407,6 +407,31 @@ class PropertyNameView(ModelViewSet):
         elif self.action in ['partial_update', 'destroy']:
             return [IsAdmin()]
         return []
+
+
+class PropertyValueView(ModelViewSet):
+    queryset = PropertyValue.objects.all()
+    serializer_class = PropertyValueSerializer
+    authentication_classes = [TokenAuthentication]
+
+    def create(self, request, *args, **kwargs):
+        field = check_request_fields(request, PropertyValue)
+        if field:
+            return Response(get_fail_response(self.action, field=field), status=status.HTTP_400_BAD_REQUEST)
+        value = check_item_owner(Item, request)
+        if value:
+            return Response({"status": "False", "message": f"Item with id {value} doesn't belong to you"}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            obj = PropertyValue.objects.create(**get_model_fields(self.get_serializer_class(), request))
+        except IntegrityError as err:
+            return Response(get_fail_response(self.action, err=err), status=status.HTTP_400_BAD_REQUEST)
+        return Response(get_success_response(self.action, obj=obj), status=status.HTTP_201_CREATED)
+
+
+
+
+
+
 
 
 
