@@ -37,7 +37,7 @@ class UserView(ViewSet):
 
     def retrieve(self, request, pk=None):
         obj = get_object(User, pk)
-        serializer = UserSerializer(obj)
+        serializer = self.get_serializer_class()(obj)
         return Response(get_success_response(self.action, serializer, pk), status=status.HTTP_200_OK)
 
     def partial_update(self, request, pk=None):
