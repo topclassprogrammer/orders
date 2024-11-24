@@ -151,8 +151,22 @@ class RoleView(ModelViewSet):
     permission_classes = [IsAdmin]
 
 
-class ShopView(ViewSet):
+class ShopView(ModelViewSet):
+    queryset = Shop.objects.all()
+    serializer_class = ShopSerializer
     authentication_classes = [TokenAuthentication]
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer_class()(data=request.data)
+        if serializer.is_valid():
+            user = request.user
+            if hasattr(user, 'shop'):
+                return Response({"status": False, "message": f"Cannot create shop because you already have it"}, status=status.HTTP_400_BAD_REQUEST)
+            serializer.save(user=user)
+            user.role = Role.objects.get(name=RoleChoices.SHOP)  # Устанавливаем у пользователя роль магазина
+            user.save()
+            return Response(get_success_response(self.action, serializer), status=status.HTTP_201_CREATED)
+        return Response(get_fail_response(self.action, serializer), status=status.HTTP_400_BAD_REQUEST)
 
     def list(self, request):
         queryset = Shop.objects.all()
@@ -164,12 +178,7 @@ class ShopView(ViewSet):
         serializer = ShopSerializer(obj)
         return Response(get_success_response(self.action, serializer), status=status.HTTP_200_OK)
 
-    def create(self, request):
-        serializer = ShopSerializer(data=request.data)
-        if serializer.is_valid():
-            self.perform_create(serializer)
-            return Response(get_success_response(self.action, serializer), status=status.HTTP_201_CREATED)
-        return Response(get_fail_response(self.action, serializer), status=status.HTTP_400_BAD_REQUEST)
+
 
     def partial_update(self, request, pk=None):
         obj = get_object(Shop, pk)
