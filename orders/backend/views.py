@@ -82,18 +82,18 @@ class UserView(ViewSet):
 
     @action(methods=['POST'], detail=False, url_path='activate')
     def activate(self, request):
-        serializer = ActivationSerializer(data=request.data)
+        serializer = self.get_serializer_class()(data=request.data)
         if serializer.is_valid():
             key = request.data['key']
             user = request.user
+            if user.is_active:
+                return Response({"status": False, "message": "Account is already activated"}, status=status.HTTP_400_BAD_REQUEST)
             try:
                 registration_token = ActivationToken.objects.get(key=uuid.UUID(key))
             except ActivationToken.DoesNotExist:
                 return Response({"status": False, "message": "Activation token key not found in DB"}, status=status.HTTP_404_NOT_FOUND)
             if registration_token.user != user:
                 return Response({"status": False, "message": "You cannot activate account that does not belong to you"}, status=status.HTTP_403_FORBIDDEN)
-            if user.is_active:
-                return Response({"status": False, "message": "Account is already activated"}, status=status.HTTP_400_BAD_REQUEST)
             user.is_active = True
             user.save()
             registration_token.delete()
