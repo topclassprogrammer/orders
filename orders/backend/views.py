@@ -184,8 +184,8 @@ class ShopView(ModelViewSet):
     def get_permissions(self):
         if self.action in ['partial_update', 'destroy']:
             return [IsOwner()]
-        if self.action == 'accept_orders':
-            return [HasShop()]
+        elif self.action == 'accept_orders':
+            return [IsOwner()]
         return []
 
     def perform_create(self, serializer):
