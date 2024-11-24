@@ -168,11 +168,6 @@ class ShopView(ModelViewSet):
             return Response(get_success_response(self.action, serializer), status=status.HTTP_201_CREATED)
         return Response(get_fail_response(self.action, serializer), status=status.HTTP_400_BAD_REQUEST)
 
-    def list(self, request):
-        queryset = Shop.objects.all()
-        serializer = ShopSerializer(queryset, many=True)
-        return Response(get_success_response(self.action, serializer), status=status.HTTP_200_OK)
-
     def retrieve(self, request, pk=None):
         obj = get_object(Shop, pk)
         serializer = ShopSerializer(obj)
