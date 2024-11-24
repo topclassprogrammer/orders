@@ -77,3 +77,10 @@ def get_model_fields(serializer, request):
             param_fields.setdefault(field, request.data[clean_name])
     return param_fields
 
+
+def check_request_fields(request, model):
+    for x in request.data:
+        if x not in model.__dict__.keys():
+            return x
+
+
