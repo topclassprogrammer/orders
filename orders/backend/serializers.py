@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 from backend.models import User, ActivationToken, PasswordResetToken, Role, Shop, Address, Brand, Model, Category, Item, \
     PropertyName, PropertyValue
+from backend.utils import hash_password
 from backend.validators import check_password, check_username
 
 
@@ -13,6 +14,9 @@ class UserSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'password': {'write_only': True},
         }
+
+    def validate_password(self, value):
+        return hash_password(value)
 
 
 class LogInSerializer(serializers.ModelSerializer):
