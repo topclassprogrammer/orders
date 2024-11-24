@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from backend.models import User, ActivationToken, PasswordResetToken, Role, Shop, Address, Brand
+from backend.models import User, ActivationToken, PasswordResetToken, Role, Shop, Address, Brand, Model
 from backend.validators import check_password, check_username
 
 
@@ -76,6 +76,16 @@ class BrandSerializer(serializers.ModelSerializer):
         model = Brand
         fields = ['id', 'name']
         read_only_fields = ['id']
+
+
+class ModelSerializer(serializers.ModelSerializer):
+    brand = BrandSerializer(read_only=True)
+
+    class Meta:
+        model = Model
+        fields = ['id', 'name', 'brand']
+        read_only_fields = ['id']
+
 
 
 
