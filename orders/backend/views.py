@@ -188,12 +188,6 @@ class ShopView(ModelViewSet):
             return [IsOwner()]
         return []
 
-    def perform_create(self, serializer):
-        queryset = Shop.objects.filter(user=self.request.user)
-        if queryset.exists():
-            raise ValidationError({"status": False, "message": f"Cannot create shop because you already have it"}, code=status.HTTP_400_BAD_REQUEST)
-        serializer.save(user=self.request.user)
-
 
 class AddressView(ViewSet):
     authentication_classes = [TokenAuthentication]
