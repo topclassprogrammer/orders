@@ -449,7 +449,12 @@ class PropertyValueView(ModelViewSet):
         obj.delete()
         return Response(get_success_response(self.action), status=status.HTTP_204_NO_CONTENT)
 
-
+    def get_permissions(self):
+        if self.action == 'create':
+            return [HasShop()]
+        elif self.action in ['partial_update', 'destroy']:
+            return [IsOwner()]
+        return []
 
 
 
