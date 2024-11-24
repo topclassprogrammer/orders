@@ -16,7 +16,8 @@ from backend.serializers import LogInSerializer, ActivationSerializer, PasswordR
     RoleSerializer, ShopSerializer, UserSerializer, AddressSerializer, BrandSerializer, ModelSerializer, \
     CategorySerializer, ItemSerializer, PropertyNameSerializer, PropertyValueSerializer
 from backend.utils import hash_password, get_success_response, get_fail_response, get_object, \
-    get_auth_token, check_request_fields, get_model_fields, check_model_in_brand, slugify_item, check_item_owner
+    get_auth_token, check_request_fields, get_model_fields, check_model_in_brand, slugify_item, check_item_owner, \
+    check_passwords
 
 
 class UserView(ViewSet):
@@ -56,7 +57,7 @@ class UserView(ViewSet):
 
     @action(methods=['POST'], detail=False, url_path="log-in")
     def log_in(self, request):
-        serializer = LogInSerializer(data=request.data)
+        serializer = self.get_serializer_class()(data=request.data)
         if serializer.is_valid():
             username = request.data['username']
             password = request.data['password']
@@ -65,7 +66,7 @@ class UserView(ViewSet):
             except User.DoesNotExist:
                 return Response({"status": False, "message": "Username or/and password not found in DB"}, status=status.HTTP_404_NOT_FOUND)
             user_password = user.password
-            if not check_hashed_passwords(password, user_password):
+            if not check_passwords(password, user_password):
                 return Response({"status": False, "message": "Username or/and password not found in DB"}, status=status.HTTP_404_NOT_FOUND)
             AuthToken.objects.create(key=uuid.uuid4(), user=user)
             user.last_login = datetime.datetime.now()
