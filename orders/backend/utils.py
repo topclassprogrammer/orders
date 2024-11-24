@@ -2,6 +2,7 @@ import uuid
 
 import bcrypt
 from django.http import Http404
+from django.utils.text import slugify
 from rest_framework.exceptions import ValidationError
 
 
@@ -91,5 +92,16 @@ def check_model_in_brand(brand_model, request):
     model_id = request.data.get('model')
     if model_id and model_id not in brand_models_ids:
         return request.data['model']
+
+
+def slugify_item(brand, model, item, request):
+    brand_obj = brand.objects.get(id=request.data[brand.__name__.lower()])
+    model_obj = model.objects.get(id=request.data[model.__name__.lower()])
+    slug = slugify(brand_obj.name + '-' + model_obj.name)
+    if item.objects.filter(slug=slug):
+        slug += ('-' + str(uuid.uuid4()))
+    request.data['slug'] = slug
+    return request
+
 
 
