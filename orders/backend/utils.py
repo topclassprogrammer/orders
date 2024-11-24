@@ -84,3 +84,12 @@ def check_request_fields(request, model):
             return x
 
 
+def check_model_in_brand(brand_model, request):
+    brand_obj = brand_model.objects.get(id=request.data['brand'])
+    brand_models = list(brand_obj.models.values())
+    brand_models_ids = [x['id'] for x in brand_models]
+    model_id = request.data.get('model')
+    if model_id and model_id not in brand_models_ids:
+        return request.data['model']
+
+
