@@ -8,8 +8,8 @@ from backend.validators import check_password, check_username
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'first_name', 'last_name', 'username', 'password', 'email', 'phone', 'is_active', 'created_at']
-        read_only_fields = ['id', 'created_at', 'is_active']
+        fields = ['id', 'first_name', 'last_name', 'username', 'password', 'email', 'phone', 'role', 'is_active', 'created_at']
+        read_only_fields = ['id', 'is_active', 'role', 'created_at']
         extra_kwargs = {
             'password': {'write_only': True},
         }
