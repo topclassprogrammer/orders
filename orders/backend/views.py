@@ -427,7 +427,22 @@ class PropertyValueView(ModelViewSet):
             return Response(get_fail_response(self.action, err=err), status=status.HTTP_400_BAD_REQUEST)
         return Response(get_success_response(self.action, obj=obj), status=status.HTTP_201_CREATED)
 
-
+    def partial_update(self, request, *args, **kwargs):
+        field = check_request_fields(request, PropertyValue)
+        if field:
+            return Response(get_fail_response(self.action, field=field), status=status.HTTP_400_BAD_REQUEST)
+        value = check_item_owner(Item, request)
+        if value is int:
+            return Response({"status": "False", "message": f"Item with id {value} doesn't belong to you"}, status=status.HTTP_400_BAD_REQUEST)
+        if value is isinstance(value, Item.DoesNotExist):
+            return Response({"status": "False", "message": f"Item with id {value} doesn't exists"}, status=status.HTTP_404_NOT_FOUND)
+        obj = self.get_object()
+        queryset = PropertyValue.objects.filter(id=obj.id)
+        try:
+            obj = queryset.update(**get_model_fields(self.get_serializer_class(), request))
+        except IntegrityError as err:
+            return Response(get_fail_response(self.action, err=err), status=status.HTTP_400_BAD_REQUEST)
+        return Response(get_success_response(self.action, obj=obj), status=status.HTTP_206_PARTIAL_CONTENT)
 
 
 
