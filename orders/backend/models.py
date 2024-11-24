@@ -128,6 +128,11 @@ class Item(models.Model):
         if Item.objects.filter(slug=self.slug):
             self.slug += ('-' + str(uuid.uuid4()))
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['brand', 'model', 'category', 'shop'], name='unique_item')
+        ]
+
 
 class PropertyValue(models.Model):
     item = models.ForeignKey(Item, on_delete=models.CASCADE, related_name="property_value")
