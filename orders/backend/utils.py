@@ -56,3 +56,24 @@ def get_fail_response(action, serializer):
     obj = serializer.Meta.model.__name__.lower()
     return {"status": False, "message": f"{action} {obj} failed: {serializer.errors}"}
 
+
+def get_model_fields(serializer, request):
+    serializer_fields = serializer.Meta.fields
+    serializer_read_only_fields = serializer.Meta.read_only_fields
+    nested_serializers_names = serializer.__dict__['_declared_fields']
+    nested_serializers_names_with_id = []
+    for name in nested_serializers_names:
+        name_id = name + '_id'
+        nested_serializers_names_with_id.append(name_id)
+        if name in serializer_fields:
+            serializer_fields.remove(name)
+    serializer_fields.extend(nested_serializers_names_with_id)
+    res_fields = [x for x in serializer_fields if x not in serializer_read_only_fields]
+
+    param_fields = {}
+    for field in res_fields:
+        clean_name = field.split('_id')[0]
+        if clean_name in request.data.keys():
+            param_fields.setdefault(field, request.data[clean_name])
+    return param_fields
+
