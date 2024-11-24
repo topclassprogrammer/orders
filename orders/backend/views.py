@@ -10,13 +10,13 @@ from rest_framework.viewsets import ViewSet, ModelViewSet
 
 from backend.auth import TokenAuthentication
 from backend.models import User, AuthToken, ActivationToken, PasswordResetToken, Role, Shop, RoleChoices, Address, \
-    Brand, Model, Category
+    Brand, Model, Category, Item
 from backend.permissions import IsOwner, IsAdmin, HasShop
 from backend.serializers import LogInSerializer, ActivationSerializer, PasswordResetSerializer, \
     RoleSerializer, ShopSerializer, UserSerializer, AddressSerializer, BrandSerializer, ModelSerializer, \
-    CategorySerializer
+    CategorySerializer, ItemSerializer
 from backend.utils import hash_password, check_hashed_passwords, get_success_response, get_fail_response, get_object, \
-    get_auth_token, check_request_fields, get_model_fields
+    get_auth_token, check_request_fields, get_model_fields, check_model_in_brand, slugify_item
 
 
 class UserView(ViewSet):
@@ -348,5 +348,26 @@ class CategoryView(ModelViewSet):
         elif self.action in ['partial_update', 'destroy']:
             return [IsAdmin()]
         return []
+
+
+class ItemView(ModelViewSet):
+    queryset = Item.objects.all()
+    serializer_class = ItemSerializer
+    authentication_classes = [TokenAuthentication]
+
+    def create(self, request, *args, **kwargs):
+        field = check_request_fields(request, Item)
+        value = check_model_in_brand(Brand, request)
+        if field or value:
+            return Response(get_fail_response(self.action, field=field if field else value), status=status.HTTP_400_BAD_REQUEST)
+        request = slugify_item(Brand, Model, Item, request)
+        request.data['shop'] = request.user.shop.id
+        try:
+            obj = Item.objects.create(**get_model_fields(self.get_serializer_class(), request))
+        except IntegrityError as err:
+            return Response(get_fail_response(self.action, err=err), status=status.HTTP_400_BAD_REQUEST)
+        return Response(get_success_response(self.action, obj=obj), status=status.HTTP_201_CREATED)
+
+
 
 
