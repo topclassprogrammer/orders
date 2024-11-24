@@ -59,10 +59,14 @@ def get_success_response(action, serializer=None, pk=None, obj=None):
         return {"status": True, "message": f"Deleted object with id {pk}"}
 
 
-def get_fail_response(action, serializer):
+def get_fail_response(action, serializer=None, err=None, field=None):
     action = (action.lstrip('partial_').rstrip('e') + 'ing').capitalize()
-    obj = serializer.Meta.model.__name__.lower()
-    return {"status": False, "message": f"{action} {obj} failed: {serializer.errors}"}
+    if serializer:
+        obj = serializer.Meta.model.__name__.lower()
+        return {"status": False, "message": f"{action} {obj} failed: {serializer.errors}"}
+    else:
+        return {"status": False, "message": f"{action} failed: "
+               f"{err if err else f'field/value `{field}` does not exist in model'}"}
 
 
 def get_model_fields(serializer, request):
