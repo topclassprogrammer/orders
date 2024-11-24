@@ -124,9 +124,9 @@ class Item(models.Model):
 
     def clean(self):
         super().clean()
-        self.slug = slugify(self.brand.name + self.model.name)
+        self.slug = slugify(self.brand.name + '-' + self.model.name)
         if Item.objects.filter(slug=self.slug):
-            self.slug += str(uuid.uuid4())
+            self.slug += ('-' + str(uuid.uuid4()))
 
 
 class PropertyValue(models.Model):
