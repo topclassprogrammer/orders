@@ -94,6 +94,15 @@ def check_model_in_brand(brand_model, request):
         return request.data['model']
 
 
+def check_item_owner(model, request):
+    try:
+        item_obj = model.objects.get(id=request.data[model.__name__.lower()])
+    except model.DoesNotExist as err:
+        return err
+    if item_obj.shop.user != request.user:
+        return item_obj.id
+
+
 def slugify_item(brand, model, item, request):
     brand_obj = brand.objects.get(id=request.data[brand.__name__.lower()])
     model_obj = model.objects.get(id=request.data[model.__name__.lower()])
