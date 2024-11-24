@@ -144,7 +144,11 @@ class UserView(ViewSet):
             return PasswordResetSerializer
 
 
-
+class RoleView(ModelViewSet):
+    queryset = Role.objects.all()
+    serializer_class = RoleSerializer
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAdmin]
 
 
 class ShopView(ViewSet):
