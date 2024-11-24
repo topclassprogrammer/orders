@@ -144,42 +144,7 @@ class UserView(ViewSet):
             return PasswordResetSerializer
 
 
-class RoleView(ViewSet):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAdmin]
 
-    def list(self, request):
-        queryset = Role.objects.all()
-        serializer = RoleSerializer(queryset, many=True)
-        return Response(get_success_response(self.action, serializer), status=status.HTTP_200_OK)
-
-    def retrieve(self, request, pk=None):
-        try:
-            instance = Role.objects.get(id=pk)
-        except Role.DoesNotExist:
-            return Response({"status": False, "message": f"Role with id {pk} does not exist"}, status=status.HTTP_404_NOT_FOUND)
-        serializer = RoleSerializer(instance)
-        return Response({"status": True, "message": serializer.data}, status=status.HTTP_200_OK)
-
-    def create(self, request):
-        serializer = RoleSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(get_success_response(self.action, serializer), status=status.HTTP_201_CREATED)
-        return Response(get_fail_response(self.action, serializer), status=status.HTTP_400_BAD_REQUEST)
-
-    def partial_update(self, request, pk=None):
-        obj = get_object(Role, pk)
-        serializer = RoleSerializer(obj, request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(get_success_response(self.action, serializer), status=status.HTTP_206_PARTIAL_CONTENT)
-        return Response(get_fail_response(self.action, serializer), status=status.HTTP_400_BAD_REQUEST)
-
-    def destroy(self, request, pk=None):
-        obj = get_object(Role, pk)
-        obj.delete()
-        return Response(get_success_response(self.action, pk=pk), status=status.HTTP_204_NO_CONTENT)
 
 
 class ShopView(ViewSet):
