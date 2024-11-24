@@ -1,6 +1,7 @@
 import uuid
 
 from django.contrib.auth.base_user import AbstractBaseUser
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.text import slugify
 
@@ -53,6 +54,11 @@ class Shop(models.Model):
     url = models.URLField(max_length=256, blank=True, validators=[check_url])
     accept_orders = models.BooleanField(default=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="shop")
+
+    def clean(self):
+        super().clean()
+        if self.user.role.name != RoleChoices.SHOP:
+            raise ValidationError(f"User {self.user} does not have shop rights")
 
 
 class AuthToken(models.Model):
