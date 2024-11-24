@@ -157,6 +157,11 @@ class Model(models.Model):
     name = models.CharField(max_length=64)
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE, related_name="models", null=True, blank=True)
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['name', 'brand'], name='unique_model')
+        ]
+
 
 class Category(models.Model):
     name = models.CharField(max_length=32)
