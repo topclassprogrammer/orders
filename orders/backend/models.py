@@ -39,7 +39,7 @@ class User(AbstractBaseUser):
     is_active = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    def clean(self):  # Вызывается при добавлении записей через фикстуры или формы. Если нужно, чтобы вызывалось при отправке запроса на API-эндпойнт, то нужно в сериализаторе переопределять методы create() и update()
+    def clean(self):
         super().clean()
         self.password = hash_password(self.password)
 
