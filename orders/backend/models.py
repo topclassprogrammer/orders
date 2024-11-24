@@ -150,7 +150,7 @@ class PropertyName(models.Model):
 
 
 class Brand(models.Model):
-    name = models.CharField(max_length=32)
+    name = models.CharField(max_length=32, unique=True)
 
 
 class Model(models.Model):
