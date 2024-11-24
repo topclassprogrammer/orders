@@ -161,7 +161,7 @@ class ShopView(ModelViewSet):
             if hasattr(user, 'shop'):
                 return Response({"status": False, "message": f"Cannot create shop because you already have it"}, status=status.HTTP_400_BAD_REQUEST)
             serializer.save(user=user)
-            user.role = Role.objects.get(name=RoleChoices.SHOP)  # Устанавливаем у пользователя роль магазина
+            user.role = Role.objects.get(name=RoleChoices.SHOP)
             user.save()
             return Response(get_success_response(self.action, serializer), status=status.HTTP_201_CREATED)
         return Response(get_fail_response(self.action, serializer), status=status.HTTP_400_BAD_REQUEST)
