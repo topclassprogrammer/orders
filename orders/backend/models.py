@@ -164,7 +164,7 @@ class Model(models.Model):
 
 
 class Category(models.Model):
-    name = models.CharField(max_length=32)
+    name = models.CharField(max_length=32, unique=True)
 
 
 
