@@ -26,16 +26,19 @@ class IsOwner(BasePermission):
         return True
 
 
-class IsAdmin(BasePermission):
-    def has_permission(self, request, view):
-        if request.user.role.name != models.RoleChoices.ADMIN:
-            raise PermissionDenied('You cannot get or modify this object because you do not have admin role')
-        return True
-
-
 class HasShop(BasePermission):
     def has_permission(self, request, view):
         if not hasattr(request.user, 'shop'):
             raise PermissionDenied('You do not have shop')
         return True
+
+
+class IsAdmin(BasePermission):
+    def has_permission(self, request, view):
+        if request.user.role.name != models.RoleChoices.ADMIN:
+            raise PermissionDenied('You cannot get and/or modify this object because you do not have admin role')
+        return True
+
+
+
 
