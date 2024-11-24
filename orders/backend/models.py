@@ -74,7 +74,7 @@ class AuthToken(models.Model):
 class ActivationToken(models.Model):
     key = models.UUIDField()
     created_at = models.DateTimeField(auto_now_add=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="activation_token")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="activation_tokens")
 
 
 class PasswordResetToken(models.Model):
