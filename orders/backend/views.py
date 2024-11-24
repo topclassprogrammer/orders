@@ -11,7 +11,7 @@ from rest_framework.viewsets import ViewSet, ModelViewSet
 from backend.auth import TokenAuthentication
 from backend.models import User, AuthToken, ActivationToken, PasswordResetToken, Role, Shop, RoleChoices, Address, \
     Brand, Model, Category, Item, PropertyName, PropertyValue
-from backend.permissions import IsOwner, IsAdmin, HasShop
+from backend.permissions import IsOwner, IsAdmin, HasShop, IsAuthenticated
 from backend.serializers import LogInSerializer, ActivationSerializer, PasswordResetSerializer, \
     RoleSerializer, ShopSerializer, UserSerializer, AddressSerializer, BrandSerializer, ModelSerializer, \
     CategorySerializer, ItemSerializer, PropertyNameSerializer, PropertyValueSerializer
@@ -124,9 +124,14 @@ class UserView(ViewSet):
         return Response({"status": False, "message": f"Incorrect key or/and password provided: {serializer.errors}"}, status=status.HTTP_400_BAD_REQUEST)
 
     def get_permissions(self):
-        if self.action in ['partial_update', 'destroy']:
-            return [IsOwner()]
-        return []
+        if self.action in ['create', 'log_in']:
+            return []
+        elif self.action == "list":
+            return [IsAuthenticated(), IsAdmin()]
+        elif self.action in ['partial_update', 'destroy']:
+            return [IsAuthenticated(), IsOwner()]
+        elif self.action in ['retrieve', 'log_out', 'activate', 'password_reset_request', 'password_reset_response']:
+            return [IsAuthenticated()]
 
     def get_authenticators(self):
         if self.request.method not in ['POST', 'log_in']:
