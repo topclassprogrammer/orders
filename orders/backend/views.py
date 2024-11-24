@@ -318,3 +318,11 @@ class ModelView(ModelViewSet):
             return Response(get_fail_response(self.action, err=err), status=status.HTTP_400_BAD_REQUEST)
         return Response(get_success_response(self.action, obj=obj), status=status.HTTP_206_PARTIAL_CONTENT)
 
+    def destroy(self, request, *args, **kwargs):
+        obj = self.get_object()
+        queryset = Model.objects.filter(id=obj.id)
+        queryset.delete()
+        return Response(get_success_response(self.action), status=status.HTTP_204_NO_CONTENT)
+
+
+
