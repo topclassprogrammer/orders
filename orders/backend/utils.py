@@ -41,14 +41,21 @@ def get_object(model, pk=None):
     return obj
 
 
-def get_success_response(action, serializer=None, pk=None):
+def get_success_response(action, serializer=None, pk=None, obj=None):
     if action in ['list', 'retrieve']:
         return {"status": True, "message": serializer.data}
-    if action in ['create', 'partial_update']:
-        action = (action.lstrip('partial_') + 'd').capitalize()
-        obj = serializer.Meta.model.__name__.lower()
-        return {"status": True, "message": f"{action} {obj}: {serializer.data}"}
-    if action == 'destroy':
+    elif action in ['create', 'partial_update']:
+        action_resp = (action.lstrip('partial_') + 'd').capitalize()
+        if serializer:
+            obj = serializer.Meta.model.__name__.lower()
+            return {"status": True, "message": f"{action_resp} {obj}: {serializer.data}"}
+        else:  # Без сериализаторов - там где есть вложенные сериализаторы
+            if action == 'create':
+                obj.__dict__.pop('_state')  # Без сериализаторов: при create запросе должен выполняться pop, а при update - нет
+                return {"status": True, "message": f"Created object: {obj.__dict__}"}
+            elif action == 'partial_update':
+                return {"status": True, "message": f"Objects updated: {obj}"}
+    elif action == 'destroy':
         return {"status": True, "message": f"Deleted object with id {pk}"}
 
 
