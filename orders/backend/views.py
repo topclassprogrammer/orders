@@ -108,7 +108,7 @@ class UserView(ViewSet):
 
     @action(methods=['POST'], detail=False, url_path='password-reset-response')
     def password_reset_response(self, request):
-        serializer = PasswordResetSerializer(data=request.data)
+        serializer = self.get_serializer_class()(data=request.data)
         if serializer.is_valid():
             key = request.data['key']
             user = request.user
