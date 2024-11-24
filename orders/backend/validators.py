@@ -49,13 +49,6 @@ def check_url(value: str):
         raise ValidationError(f"URL is not reachable: {err}")
 
 
-def check_shop_role(value: int):
-    from backend.models import User
-    user = User.objects.get(id=value)
-    if user.role.name != 'shop':
-        raise ValidationError(f"User {user} does not have shop rights")
-
-
 def check_uuid_token(value: str):
     try:
         uuid.UUID(value)
