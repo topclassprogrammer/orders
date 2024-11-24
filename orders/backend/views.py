@@ -4,20 +4,18 @@ import uuid
 from django.db import IntegrityError
 from rest_framework import status
 from rest_framework.decorators import action
-from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet, ModelViewSet
 
 from backend.auth import TokenAuthentication
-from backend.models import User, AuthToken, ActivationToken, PasswordResetToken, Role, Shop, RoleChoices, Address, \
+from backend.models import ActivationToken, AuthToken, PasswordResetToken, User, RoleChoices, Role, Shop, Address, \
     Brand, Model, Category, Item, PropertyName, PropertyValue
 from backend.permissions import IsOwner, IsAdmin, HasShop, IsAuthenticated
-from backend.serializers import LogInSerializer, ActivationSerializer, PasswordResetSerializer, \
-    RoleSerializer, ShopSerializer, UserSerializer, AddressSerializer, BrandSerializer, ModelSerializer, \
+from backend.serializers import UserSerializer, ActivationSerializer, PasswordResetSerializer, \
+    LogInSerializer, RoleSerializer, ShopSerializer, AddressSerializer, BrandSerializer, ModelSerializer, \
     CategorySerializer, ItemSerializer, PropertyNameSerializer, PropertyValueSerializer
-from backend.utils import hash_password, get_success_response, get_fail_response, get_object, \
-    get_auth_token, check_request_fields, get_model_fields, check_model_in_brand, slugify_item, check_item_owner, \
-    check_passwords
+from backend.utils import hash_password, check_passwords, get_auth_token, get_object, get_success_response, \
+    get_fail_response, get_model_fields, check_request_fields, check_model_in_brand, slugify_item, check_item_owner
 
 
 class UserView(ViewSet):
@@ -279,7 +277,6 @@ class BrandView(ModelViewSet):
             return [IsAdmin()]
         return []
 
-
 class ModelView(ModelViewSet):
     queryset = Model.objects.all()
     serializer_class = ModelSerializer
@@ -443,7 +440,5 @@ class PropertyValueView(ModelViewSet):
         elif self.action in ['partial_update', 'destroy']:
             return [IsOwner()]
         return []
-
-
 
 
