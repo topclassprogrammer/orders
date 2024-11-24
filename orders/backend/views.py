@@ -194,7 +194,15 @@ class AddressView(ModelViewSet):
     serializer_class = AddressSerializer
     authentication_classes = [TokenAuthentication]
 
-
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer_class()(data=request.data)
+        if serializer.is_valid():
+            queryset = Address.objects.filter(**self.request.data, user=self.request.user)
+            if queryset:
+                return Response({"status": False, "message": f"You already have this address"}, status=status.HTTP_400_BAD_REQUEST)
+            serializer.save(user=request.user)
+            return Response(get_success_response(self.action, serializer), status=status.HTTP_201_CREATED)
+        return Response(get_fail_response(self.action, serializer), status=status.HTTP_400_BAD_REQUEST)
 
 
 class BrandView(ModelViewSet):
