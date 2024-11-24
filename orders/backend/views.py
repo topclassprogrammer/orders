@@ -204,6 +204,13 @@ class AddressView(ModelViewSet):
             return Response(get_success_response(self.action, serializer), status=status.HTTP_201_CREATED)
         return Response(get_fail_response(self.action, serializer), status=status.HTTP_400_BAD_REQUEST)
 
+    def get_permissions(self):
+        if self.action == "list":
+            return [IsAdmin()]
+        elif self.action in ["retrieve", "partial_update", "destroy"]:
+            return [IsOwner()]
+        return []
+
 
 class BrandView(ModelViewSet):
     queryset = Brand.objects.all()
@@ -218,6 +225,7 @@ class BrandView(ModelViewSet):
         elif self.action in ['partial_update', 'destroy']:
             return [IsAdmin()]
         return []
+
 
 class ModelView(ModelViewSet):
     queryset = Model.objects.all()
