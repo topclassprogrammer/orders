@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from backend.models import User, ActivationToken, PasswordResetToken, Role, Shop, Address, Brand, Model, Category
+from backend.models import User, ActivationToken, PasswordResetToken, Role, Shop, Address, Brand, Model, Category, Item
 from backend.validators import check_password, check_username
 
 
@@ -94,7 +94,16 @@ class CategorySerializer(serializers.ModelSerializer):
         read_only_fields = ['id']
 
 
+class ItemSerializer(serializers.ModelSerializer):
+    brand = BrandSerializer(read_only=True)
+    model = ModelSerializer(read_only=True)
+    category = CategorySerializer(read_only=True)
+    shop = ShopSerializer(read_only=True)
 
+    class Meta:
+        model = Item
+        fields = ['id', 'brand', 'model', 'category', 'shop', 'description', 'image', 'price', 'quantity', 'slug']
+        read_only_fields = ['id', 'shop']
 
 
 
