@@ -368,6 +368,17 @@ class ItemView(ModelViewSet):
             return Response(get_fail_response(self.action, err=err), status=status.HTTP_400_BAD_REQUEST)
         return Response(get_success_response(self.action, obj=obj), status=status.HTTP_201_CREATED)
 
-
+    def partial_update(self, request, *args, **kwargs):
+        field = check_request_fields(request, Item)
+        value = check_model_in_brand(Brand, request)
+        if field or value:
+            return Response(get_fail_response(self.action, field=field if field else value), status=status.HTTP_400_BAD_REQUEST)
+        obj = self.get_object()
+        queryset = Item.objects.filter(id=obj.id)
+        try:
+            obj = queryset.update(**get_model_fields(self.get_serializer_class(), request))
+        except IntegrityError as err:
+            return Response(get_fail_response(self.action, err=err), status=status.HTTP_400_BAD_REQUEST)
+        return Response(get_success_response(self.action, obj=obj), status=status.HTTP_206_PARTIAL_CONTENT)
 
 
