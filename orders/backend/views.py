@@ -189,54 +189,7 @@ class ShopView(ModelViewSet):
         return []
 
 
-class AddressView(ViewSet):
-    authentication_classes = [TokenAuthentication]
 
-    def list(self, request):
-        queryset = Address.objects.all()
-        serializer = AddressSerializer(queryset, many=True)
-        return Response(get_success_response(self.action, serializer), status=status.HTTP_200_OK)
-
-    def retrieve(self, request, pk=None):
-        obj = get_object(Address, pk)
-        self.check_object_permissions(request, obj)
-        serializer = AddressSerializer(obj)
-        return Response(get_success_response(self.action, serializer), status=status.HTTP_200_OK)
-
-    def create(self, request):
-        serializer = AddressSerializer(data=request.data)
-        if serializer.is_valid():
-            self.perform_create(serializer)
-            return Response(get_success_response(self.action, serializer), status=status.HTTP_201_CREATED)
-        return Response(get_fail_response(self.action, serializer), status=status.HTTP_400_BAD_REQUEST)
-
-    def partial_update(self, request, pk=None):
-        obj = get_object(Address, pk)
-        self.check_object_permissions(request, obj)
-        serializer = AddressSerializer(obj, request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(get_success_response(self.action, serializer, pk), status=status.HTTP_206_PARTIAL_CONTENT)
-        return Response(get_fail_response(self.action, serializer), status=status.HTTP_400_BAD_REQUEST)
-
-    def destroy(self, request, pk=None):
-        obj = get_object(Address, pk)
-        self.check_object_permissions(request, obj)
-        obj.delete()
-        return Response(get_success_response(self.action, pk=pk), status=status.HTTP_204_NO_CONTENT)
-
-    def get_permissions(self):
-        if self.action == "list":
-            return [IsAdmin()]
-        elif self.action in ["retrieve", "partial_update", "destroy"]:
-            return [IsOwner()]
-        return []
-
-    def perform_create(self, serializer):
-        queryset = Address.objects.filter(**self.request.data, user=self.request.user)
-        if queryset.exists():
-            raise ValidationError({"status": False, "message": f"Cannot create it because such {Address.__name__.lower()} already exists in DB"}, code=status.HTTP_400_BAD_REQUEST)
-        serializer.save(user=self.request.user)
 
 
 class BrandView(ModelViewSet):
