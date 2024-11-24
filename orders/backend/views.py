@@ -189,6 +189,11 @@ class ShopView(ModelViewSet):
         return []
 
 
+class AddressView(ModelViewSet):
+    queryset = Address.objects.all()
+    serializer_class = AddressSerializer
+    authentication_classes = [TokenAuthentication]
+
 
 
 
