@@ -16,7 +16,7 @@ class RoleChoices(models.TextChoices):
     SHOP = "shop", "Shop"
 
 
-class CartChoices(models.TextChoices):
+class OrderChoices(models.TextChoices):
     CART = "cart", "In cart"
     NEW = "new", "New"
     PACKING = "packing", "Packing"
