@@ -28,7 +28,7 @@ class IsOwner(BasePermission):
 
 class HasShop(BasePermission):
     def has_permission(self, request, view):
-        if not hasattr(request.user, 'shop'):
+        if request.user.role.name != models.RoleChoices.SHOP:
             raise PermissionDenied('You do not have shop')
         return True
 
