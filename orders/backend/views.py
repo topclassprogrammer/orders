@@ -133,10 +133,7 @@ class UserView(ViewSet):
         elif self.action in ['retrieve', 'log_out', 'activate', 'password_reset_request', 'password_reset_response']:
             return [IsAuthenticated()]
 
-    def get_authenticators(self):
-        if self.request.method not in ['POST', 'log_in']:
-            return [TokenAuthentication()]
-        return []
+
 
 
 class RoleView(ViewSet):
