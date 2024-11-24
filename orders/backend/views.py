@@ -15,11 +15,16 @@ from backend.permissions import IsOwner, IsAdmin, HasShop
 from backend.serializers import LogInSerializer, ActivationSerializer, PasswordResetSerializer, \
     RoleSerializer, ShopSerializer, UserSerializer, AddressSerializer, BrandSerializer, ModelSerializer, \
     CategorySerializer, ItemSerializer, PropertyNameSerializer, PropertyValueSerializer
-from backend.utils import hash_password, check_hashed_passwords, get_success_response, get_fail_response, get_object, \
+from backend.utils import hash_password, get_success_response, get_fail_response, get_object, \
     get_auth_token, check_request_fields, get_model_fields, check_model_in_brand, slugify_item, check_item_owner
 
 
 class UserView(ViewSet):
+    def list(self, request):
+        queryset = User.objects.all()
+        serializer = self.get_serializer_class()(queryset, many=True)
+        return Response(get_success_response(self.action, serializer), status=status.HTTP_200_OK)
+
     def create(self, request):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
