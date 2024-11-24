@@ -133,7 +133,15 @@ class UserView(ViewSet):
         elif self.action in ['retrieve', 'log_out', 'activate', 'password_reset_request', 'password_reset_response']:
             return [IsAuthenticated()]
 
-
+    def get_serializer_class(self):
+        if self.action in ['list', 'retrieve', 'create', 'partial_update']:
+            return UserSerializer
+        elif self.action in ['log_in']:
+            return LogInSerializer
+        elif self.action in ['activate']:
+            return ActivationSerializer
+        elif self.action in ['password_reset_response']:
+            return PasswordResetSerializer
 
 
 class RoleView(ViewSet):
