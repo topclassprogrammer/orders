@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from backend.models import User, ActivationToken, PasswordResetToken, Role, Shop, Address, Brand, Model, Category, Item, \
-    PropertyName, PropertyValue, Order
+    PropertyName, PropertyValue, Order, OrderItem
 from backend.utils import hash_password
 from backend.validators import check_password, check_username
 
@@ -137,6 +137,16 @@ class OrderSerializer(serializers.ModelSerializer):
         model = Order
         fields = ['id', 'state', 'address', 'user', 'sum', 'created_at']
         read_only_fields = ['id', 'state', 'user', 'sum' 'created_at']
+
+
+class OrderItemSerializer(serializers.ModelSerializer):
+    order = OrderSerializer()
+    item = ItemSerializer()
+
+    class Meta:
+        model = OrderItem
+        fields = ['id', 'order', 'item', 'quantity']
+        read_only_fields = ['id', 'order']
 
 
 
