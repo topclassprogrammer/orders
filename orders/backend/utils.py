@@ -41,7 +41,7 @@ def get_object(model, pk=None):
     return obj
 
 
-def get_success_response(action, serializer=None, pk=None, obj=None):
+def get_success_msg(action, serializer=None, pk=None, obj=None):
     if action in ['list', 'retrieve']:
         return {"status": True, "message": serializer.data}
     elif action in ['create', 'partial_update']:
