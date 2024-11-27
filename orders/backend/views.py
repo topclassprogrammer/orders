@@ -15,7 +15,7 @@ from backend.serializers import UserSerializer, ActivationSerializer, PasswordRe
     LogInSerializer, RoleSerializer, ShopSerializer, AddressSerializer, BrandSerializer, ModelSerializer, \
     CategorySerializer, ItemSerializer, PropertyNameSerializer, PropertyValueSerializer
 from backend.utils import hash_password, check_passwords, get_auth_token, get_object, get_success_response, \
-    get_fail_response, get_model_fields, check_request_fields, check_model_in_brand, slugify_item, check_item_owner
+    get_fail_msg, get_model_fields, check_request_fields, check_model_in_brand, slugify_item, check_item_owner
 
 
 class UserView(ViewSet):
@@ -36,7 +36,7 @@ class UserView(ViewSet):
             user = serializer.save(role=role)
             ActivationToken.objects.create(key=uuid.uuid4(), user=user)
             return Response(get_success_response(self.action, serializer), status=status.HTTP_201_CREATED)
-        return Response(get_fail_response(self.action, serializer), status=status.HTTP_400_BAD_REQUEST)
+        return Response(get_fail_msg(self.action, serializer), status=status.HTTP_400_BAD_REQUEST)
 
     def partial_update(self, request, pk=None):
         obj = get_object(User, pk)
@@ -45,7 +45,7 @@ class UserView(ViewSet):
         if serializer.is_valid():
             serializer.save()
             return Response(get_success_response(self.action, serializer), status=status.HTTP_206_PARTIAL_CONTENT)
-        return Response(get_fail_response(self.action, serializer), status=status.HTTP_400_BAD_REQUEST)
+        return Response(get_fail_msg(self.action, serializer), status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, pk=None):
         obj = get_object(User, pk)
@@ -96,7 +96,7 @@ class UserView(ViewSet):
             user.save()
             registration_token.delete()
             return Response({"status": True, "message": "Account successfully activated"}, status=status.HTTP_200_OK)
-        return Response(get_fail_response(self.action, serializer), status=status.HTTP_400_BAD_REQUEST)
+        return Response(get_fail_msg(self.action, serializer), status=status.HTTP_400_BAD_REQUEST)
 
     @action(methods=['POST'], detail=False, url_path='password-reset-request')
     def password_reset_request(self, request):
@@ -164,7 +164,7 @@ class ShopView(ModelViewSet):
             user.role = Role.objects.get(name=RoleChoices.SHOP)
             user.save()
             return Response(get_success_response(self.action, serializer), status=status.HTTP_201_CREATED)
-        return Response(get_fail_response(self.action, serializer), status=status.HTTP_400_BAD_REQUEST)
+        return Response(get_fail_msg(self.action, serializer), status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, *args, **kwargs):
         obj = self.get_object()
@@ -202,7 +202,7 @@ class AddressView(ModelViewSet):
                 return Response({"status": False, "message": f"You already have this address"}, status=status.HTTP_400_BAD_REQUEST)
             serializer.save(user=request.user)
             return Response(get_success_response(self.action, serializer), status=status.HTTP_201_CREATED)
-        return Response(get_fail_response(self.action, serializer), status=status.HTTP_400_BAD_REQUEST)
+        return Response(get_fail_msg(self.action, serializer), status=status.HTTP_400_BAD_REQUEST)
 
     def get_permissions(self):
         if self.action == "list":
@@ -235,23 +235,23 @@ class ModelView(ModelViewSet):
     def create(self, request, *args, **kwargs):
         field = check_request_fields(request, Model)
         if field:
-            return Response(get_fail_response(self.action, field=field), status=status.HTTP_400_BAD_REQUEST)
+            return Response(get_fail_msg(self.action, field=field), status=status.HTTP_400_BAD_REQUEST)
         try:
             obj = Model.objects.create(**get_model_fields(self.get_serializer_class(), request))
         except IntegrityError as err:
-            return Response(get_fail_response(self.action, err=err), status=status.HTTP_400_BAD_REQUEST)
+            return Response(get_fail_msg(self.action, err=err), status=status.HTTP_400_BAD_REQUEST)
         return Response(get_success_response(self.action, obj=obj), status=status.HTTP_201_CREATED)
 
     def partial_update(self, request, *args, **kwargs):
         field = check_request_fields(request, Model)
         if field:
-            return Response(get_fail_response(self.action, field=field), status=status.HTTP_400_BAD_REQUEST)
+            return Response(get_fail_msg(self.action, field=field), status=status.HTTP_400_BAD_REQUEST)
         obj = self.get_object()
         queryset = Model.objects.filter(id=obj.id)
         try:
             obj = queryset.update(**get_model_fields(self.get_serializer_class(), request))
         except IntegrityError as err:
-            return Response(get_fail_response(self.action, err=err), status=status.HTTP_400_BAD_REQUEST)
+            return Response(get_fail_msg(self.action, err=err), status=status.HTTP_400_BAD_REQUEST)
         return Response(get_success_response(self.action, obj=obj), status=status.HTTP_206_PARTIAL_CONTENT)
 
     def destroy(self, request, *args, **kwargs):
@@ -294,26 +294,26 @@ class ItemView(ModelViewSet):
         field = check_request_fields(request, Item)
         value = check_model_in_brand(Brand, request)
         if field or value:
-            return Response(get_fail_response(self.action, field=field if field else value), status=status.HTTP_400_BAD_REQUEST)
+            return Response(get_fail_msg(self.action, field=field if field else value), status=status.HTTP_400_BAD_REQUEST)
         request = slugify_item(Brand, Model, Item, request)
         request.data['shop'] = request.user.shop.id
         try:
             obj = Item.objects.create(**get_model_fields(self.get_serializer_class(), request))
         except IntegrityError as err:
-            return Response(get_fail_response(self.action, err=err), status=status.HTTP_400_BAD_REQUEST)
+            return Response(get_fail_msg(self.action, err=err), status=status.HTTP_400_BAD_REQUEST)
         return Response(get_success_response(self.action, obj=obj), status=status.HTTP_201_CREATED)
 
     def partial_update(self, request, *args, **kwargs):
         field = check_request_fields(request, Item)
         value = check_model_in_brand(Brand, request)
         if field or value:
-            return Response(get_fail_response(self.action, field=field if field else value), status=status.HTTP_400_BAD_REQUEST)
+            return Response(get_fail_msg(self.action, field=field if field else value), status=status.HTTP_400_BAD_REQUEST)
         obj = self.get_object()
         queryset = Item.objects.filter(id=obj.id)
         try:
             obj = queryset.update(**get_model_fields(self.get_serializer_class(), request))
         except IntegrityError as err:
-            return Response(get_fail_response(self.action, err=err), status=status.HTTP_400_BAD_REQUEST)
+            return Response(get_fail_msg(self.action, err=err), status=status.HTTP_400_BAD_REQUEST)
         return Response(get_success_response(self.action, obj=obj), status=status.HTTP_206_PARTIAL_CONTENT)
 
     def destroy(self, request, *args, **kwargs):
@@ -352,20 +352,20 @@ class PropertyValueView(ModelViewSet):
     def create(self, request, *args, **kwargs):
         field = check_request_fields(request, PropertyValue)
         if field:
-            return Response(get_fail_response(self.action, field=field), status=status.HTTP_400_BAD_REQUEST)
+            return Response(get_fail_msg(self.action, field=field), status=status.HTTP_400_BAD_REQUEST)
         value = check_item_owner(Item, request)
         if value:
             return Response({"status": "False", "message": f"Item with id {value} doesn't belong to you"}, status=status.HTTP_400_BAD_REQUEST)
         try:
             obj = PropertyValue.objects.create(**get_model_fields(self.get_serializer_class(), request))
         except IntegrityError as err:
-            return Response(get_fail_response(self.action, err=err), status=status.HTTP_400_BAD_REQUEST)
+            return Response(get_fail_msg(self.action, err=err), status=status.HTTP_400_BAD_REQUEST)
         return Response(get_success_response(self.action, obj=obj), status=status.HTTP_201_CREATED)
 
     def partial_update(self, request, *args, **kwargs):
         field = check_request_fields(request, PropertyValue)
         if field:
-            return Response(get_fail_response(self.action, field=field), status=status.HTTP_400_BAD_REQUEST)
+            return Response(get_fail_msg(self.action, field=field), status=status.HTTP_400_BAD_REQUEST)
         value = check_item_owner(Item, request)
         if value is int:
             return Response({"status": "False", "message": f"Item with id {value} doesn't belong to you"}, status=status.HTTP_400_BAD_REQUEST)
@@ -376,7 +376,7 @@ class PropertyValueView(ModelViewSet):
         try:
             obj = queryset.update(**get_model_fields(self.get_serializer_class(), request))
         except IntegrityError as err:
-            return Response(get_fail_response(self.action, err=err), status=status.HTTP_400_BAD_REQUEST)
+            return Response(get_fail_msg(self.action, err=err), status=status.HTTP_400_BAD_REQUEST)
         return Response(get_success_response(self.action, obj=obj), status=status.HTTP_206_PARTIAL_CONTENT)
 
     def destroy(self, request, *args, **kwargs):

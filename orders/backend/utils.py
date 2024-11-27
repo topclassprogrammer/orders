@@ -59,7 +59,7 @@ def get_success_response(action, serializer=None, pk=None, obj=None):
         return {"status": True, "message": f"Deleted object with id {pk}"}
 
 
-def get_fail_response(action, serializer=None, err=None, field=None):
+def get_fail_msg(action, serializer=None, err=None, field=None):
     action = (action.lstrip('partial_').rstrip('e') + 'ing').capitalize()
     if serializer:
         obj = serializer.Meta.model.__name__.lower()
