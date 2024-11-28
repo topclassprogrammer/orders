@@ -1,0 +1,67 @@
+[
+  {
+  "brand": "Samsung",
+  "model": "M05",
+  "category": "Смартфоны",
+  "description": "some random description",
+  "image": "images/some_pic_1.jpeg",
+  "price": "655.95",
+  "quantity": 97,
+  "properties": {
+    "name": "свойство_1",
+    "value": "значение_1"
+    }
+  },
+  {
+  "brand": "Samsung",
+  "model": "A06",
+  "category": "Смартфоны2",
+  "description": "some random description2",
+  "image": "images/some_pic_2.jpeg",
+  "price": "548.49",
+  "quantity": 19,
+  "properties": {
+    "name": "свойство_1",
+    "value": "значение_1"
+    }
+  },
+  {
+  "brand": "Samsung",
+  "model": "A06",
+  "category": "Смартфоны3",
+  "description": "some random description3",
+  "image": "images/some_pic_3.jpeg",
+  "price": "412.57",
+  "quantity": 43,
+  "properties": {
+    "name": "свойство_1",
+    "value": "значение_2"
+    }
+  },
+  {
+  "brand": "Samsung",
+  "model": "A06",
+  "category": "Смартфоны3",
+  "description": "some random description3",
+  "image": "images/some_pic_5.jpeg",
+  "price": "899.99",
+  "quantity": 20,
+  "properties": {
+    "name": "свойство_2",
+    "value": "значение_1"
+    }
+  },
+  {
+  "brand": "Huawei",
+  "model": "Mate 70 Pro",
+  "category": "Супер смартфоны",
+  "description": "new description",
+  "image": "images/new_pic_0.png",
+  "price": "1234.05",
+  "quantity": 31,
+  "properties": {
+    "name": "свойство_2",
+    "value": "значение_2"
+    }
+  }
+]
