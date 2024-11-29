@@ -112,17 +112,20 @@ class UserView(ViewSet):
         serializer = self.get_serializer_class()(data=request.data)
         if serializer.is_valid():
             key = request.data['key']
-            user = request.user
-            password = request.data['password']
             try:
                 reset_token = PasswordResetToken.objects.get(key=uuid.UUID(key))
             except PasswordResetToken.DoesNotExist:
-                return Response({"status": False, "message": "PasswordResetToken key not found in DB"}, status=status.HTTP_404_NOT_FOUND)
+                return Response({"status": False, "message": "PasswordResetToken key not found in DB"},
+                                status=status.HTTP_404_NOT_FOUND)
+
+            user = request.user
+            password = request.data['password']
             user.password = hash_password(password)
             user.save()
             reset_token.delete()
             return Response({"status": True, "message": "Password successfully changed"}, status=status.HTTP_200_OK)
-        return Response({"status": False, "message": f"Incorrect key or/and password provided: {serializer.errors}"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"status": False, "message": f"Incorrect key or/and password provided: {serializer.errors}"},
+                        status=status.HTTP_400_BAD_REQUEST)
 
     def get_permissions(self):
         if self.action in ['create', 'log_in']:
