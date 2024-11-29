@@ -531,5 +531,16 @@ class OrderView(ModelViewSet):
             commit()
             return Response({"status": True, "message": "Order successfully made"}, status=status.HTTP_201_CREATED)
 
+    def partial_update(self, request, *args, **kwargs):
+        state = request.data.get('state')
+        if not state:
+            return Response({"status": False, "message": "You must provide field 'state'"},
+                            status=status.HTTP_400_BAD_REQUEST)
+        if state not in OrderChoices.values:
+            return Response({"status": False, "message": "Unknown state provided"}, status=status.HTTP_404_NOT_FOUND)
 
+        obj = self.get_object()
+        obj.state = getattr(OrderChoices, state.upper())
+        obj.save()
+        return Response(get_success_msg(self.action, obj=obj), status=status.HTTP_206_PARTIAL_CONTENT)
 
