@@ -97,8 +97,8 @@ class UserView(ViewSet):
 
     @action(methods=['POST'], detail=False, url_path='log-out')
     def log_out(self, request):
-        auth_token = get_auth_token(request)
-        auth_token.delete()
+        token = get_auth_token(request)
+        token.delete()
         return Response({"status": True, "message": "You just logged out"}, status=status.HTTP_200_OK)
 
     @action(methods=['POST'], detail=False, url_path='password-reset-request')
