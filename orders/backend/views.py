@@ -13,7 +13,8 @@ from backend.models import ActivationToken, AuthToken, PasswordResetToken, User,
 from backend.permissions import IsOwner, IsAdmin, HasShop, IsAuthenticated
 from backend.serializers import UserSerializer, ActivationSerializer, PasswordResetSerializer, \
     LogInSerializer, RoleSerializer, ShopSerializer, AddressSerializer, BrandSerializer, ModelSerializer, \
-    CategorySerializer, ItemSerializer, PropertyNameSerializer, PropertyValueSerializer
+    CategorySerializer, ItemSerializer, PropertyNameSerializer, PropertyValueSerializer, OrderSerializer, \
+    OrderItemSerializer
 from backend.utils import hash_password, check_passwords, get_auth_token, get_object, get_success_msg, \
     get_fail_msg, get_model_fields, check_request_fields, check_model_in_brand, slugify_item, check_item_owner, \
     check_quantity, get_order
@@ -465,4 +466,8 @@ class OrderItemView(ModelViewSet):
             return [IsOwner()]
         return []
 
-
+    def get_serializer_class(self):
+        if self.action in ['list', 'retrieve']:
+            return OrderSerializer
+        elif self.action in ['create']:
+            return OrderItemSerializer
