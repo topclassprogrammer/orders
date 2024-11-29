@@ -2,6 +2,7 @@ import datetime
 import uuid
 
 from django.db import IntegrityError
+from django.db.models import Q, Sum, F
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -471,3 +472,25 @@ class OrderItemView(ModelViewSet):
             return OrderSerializer
         elif self.action in ['create']:
             return OrderItemSerializer
+
+    def get_queryset(self):
+        if self.action in ['list', 'retrieve']:
+            query = Q(state=OrderChoices.CART)
+            if self.request.user.role.name == RoleChoices.ADMIN:
+                pass
+            else:
+                query &= Q(user=self.request.user)
+
+            if self.action == 'retrieve':
+                pk = int(self.request.__dict__['parser_context']['kwargs']['pk'])  # self.get_object() выдает здесь рекурсию, поэтому используем такую длинную конструкцию
+                obj = get_object(Order, pk)
+                self.check_object_permissions(self.request, obj)
+                query &= Q(id=obj.id)
+
+            queryset = Order.objects.filter(query).prefetch_related("order_items__item"). \
+                annotate(sum=Sum(F("order_items__item__quantity") * F("order_items__item__price")))
+            return queryset
+        else:
+            return OrderItem.objects.all()
+
+
