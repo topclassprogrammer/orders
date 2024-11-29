@@ -549,7 +549,26 @@ class OrderView(ModelViewSet):
         obj.delete()
         return Response(get_success_msg(self.action), status=status.HTTP_204_NO_CONTENT)
 
+    def get_queryset(self):
+        if self.action in ['list', 'retrieve']:
+            query = ~Q(state=OrderChoices.CART)
+            if self.request.user.role.name == RoleChoices.ADMIN:
+                pass
+            else:
+                query &= Q(user=self.request.user)
 
+            if self.action == 'retrieve':
+                pk = int(self.request.__dict__['parser_context']['kwargs']['pk'])
+                obj = get_object(Order, pk)
+                self.check_object_permissions(self.request, obj)
+                query &= Q(id=obj.id)
+
+            queryset = Order.objects.filter(query).prefetch_related("order_items__item"). \
+                annotate(sum=Sum(F("order_items__item__quantity") * F("order_items__item__price")))
+            return queryset
+
+        else:
+            return Order.objects.all()
 
 
 
