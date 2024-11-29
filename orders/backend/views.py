@@ -570,5 +570,12 @@ class OrderView(ModelViewSet):
         else:
             return Order.objects.all()
 
-
+    def get_permissions(self):
+        if self.request.user.role.name == RoleChoices.ADMIN:
+            return []
+        elif self.action in ['create', 'retrieve']:
+            return [IsOwner()]
+        elif self.action in ['partial_update', 'destroy']:
+            return [IsAdmin()]
+        return []
 
