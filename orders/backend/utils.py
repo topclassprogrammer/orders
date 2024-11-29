@@ -114,6 +114,20 @@ def check_item_owner(model, request):
         return item_obj.id
 
 
+def get_order(request, model, state):
+    query = Q(user=request.user, state=state)
+    order_id = request.data.get('id')
+    if order_id:
+        query &= Q(id=order_id)
+    try:
+        order = model.objects.get(query)
+    except model.DoesNotExist as err:
+        if order_id:
+            return err
+        order = model.objects.create(user=request.user)
+    return order
+
+
 def check_quantity(quantity, item):
     try:
         quantity = int(quantity)
