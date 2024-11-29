@@ -455,4 +455,7 @@ class OrderItemView(ModelViewSet):  # Неоформленный заказ(в �
         obj.save()
         return Response(get_success_msg(self.action, obj=obj), status=status.HTTP_201_CREATED)
 
-
+    def destroy(self, request, *args, **kwargs):  # Удалить товар из корзины
+        obj = self.get_object()
+        obj.delete()
+        return Response(get_success_msg(self.action), status=status.HTTP_204_NO_CONTENT)
