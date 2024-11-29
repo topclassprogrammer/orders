@@ -3,6 +3,7 @@ import uuid
 
 from django.db import IntegrityError
 from django.db.models import Q, Sum, F
+from django.db.transaction import set_autocommit, rollback, commit
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -492,5 +493,44 @@ class OrderItemView(ModelViewSet):
             return queryset
         else:
             return OrderItem.objects.all()
+
+
+class OrderView(ModelViewSet):  # Оформленные заказы(уже не в корзине)
+    serializer_class = OrderSerializer
+    authentication_classes = [TokenAuthentication]
+
+    # Методы: list - список всех уже оформленных заказов, т.е. у них уже нет статуса CART(не лежат в корзине); retrieve - конкретный оформленный заказ не со статусом CART
+
+    def create(self, request, *args,
+               **kwargs):  # Подтвердить(завершить оформление заказа) - изменить запись заказа со статусом CART на статус NEW - эта запись была автоматически создана в create() у OrderItem в таблице OrderItem
+        field = check_request_fields(request, Order)
+        if field:
+            return Response(get_fail_msg(self.action, field=field), status=status.HTTP_400_BAD_REQUEST)
+
+        order = get_order(request, Order, state=OrderChoices.CART)
+        if not isinstance(order, Order):
+            return Response(get_fail_msg(self.action, err=order), status=status.HTTP_404_NOT_FOUND)
+        order.state = OrderChoices.NEW
+        order.address = Address.objects.get(id=request.data['address'])
+
+        set_autocommit(autocommit=False)
+        try:
+            for el in order.order_items.all():  # Вычитаем кол-во заказываемого товара пользователем из кол-во доступного товара в наличии в магазине
+                diff = el.item.quantity - el.quantity
+                if diff < 0:  # Делаем проверку на случай, когда клиент, что-то положил в корзину, но еще не оформил заказ, и кто-то другой уже оформил заказ и соответственно в магазине кол-во доступного товара стало меньше, чем было на тот момент, когда клиент добавлял товар в корзину
+                    return Response({"status": False,
+                                     "message": f"Insufficient quantity of item {el.item.brand.name} {el.item.model.name} in stock. You chose {el.quantity} but only {el.item.quantity} are available in stock"},
+                                    status=status.HTTP_400_BAD_REQUEST)
+                el.item.quantity = diff
+                el.item.save()
+            order.save()
+        except IntegrityError:
+            rollback()
+            return Response({"status": False, "message": "Unknown error occurred. Please try again later"},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            commit()
+            return Response({"status": True, "message": "Order successfully made"}, status=status.HTTP_201_CREATED)
+
 
 
