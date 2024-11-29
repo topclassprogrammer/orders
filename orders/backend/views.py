@@ -9,13 +9,14 @@ from rest_framework.viewsets import ViewSet, ModelViewSet
 
 from backend.auth import TokenAuthentication
 from backend.models import ActivationToken, AuthToken, PasswordResetToken, User, RoleChoices, Role, Shop, Address, \
-    Brand, Model, Category, Item, PropertyName, PropertyValue
+    Brand, Model, Category, Item, PropertyName, PropertyValue, OrderItem, Order, OrderChoices
 from backend.permissions import IsOwner, IsAdmin, HasShop, IsAuthenticated
 from backend.serializers import UserSerializer, ActivationSerializer, PasswordResetSerializer, \
     LogInSerializer, RoleSerializer, ShopSerializer, AddressSerializer, BrandSerializer, ModelSerializer, \
     CategorySerializer, ItemSerializer, PropertyNameSerializer, PropertyValueSerializer
 from backend.utils import hash_password, check_passwords, get_auth_token, get_object, get_success_msg, \
-    get_fail_msg, get_model_fields, check_request_fields, check_model_in_brand, slugify_item, check_item_owner
+    get_fail_msg, get_model_fields, check_request_fields, check_model_in_brand, slugify_item, check_item_owner, \
+    check_quantity, get_order
 
 
 class UserView(ViewSet):
@@ -390,5 +391,43 @@ class PropertyValueView(ModelViewSet):
         elif self.action in ['partial_update', 'destroy']:
             return [IsOwner()]
         return []
+
+
+class OrderItemView(ModelViewSet):  # Неоформленный заказ(в корзине)
+    authentication_classes = [TokenAuthentication]
+
+    # Методы: list - список всех заказов со статусом CART; retrieve - конкретный заказ со статусом CART
+
+    def create(self, request, *args,
+               **kwargs):  # Добавляем товар в корзину, и здесь же создаем корзину(если еще не создана(т.е. если корзина не имеет статуса CART))
+        field = check_request_fields(request, OrderItem)
+        if field:
+            return Response(get_fail_msg(self.action, field=field), status=status.HTTP_400_BAD_REQUEST)
+
+        item_id = request.data['item']
+        try:
+            item = Item.objects.get(id=item_id)
+        except (Item.DoesNotExist, ValueError) as err:
+            return Response(get_fail_msg(self.action, err=err), status=status.HTTP_400_BAD_REQUEST)
+
+        if item.shop.accept_orders is False:
+            return Response({"status": False,
+                             "message": "You can't choose this item because the shop cannot accept any orders at this time"},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        quantity = request.data['quantity']
+        quantity_err_msg = check_quantity(quantity, item)
+        if quantity_err_msg:
+            return Response(quantity_err_msg, status=status.HTTP_400_BAD_REQUEST)
+
+        order = get_order(request, Order, OrderChoices.CART)
+        try:
+            obj = OrderItem.objects.create(**get_model_fields(self.get_serializer_class(), request), order=order)
+        except (IntegrityError, ValueError) as err:
+            return Response(get_fail_msg(self.action, err=err), status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(get_success_msg(self.action, obj=obj), status=status.HTTP_201_CREATED)
+
+
 
 
