@@ -180,12 +180,14 @@ class ShopView(ModelViewSet):
         user.save()
         return Response(get_success_msg(self.action, obj.id), status=status.HTTP_204_NO_CONTENT)
 
-    @action(methods=['POST'], detail=True, url_path="accept-orders")
-    def accept_orders(self, request, pk=None):
+    @action(methods=['POST'], detail=True, url_path="switch-accept-orders")
+    def switch_accept_orders(self, request, pk=None):
         obj = self.get_object()
         obj.accept_orders = not obj.accept_orders
         obj.save()
-        return Response({"status": True, "message": f"Accept orders changed from {not obj.accept_orders} to {obj.accept_orders}"}, status=status.HTTP_200_OK)
+        return Response(
+            {"status": True, "message": f"Accept orders switched from {not obj.accept_orders} to {obj.accept_orders}"},
+            status=status.HTTP_200_OK)
 
     def get_permissions(self):
         if self.action in ['partial_update', 'destroy']:
