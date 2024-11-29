@@ -393,13 +393,11 @@ class PropertyValueView(ModelViewSet):
         return []
 
 
-class OrderItemView(ModelViewSet):  # Неоформленный заказ(в корзине)
+class OrderItemView(ModelViewSet):
     authentication_classes = [TokenAuthentication]
 
-    # Методы: list - список всех заказов со статусом CART; retrieve - конкретный заказ со статусом CART
-
     def create(self, request, *args,
-               **kwargs):  # Добавляем товар в корзину, и здесь же создаем корзину(если еще не создана(т.е. если корзина не имеет статуса CART))
+               **kwargs):
         field = check_request_fields(request, OrderItem)
         if field:
             return Response(get_fail_msg(self.action, field=field), status=status.HTTP_400_BAD_REQUEST)
@@ -428,7 +426,7 @@ class OrderItemView(ModelViewSet):  # Неоформленный заказ(в �
 
         return Response(get_success_msg(self.action, obj=obj), status=status.HTTP_201_CREATED)
 
-    def partial_update(self, request, *args, **kwargs):  # Поменять товар и его кол-во в корзине
+    def partial_update(self, request, *args, **kwargs):
         field = check_request_fields(request, OrderItem)
         if field:
             return Response(get_fail_msg(self.action, field=field), status=status.HTTP_400_BAD_REQUEST)
@@ -455,7 +453,7 @@ class OrderItemView(ModelViewSet):  # Неоформленный заказ(в �
         obj.save()
         return Response(get_success_msg(self.action, obj=obj), status=status.HTTP_201_CREATED)
 
-    def destroy(self, request, *args, **kwargs):  # Удалить товар из корзины
+    def destroy(self, request, *args, **kwargs):
         obj = self.get_object()
         obj.delete()
         return Response(get_success_msg(self.action), status=status.HTTP_204_NO_CONTENT)
