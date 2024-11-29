@@ -12,6 +12,34 @@ class IsAuthenticated(BasePermission):
 
 
 class IsOwner(BasePermission):
+    def has_permission(self, request, view):
+        from backend.views import OrderView
+        if isinstance(view, OrderView):
+            if view.__dict__['action'] == 'create':
+                fields = ['id', 'address']
+                for field in fields:
+                    if field not in request.data:
+                        raise PermissionDenied(f"You must provide field '{field}'")
+
+                order_id = request.data['id']
+                try:
+                    order = models.Order.objects.get(id=order_id)
+                except (models.Order.DoesNotExist, ValueError) as err:
+                    raise PermissionDenied(err)
+
+                address_id = request.data['address']
+                try:
+                    address = models.Address.objects.get(id=address_id)
+                except (models.Order.DoesNotExist, ValueError) as err:
+                    raise PermissionDenied(err)
+
+                if address.user != request.user:
+                    raise PermissionDenied(f"{models.Address.__name__} with id {address_id} doesn't belong to you")
+                if order.user != request.user:
+                    raise PermissionDenied(f"{models.Order.__name__} with id {order_id} doesn't belong to you")
+
+        return True
+
     def has_object_permission(self, request, view, obj):
         conditions = {
             'shop': 'obj.user != request.user',
