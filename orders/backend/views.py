@@ -495,14 +495,11 @@ class OrderItemView(ModelViewSet):
             return OrderItem.objects.all()
 
 
-class OrderView(ModelViewSet):  # Оформленные заказы(уже не в корзине)
+class OrderView(ModelViewSet):
     serializer_class = OrderSerializer
     authentication_classes = [TokenAuthentication]
 
-    # Методы: list - список всех уже оформленных заказов, т.е. у них уже нет статуса CART(не лежат в корзине); retrieve - конкретный оформленный заказ не со статусом CART
-
-    def create(self, request, *args,
-               **kwargs):  # Подтвердить(завершить оформление заказа) - изменить запись заказа со статусом CART на статус NEW - эта запись была автоматически создана в create() у OrderItem в таблице OrderItem
+    def create(self, request, *args, **kwargs):
         field = check_request_fields(request, Order)
         if field:
             return Response(get_fail_msg(self.action, field=field), status=status.HTTP_400_BAD_REQUEST)
@@ -515,11 +512,13 @@ class OrderView(ModelViewSet):  # Оформленные заказы(уже н�
 
         set_autocommit(autocommit=False)
         try:
-            for el in order.order_items.all():  # Вычитаем кол-во заказываемого товара пользователем из кол-во доступного товара в наличии в магазине
+            for el in order.order_items.all():
                 diff = el.item.quantity - el.quantity
-                if diff < 0:  # Делаем проверку на случай, когда клиент, что-то положил в корзину, но еще не оформил заказ, и кто-то другой уже оформил заказ и соответственно в магазине кол-во доступного товара стало меньше, чем было на тот момент, когда клиент добавлял товар в корзину
+                if diff < 0:
                     return Response({"status": False,
-                                     "message": f"Insufficient quantity of item {el.item.brand.name} {el.item.model.name} in stock. You chose {el.quantity} but only {el.item.quantity} are available in stock"},
+                                     "message": f"Insufficient quantity of item {el.item.brand.name} "
+                                                f"{el.item.model.name} in stock. You chose {el.quantity} "
+                                                f"but only {el.item.quantity} are available in stock"},
                                     status=status.HTTP_400_BAD_REQUEST)
                 el.item.quantity = diff
                 el.item.save()
