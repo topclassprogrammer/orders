@@ -57,6 +57,25 @@ class UserView(ViewSet):
         obj.delete()
         return Response(get_success_msg(self.action, pk=pk), status=status.HTTP_204_NO_CONTENT)
 
+    @action(methods=['POST'], detail=False, url_path='activate')
+    def activate(self, request):
+        serializer = self.get_serializer_class()(data=request.data)
+        if serializer.is_valid():
+            key = request.data['key']
+            try:
+                token = ActivationToken.objects.get(key=uuid.UUID(key))
+            except ActivationToken.DoesNotExist:
+                return Response({"status": False, "message": "Activation token key not found in DB"},
+                                status=status.HTTP_404_NOT_FOUND)
+            if token.user.is_active:
+                return Response({"status": False, "message": "Account is already activated"},
+                                status=status.HTTP_400_BAD_REQUEST)
+            token.user.is_active = True
+            token.user.save()
+            token.delete()
+            return Response({"status": True, "message": "Account successfully activated"}, status=status.HTTP_200_OK)
+        return Response(get_fail_msg(self.action, serializer), status=status.HTTP_400_BAD_REQUEST)
+
     @action(methods=['POST'], detail=False, url_path="log-in")
     def log_in(self, request):
         serializer = self.get_serializer_class()(data=request.data)
@@ -81,25 +100,6 @@ class UserView(ViewSet):
         auth_token = get_auth_token(request)
         auth_token.delete()
         return Response({"status": True, "message": "You just logged out"}, status=status.HTTP_200_OK)
-
-    @action(methods=['POST'], detail=False, url_path='activate')
-    def activate(self, request):
-        serializer = self.get_serializer_class()(data=request.data)
-        if serializer.is_valid():
-            key = request.data['key']
-            try:
-                token = ActivationToken.objects.get(key=uuid.UUID(key))
-            except ActivationToken.DoesNotExist:
-                return Response({"status": False, "message": "Activation token key not found in DB"},
-                                status=status.HTTP_404_NOT_FOUND)
-            if token.user.is_active:
-                return Response({"status": False, "message": "Account is already activated"},
-                                status=status.HTTP_400_BAD_REQUEST)
-            token.user.is_active = True
-            token.user.save()
-            token.delete()
-            return Response({"status": True, "message": "Account successfully activated"}, status=status.HTTP_200_OK)
-        return Response(get_fail_msg(self.action, serializer), status=status.HTTP_400_BAD_REQUEST)
 
     @action(methods=['POST'], detail=False, url_path='password-reset-request')
     def password_reset_request(self, request):
