@@ -114,6 +114,17 @@ def check_item_owner(model, request):
         return item_obj.id
 
 
+def check_quantity(quantity, item):
+    try:
+        quantity = int(quantity)
+        if not 0 < quantity < 32767:
+            return {"status": False, "message": f"Incorrect quantity value: you must enter value 0 to 32767"}
+    except TypeError as err:
+        return {"status": False, "message": f"Incorrect quantity value: {err}"}
+    if quantity > item.quantity:
+        return {"status": False, "message": "You chose more items than available in stock"}
+
+
 def slugify_item(brand, model, item, request):
     brand_obj = brand.objects.get(id=request.data[brand.__name__.lower()])
     model_obj = model.objects.get(id=request.data[model.__name__.lower()])
