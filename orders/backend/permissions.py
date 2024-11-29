@@ -42,11 +42,13 @@ class IsOwner(BasePermission):
 
     def has_object_permission(self, request, view, obj):
         conditions = {
-            'shop': 'obj.user != request.user',
             'user': 'obj != request.user',
+            'shop': 'obj.user != request.user',
             'address': 'obj.user != request.user',
             'item': 'obj.shop.user != request.user',
-            'propertyvalue': 'obj.item.shop.user != request.user'
+            'propertyvalue': 'obj.item.shop.user != request.user',
+            'order': 'obj.user != request.user',
+            'orderitem': 'obj.order.user != request.user'
         }
         model_name = obj._meta.model.__name__.lower()
         if eval(conditions[model_name]):
