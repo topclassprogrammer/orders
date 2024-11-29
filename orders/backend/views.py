@@ -190,9 +190,7 @@ class ShopView(ModelViewSet):
             status=status.HTTP_200_OK)
 
     def get_permissions(self):
-        if self.action in ['partial_update', 'destroy']:
-            return [IsOwner()]
-        elif self.action == 'accept_orders':
+        if self.action in ['partial_update', 'destroy', 'switch_accept_orders']:
             return [IsOwner()]
         return []
 
