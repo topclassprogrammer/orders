@@ -457,3 +457,12 @@ class OrderItemView(ModelViewSet):
         obj = self.get_object()
         obj.delete()
         return Response(get_success_msg(self.action), status=status.HTTP_204_NO_CONTENT)
+
+    def get_permissions(self):
+        if self.request.user.role.name == RoleChoices.ADMIN:
+            return []
+        elif self.action in ['retrieve', 'partial_update', 'destroy']:
+            return [IsOwner()]
+        return []
+
+
