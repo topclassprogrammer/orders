@@ -22,7 +22,10 @@ from backend.utils import hash_password, check_passwords, get_auth_token, get_ob
     check_quantity, get_order
 
 
-class UserView(ViewSet):
+class UserView(ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
     def create(self, request):
         serializer = self.get_serializer_class()(data=request.data)
         if serializer.is_valid():
