@@ -23,11 +23,6 @@ from backend.utils import hash_password, check_passwords, get_auth_token, get_ob
 
 
 class UserView(ViewSet):
-    def retrieve(self, request, pk=None):
-        obj = get_object(User, pk)
-        serializer = self.get_serializer_class()(obj)
-        return Response(get_success_msg(self.action, serializer, pk), status=status.HTTP_200_OK)
-
     def create(self, request):
         serializer = self.get_serializer_class()(data=request.data)
         if serializer.is_valid():
