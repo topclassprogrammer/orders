@@ -26,7 +26,7 @@ class UserView(ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
-    def create(self, request):
+    def create(self, request, *args, **kwargs):
         serializer = self.get_serializer_class()(data=request.data)
         if serializer.is_valid():
             role = Role.objects.get(name=RoleChoices.CLIENT)
@@ -35,7 +35,7 @@ class UserView(ModelViewSet):
             return Response(get_success_msg(self.action, serializer), status=status.HTTP_201_CREATED)
         return Response(get_fail_msg(self.action, serializer), status=status.HTTP_400_BAD_REQUEST)
 
-    def partial_update(self, request, pk=None):
+    def partial_update(self, request, *args, pk=None, **kwargs):
         obj = get_object(User, pk)
         self.check_object_permissions(request, obj)
         serializer = self.get_serializer_class()(obj, request.data, partial=True)
@@ -44,7 +44,7 @@ class UserView(ModelViewSet):
             return Response(get_success_msg(self.action, serializer), status=status.HTTP_206_PARTIAL_CONTENT)
         return Response(get_fail_msg(self.action, serializer), status=status.HTTP_400_BAD_REQUEST)
 
-    def destroy(self, request, pk=None):
+    def destroy(self, request, *args, pk=None, **kwargs):
         obj = get_object(User, pk)
         self.check_object_permissions(request, obj)
         obj.delete()
