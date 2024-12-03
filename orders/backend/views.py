@@ -160,7 +160,7 @@ class UserView(ModelViewSet):
             return LogInSerializer
         elif self.action in ['activate']:
             return ActivationSerializer
-        elif self.action in ['password_reset_response']:
+        elif self.action in ['set_new_password']:
             return PasswordResetSerializer
 
 
