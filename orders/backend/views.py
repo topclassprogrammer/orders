@@ -70,8 +70,8 @@ class UserView(ModelViewSet):
             token.user.is_active = True
             token.user.save()
             token.delete()
-            return Response({"status": True, "message": "Account successfully activated"}, status=status.HTTP_200_OK)
-        return Response(get_fail_msg(self.action, serializer), status=status.HTTP_400_BAD_REQUEST)
+            return Response({"status": True, "message": f"Account with ID {token.user.id} successfully activated"}, status=status.HTTP_200_OK)
+        return Response({"status": False, "message": f"Activation failed: {serializer.errors}"}, status=status.HTTP_400_BAD_REQUEST)
 
     @action(methods=['POST'], detail=False, url_path="log-in")
     def log_in(self, request):
