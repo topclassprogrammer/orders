@@ -160,4 +160,5 @@ def get_url_end_path(request, basename):
     return method_name
 
 
-
+def get_request_method(request):
+    return request.environ.get('REQUEST_METHOD')
