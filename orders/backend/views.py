@@ -138,14 +138,12 @@ class UserView(ModelViewSet):
                         status=status.HTTP_400_BAD_REQUEST)
 
     def get_permissions(self):
-        if self.action in ['create', 'log_in', 'activate']:
-            return []
-        elif self.action == "list":
-            return [IsAuthenticated(), IsAdmin()]
+        if self.action == "list":
+            return [IsAdmin()]
         elif self.action in ['partial_update', 'destroy']:
-            return [IsAuthenticated(), IsOwner()]
-        elif self.action in ['retrieve', 'log_out', 'password_reset_request', 'password_reset_response']:
-            return [IsAuthenticated()]
+            return [IsOwner()]
+        else:
+            return []
 
     def get_serializer_class(self):
         if self.action in ['list', 'retrieve', 'create', 'partial_update']:
