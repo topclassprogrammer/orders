@@ -20,7 +20,7 @@ from backend.serializers import UserSerializer, ActivationSerializer, PasswordRe
     OrderItemSerializer
 from backend.utils import hash_password, check_passwords, get_auth_token, get_object, get_success_msg, \
     get_fail_msg, get_model_fields, check_request_fields, check_model_in_brand, slugify_item, check_item_owner, \
-    check_quantity, get_order
+    check_quantity, get_order, get_url_end_path, get_request_method
 
 
 class UserView(ModelViewSet):
@@ -144,6 +144,14 @@ class UserView(ModelViewSet):
             return [IsOwner()]
         else:
             return []
+
+    def get_authenticators(self):
+        url_end = get_url_end_path(self.request, self.basename)
+        request_method = get_request_method(self.request)
+        if url_end in ['', 'log-in', 'activate'] and request_method == 'POST':
+            return []
+        else:
+            return [TokenAuthentication()]
 
     def get_serializer_class(self):
         if self.action in ['list', 'retrieve', 'create', 'partial_update']:
