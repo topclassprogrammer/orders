@@ -107,11 +107,15 @@ class UserView(ModelViewSet):
         token.delete()
         return Response({"status": True, "message": "You just logged out"}, status=status.HTTP_200_OK)
 
-    @action(methods=['POST'], detail=False, url_path='password-reset-request')
-    def password_reset_request(self, request):
+    @action(methods=['POST'], detail=False, url_path='request-new-password')
+    def request_new_password(self, request):
         user = self.request.user
-        PasswordResetToken.objects.create(key=uuid.uuid4(), user=user)
-        return Response({"status": True, "message": "Password reset request successfully completed"}, status=status.HTTP_200_OK)
+        token = PasswordResetToken.objects.create(key=uuid.uuid4(), user=user)
+        subject = f"Password reset request for your account"
+        msg = f"<p>Your password reset token key is <b>{token.key}</b></p><p>In order to change your password you have to provide this token in the POST request <a href=http://{request.META['HTTP_HOST']}/{BASE_URL}{self.set_new_password.url_path}>here</a>."
+        notify(user.email, subject, msg)
+        return Response({"status": True, "message": f"Password reset token has been successfully sent to your email: {token.user.email}"},
+                        status=status.HTTP_200_OK)
 
     @action(methods=['POST'], detail=False, url_path='password-reset-response')
     def password_reset_response(self, request):
