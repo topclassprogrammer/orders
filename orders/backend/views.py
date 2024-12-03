@@ -12,6 +12,7 @@ from rest_framework.viewsets import ViewSet, ModelViewSet
 from backend.auth import TokenAuthentication
 from backend.models import ActivationToken, AuthToken, PasswordResetToken, User, RoleChoices, Role, Shop, Address, \
     Brand, Model, Category, Item, PropertyName, PropertyValue, OrderItem, Order, OrderChoices
+from backend.notifications import notify
 from backend.permissions import IsOwner, IsAdmin, HasShop, IsAuthenticated
 from backend.serializers import UserSerializer, ActivationSerializer, PasswordResetSerializer, \
     LogInSerializer, RoleSerializer, ShopSerializer, AddressSerializer, BrandSerializer, ModelSerializer, \
@@ -31,8 +32,11 @@ class UserView(ModelViewSet):
         if serializer.is_valid():
             role = Role.objects.get(name=RoleChoices.CLIENT)
             user = serializer.save(role=role)
-            ActivationToken.objects.create(key=uuid.uuid4(), user=user)
-            return Response(get_success_msg(self.action, serializer), status=status.HTTP_201_CREATED)
+            token = ActivationToken.objects.create(key=uuid.uuid4(), user=user)
+            subject = f"Activation token for your account"
+            msg = f"<p>Your activation token key is <b>{token.key}</b></p><p>You have to provided it in the POST request <a href=http://{request.META['HTTP_HOST']}/{BASE_URL}{self.activate.url_path}/>here</a>. Until you do so, you are not allowed to log in</p>"
+            notify(user.email, subject, msg)
+            return Response({"status": True, "message": f"You successfully created account: f{serializer.data}. To activate it you have to follow instructions sent to your email: {token.user.email}"}, status=status.HTTP_201_CREATED)
         return Response(get_fail_msg(self.action, serializer), status=status.HTTP_400_BAD_REQUEST)
 
     def partial_update(self, request, *args, pk=None, **kwargs):
