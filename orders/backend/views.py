@@ -117,8 +117,8 @@ class UserView(ModelViewSet):
         return Response({"status": True, "message": f"Password reset token has been successfully sent to your email: {token.user.email}"},
                         status=status.HTTP_200_OK)
 
-    @action(methods=['POST'], detail=False, url_path='password-reset-response')
-    def password_reset_response(self, request):
+    @action(methods=['POST'], detail=False, url_path='set-new-password')
+    def set_new_password(self, request):
         serializer = self.get_serializer_class()(data=request.data)
         if serializer.is_valid():
             key = request.data['key']
