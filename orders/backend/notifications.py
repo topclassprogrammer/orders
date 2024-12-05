@@ -6,8 +6,8 @@ from django.http import HttpResponseServerError
 
 SMTP_SERVER = os.getenv('SMTP_SERVER')
 SMTP_PORT = int(os.getenv('SMTP_PORT'))
-EMAIL_ADDRESS = os.getenv('EMAIL_ADDRESS')
-EMAIL_PASSWORD = os.getenv('EMAIL_PASSWORD')
+SENDER_EMAIL_ADDRESS = os.getenv('SENDER_EMAIL_ADDRESS')
+SENDER_EMAIL_PASSWORD = os.getenv('SENDER_EMAIL_PASSWORD')
 
 
 def notify(receiver_email, subject, message):
