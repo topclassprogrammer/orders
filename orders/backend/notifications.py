@@ -42,15 +42,15 @@ def get_subject(view, action):
     return subject
 
 
-def notify(receiver_email, subject, message):
+def notify(user_email, view, action, **kwargs):
     msg = EmailMessage()
-    msg['Subject'] = subject
-    msg['From'] = EMAIL_ADDRESS
-    msg['To'] = receiver_email
-    msg.set_content(message,  subtype='html')
+    msg['Subject'] = get_subject(view, action)
+    msg['From'] = SENDER_EMAIL_ADDRESS
+    msg['To'] = user_email
+    msg.set_content(get_message(view, action, **kwargs),  subtype='html')
     try:
         server = smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT)
-        server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
+        server.login(SENDER_EMAIL_ADDRESS, SENDER_EMAIL_PASSWORD)
         server.send_message(msg)
         server.quit()
     except (smtplib.SMTPAuthenticationError, smtplib.SMTPRecipientsRefused, TimeoutError) as err:
