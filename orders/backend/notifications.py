@@ -27,6 +27,21 @@ def get_message(view, action, **kwargs):
     return msg
 
 
+def get_subject(view, action):
+    subject = None
+    if view == views.UserView:
+        if action == views.UserView.create.__name__:
+            subject = "Activation token for your account"
+        elif action == views.UserView.request_new_password.__name__:
+            subject = "Password reset request for your account"
+    elif view == views.OrderView:
+        if action == views.OrderView.create.__name__:
+            subject = "You made a new order"
+        elif action == views.OrderView.partial_update.__name__:
+            subject = "New order state"
+    return subject
+
+
 def notify(receiver_email, subject, message):
     msg = EmailMessage()
     msg['Subject'] = subject
