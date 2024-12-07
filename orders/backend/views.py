@@ -142,7 +142,7 @@ class UserView(ModelViewSet):
     def get_authenticators(self):
         url_end = get_url_end_path(self.request, self.basename)
         request_method = get_request_method(self.request)
-        if url_end in ['', 'log-in', 'activate'] and request_method == 'POST':
+        if url_end in ['', self.__class__.log_in.url_path, self.__class__.activate.url_path] and request_method == 'POST':
             return []
         else:
             return [TokenAuthentication()]
