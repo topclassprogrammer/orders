@@ -38,8 +38,7 @@ class UserView(ModelViewSet):
         return Response(get_fail_msg(self.action, serializer), status=status.HTTP_400_BAD_REQUEST)
 
     def partial_update(self, request, *args, pk=None, **kwargs):
-        obj = get_object(User, pk)
-        self.check_object_permissions(request, obj)
+        obj = self.get_object()
         serializer = self.get_serializer_class()(obj, request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
