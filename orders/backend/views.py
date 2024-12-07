@@ -30,13 +30,11 @@ class UserView(ModelViewSet):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer_class()(data=request.data)
         if serializer.is_valid():
-            role = Role.objects.get(name=RoleChoices.CLIENT)
-            user = serializer.save(role=role)
+            default_role = Role.objects.get(name=RoleChoices.CLIENT)
+            user = serializer.save(role=default_role)
             token = ActivationToken.objects.create(key=uuid.uuid4(), user=user)
-            subject = f"Activation token for your account"
-            msg = f"<p>Your activation token key is <b>{token.key}</b></p><p>You have to provided it in the POST request <a href=http://{request.META['HTTP_HOST']}/{BASE_URL}{self.activate.url_path}/>here</a>. Until you do so, you are not allowed to log in</p>"
-            notify(user.email, subject, msg)
-            return Response({"status": True, "message": f"You successfully created account: f{serializer.data}. To activate it you have to follow instructions sent to your email: {token.user.email}"}, status=status.HTTP_201_CREATED)
+            notify(user.email, self.__class__, self.action, token=token)
+            return Response({"status": True, "message": f"You successfully created account: {serializer.data}. Your activation token sent to your email: {token.user.email}"}, status=status.HTTP_201_CREATED)
         return Response(get_fail_msg(self.action, serializer), status=status.HTTP_400_BAD_REQUEST)
 
     def partial_update(self, request, *args, pk=None, **kwargs):
