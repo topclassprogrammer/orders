@@ -148,13 +148,13 @@ class UserView(ModelViewSet):
             return [TokenAuthentication()]
 
     def get_serializer_class(self):
-        if self.action in ['list', 'retrieve', 'create', 'partial_update']:
+        if self.action in [self.__class__.list.__name__, self.__class__.retrieve.__name__, self.__class__.create.__name__, self.__class__.partial_update.__name__]:
             return UserSerializer
-        elif self.action in ['log_in']:
+        elif self.action == self.__class__.log_in.__name__:
             return LogInSerializer
-        elif self.action in ['activate']:
+        elif self.action == self.__class__.activate.__name__:
             return ActivationSerializer
-        elif self.action in ['set_new_password']:
+        elif self.action == self.__class__.set_new_password.__name__:
             return PasswordResetSerializer
 
 
