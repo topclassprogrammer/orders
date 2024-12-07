@@ -131,14 +131,6 @@ class UserView(ModelViewSet):
         return Response({"status": False, "message": f"Incorrect key or/and password provided: {serializer.errors}"},
                         status=status.HTTP_400_BAD_REQUEST)
 
-    def get_permissions(self):
-        if self.action == "list":
-            return [IsAdmin()]
-        elif self.action in ['partial_update', 'destroy']:
-            return [IsOwner()]
-        else:
-            return []
-
     def get_authenticators(self):
         url_end = get_url_end_path(self.request, self.basename)
         request_method = get_request_method(self.request)
@@ -156,6 +148,18 @@ class UserView(ModelViewSet):
             return ActivationSerializer
         elif self.action == self.__class__.set_new_password.__name__:
             return PasswordResetSerializer
+
+    def get_permissions(self):
+        permissions = [IsAuthenticated]
+        if self.action in [self.__class__.create.__name__, self.__class__.log_in.__name__, self.__class__.activate.__name__]:
+            return []
+        elif self.action == self.__class__.list.__name__:
+            permissions.append(IsAdmin)
+        elif self.action in [self.__class__.update.__name__, self.__class__.partial_update.__name__, self.__class__.destroy.__name__]:
+            permissions.append(IsOwner)
+        else:
+            pass
+        return [p() for p in permissions]
 
 
 class RoleView(ModelViewSet):
