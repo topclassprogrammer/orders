@@ -244,6 +244,14 @@ class AddressView(ModelViewSet):
     authentication_classes = [TokenAuthentication]
     permission_classes: List[Type[BasePermission]] = [IsAuthenticated]
 
+    def list(self, request, *args, **kwargs):
+        if request.user.role.name == RoleChoices.ADMIN:
+            queryset = self.get_queryset()
+        else:
+            queryset = Address.objects.filter(user=request.user)
+        serializer = self.get_serializer_class()(queryset, many=True)
+        return Response(serializer.data)
+
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer_class()(data=request.data)
         if serializer.is_valid():
