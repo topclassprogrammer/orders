@@ -242,6 +242,7 @@ class AddressView(ModelViewSet):
     queryset = Address.objects.all()
     serializer_class = AddressSerializer
     authentication_classes = [TokenAuthentication]
+    permission_classes: List[Type[BasePermission]] = [IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer_class()(data=request.data)
