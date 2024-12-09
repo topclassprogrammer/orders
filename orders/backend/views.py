@@ -263,11 +263,9 @@ class AddressView(ModelViewSet):
         return Response(get_fail_msg(self.action, serializer), status=status.HTTP_400_BAD_REQUEST)
 
     def get_permissions(self):
-        if self.action == "list":
-            return [IsAdmin()]
-        elif self.action in ["retrieve", "partial_update", "destroy"]:
-            return [IsOwner()]
-        return []
+        if self.action in [self.__class__.retrieve.__name__, self.__class__.update.__name__, self.__class__.partial_update.__name__, self.__class__.destroy.__name__]:
+            self.permission_classes.append(IsOwner)
+        return [p() for p in self.permission_classes]
 
 
 class BrandView(ModelViewSet):
