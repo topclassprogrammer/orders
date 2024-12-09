@@ -197,12 +197,13 @@ class ShopView(ModelViewSet):
         return Response(get_success_msg(self.action, obj.id), status=status.HTTP_204_NO_CONTENT)
 
     @action(methods=['POST'], detail=True, url_path="switch-accept-orders")
-    def switch_accept_orders(self, request, pk=None):
-        obj = self.get_object()
-        obj.accept_orders = not obj.accept_orders
-        obj.save()
+    def switch_accept_orders(self, request):
+        token = get_auth_token(request)
+        shop = token.user.shop
+        shop.accept_orders = not shop.accept_orders
+        shop.save()
         return Response(
-            {"status": True, "message": f"Accept orders switched from {not obj.accept_orders} to {obj.accept_orders}"},
+            {"status": True, "message": f"Accept orders switched from {not shop.accept_orders} to {shop.accept_orders}"},
             status=status.HTTP_200_OK)
 
     def get_permissions(self):
