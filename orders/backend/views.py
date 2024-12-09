@@ -228,9 +228,14 @@ class ShopView(ModelViewSet):
             return Shop.objects.all()
 
     def get_permissions(self):
-        if self.action in ['partial_update', 'destroy', 'switch_accept_orders']:
-            return [IsOwner()]
-        return []
+        if self.action == self.__class__.get_active_orders.__name__:
+            if self.request.user.role.name == RoleChoices.ADMIN:
+                return []
+            else:
+                self.permission_classes.extend([HasShop, IsOwner])
+        if self.action in [self.__class__.update.__name__, self.__class__.partial_update.__name__, self.__class__.destroy.__name__, self.__class__.switch_accept_orders.__name__]:
+            self.permission_classes.extend([HasShop, IsOwner])
+        return [p() for p in self.permission_classes]
 
 
 class AddressView(ModelViewSet):
