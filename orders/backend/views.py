@@ -212,6 +212,21 @@ class ShopView(ModelViewSet):
         serializer = OrderSerializer(queryset, many=True)
         return Response(get_success_msg(self.action, serializer), status=status.HTTP_200_OK)
 
+    def get_queryset(self):
+        if self.action == self.__class__.get_active_orders.__name__:
+            token = get_auth_token(self.request)
+            inactive_state_orders = [OrderChoices.CART, OrderChoices.CANCELED]
+            active_state_orders = [x[0] for x in OrderChoices.choices if x[0] not in inactive_state_orders]
+            query = Q(state__in=active_state_orders)
+            if self.request.user.role.name == RoleChoices.SHOP:
+                query &= Q(user__shop=token.user.shop)
+            queryset = Order.objects.filter(query).prefetch_related(
+                "order_items__item__brand", "order_items__item__model", "order_items__item__category"). \
+                select_related("address").annotate(sum=Sum(F("order_items__quantity") * F("order_items__item__price")))
+            return queryset
+        else:
+            return Shop.objects.all()
+
     def get_permissions(self):
         if self.action in ['partial_update', 'destroy', 'switch_accept_orders']:
             return [IsOwner()]
