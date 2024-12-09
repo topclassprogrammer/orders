@@ -1,11 +1,13 @@
 import datetime
 import uuid
+from typing import List, Type
 
 from django.db import IntegrityError
 from django.db.models import Q, Sum, F
 from django.db.transaction import set_autocommit, rollback, commit
 from rest_framework import status
 from rest_framework.decorators import action
+from rest_framework.permissions import BasePermission
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet, ModelViewSet
 
@@ -166,7 +168,7 @@ class RoleView(ModelViewSet):
     queryset = Role.objects.all()
     serializer_class = RoleSerializer
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAdmin]
+    permission_classes: List[Type[BasePermission]] = [IsAuthenticated]
 
 
 class ShopView(ModelViewSet):
