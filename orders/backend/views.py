@@ -206,6 +206,12 @@ class ShopView(ModelViewSet):
             {"status": True, "message": f"Accept orders switched from {not shop.accept_orders} to {shop.accept_orders}"},
             status=status.HTTP_200_OK)
 
+    @action(methods=['GET'], detail=False, url_path="active-orders")
+    def get_active_orders(self, request):
+        queryset = self.get_queryset()
+        serializer = OrderSerializer(queryset, many=True)
+        return Response(get_success_msg(self.action, serializer), status=status.HTTP_200_OK)
+
     def get_permissions(self):
         if self.action in ['partial_update', 'destroy', 'switch_accept_orders']:
             return [IsOwner()]
