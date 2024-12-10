@@ -468,6 +468,7 @@ class PropertyValueView(ModelViewSet):
     queryset = PropertyValue.objects.all()
     serializer_class = PropertyValueSerializer
     authentication_classes = [TokenAuthentication]
+    permission_classes: List[Type[BasePermission]] = [IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
         field = check_request_fields(request, PropertyValue)
