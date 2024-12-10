@@ -515,6 +515,7 @@ class PropertyValueView(ModelViewSet):
 
 class OrderItemView(ModelViewSet):
     authentication_classes = [TokenAuthentication]
+    permission_classes: List[Type[BasePermission]] = [IsAuthenticated]
 
     def create(self, request, *args,
                **kwargs):
