@@ -22,19 +22,6 @@ class HasShop(BasePermission):
         return True
 
 
-class HasShop(BasePermission):
-    def has_permission(self, request, view):
-        if request.user.role.name != models.RoleChoices.SHOP:
-            raise PermissionDenied('You do not have shop')
-        return True
-
-
-class IsAuthenticated(BasePermission):
-    def has_permission(self, request, view):
-        request = perform_authentication(request)
-        return request.user.is_authenticated
-
-
 class IsOwner(BasePermission):
     def has_permission(self, request, view):
         from backend.views import OrderView
