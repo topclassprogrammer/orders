@@ -130,7 +130,7 @@ class PropertyValueSerializer(serializers.ModelSerializer):
 
 class OrderSerializer(serializers.ModelSerializer):
     address = AddressSerializer()
-    user = UserSerializer()
+    user = UserSerializer(read_only=True)
     sum = serializers.DecimalField(max_digits=15, decimal_places=2)
 
     class Meta:
