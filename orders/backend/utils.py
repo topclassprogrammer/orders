@@ -1,6 +1,10 @@
 import uuid
+from typing import Type
 
 import bcrypt
+import django.db.models
+from django.db import models as django_models
+from django.db.models import ForeignKey, ManyToManyField, OneToOneField
 from django.http import Http404
 from django.utils.text import slugify
 from rest_framework.exceptions import ValidationError
@@ -69,25 +73,16 @@ def get_fail_msg(action, serializer=None, err=None, field=None):
                f"{err if err else f'field/value `{field}` does not exist in model'}"}
 
 
-def get_model_fields(serializer, request):
-    serializer_fields = serializer.Meta.fields
-    serializer_read_only_fields = serializer.Meta.read_only_fields
-    nested_serializers_names = serializer.__dict__['_declared_fields']
-    nested_serializers_names_with_id = []
-    for name in nested_serializers_names:
-        name_id = name + '_id'
-        nested_serializers_names_with_id.append(name_id)
-        if name in serializer_fields:
-            serializer_fields.remove(name)
-    serializer_fields.extend(nested_serializers_names_with_id)
-    res_fields = [x for x in serializer_fields if x not in serializer_read_only_fields]
-
-    param_fields = {}
-    for field in res_fields:
-        clean_name = field.split('_id')[0]
-        if clean_name in request.data.keys():
-            param_fields.setdefault(field, request.data[clean_name])
-    return param_fields
+def get_request_data(model: Type[django_models.Model], request) -> dict:  # Добавляет _id к полям у которых есть внешний ключ
+    model_fields = model._meta.get_fields()
+    data = {}
+    id_fields = [field.name for field in model_fields if isinstance(field, (ForeignKey, ManyToManyField, OneToOneField))]
+    for k, v in request.data.items():
+        if k in id_fields:
+            data.setdefault(k + "_id", v)
+        else:
+            data.setdefault(k, v)
+    return data
 
 
 def check_request_fields(request, model):
