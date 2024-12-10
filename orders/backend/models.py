@@ -161,7 +161,7 @@ class Brand(models.Model):
 
 class Model(models.Model):
     name = models.CharField(max_length=64)
-    brand = models.ForeignKey(Brand, on_delete=models.CASCADE, related_name="models", null=True, blank=True)
+    brand = models.ForeignKey(Brand, on_delete=models.CASCADE, related_name="models", db_index=True)
 
     class Meta:
         constraints = [
