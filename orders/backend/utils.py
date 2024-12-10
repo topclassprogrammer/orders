@@ -1,5 +1,5 @@
 import uuid
-from typing import Type
+from typing import Type, List
 
 import bcrypt
 import django.db.models
@@ -8,6 +8,8 @@ from django.db.models import ForeignKey, ManyToManyField, OneToOneField
 from django.http import Http404
 from django.utils.text import slugify
 from rest_framework.exceptions import ValidationError
+
+from backend import models
 
 
 def hash_password(value):
@@ -164,3 +166,9 @@ def get_url_end_path(request, basename):
 
 def get_request_method(request):
     return request.environ.get('REQUEST_METHOD')
+
+
+def get_admin_emails() -> List[str]:
+    admin_emails = models.User.objects.filter(role__name=models.RoleChoices.ADMIN).values_list('email')
+    return list(*admin_emails)
+
