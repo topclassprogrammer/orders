@@ -85,6 +85,13 @@ def get_request_data(model: Type[django_models.Model], request) -> dict:  # До
     return data
 
 
+def slugify_bulk_item(brand_name: str, model_name: str) -> str:
+    brand_name = brand_name.lower().replace(' ', '-')
+    model_name = model_name.lower().replace(' ', '-')
+    slug = brand_name + '-' + model_name
+    return slug + '-' + str(uuid.uuid4())
+
+
 def check_request_fields(request, model):
     for x in request.data:
         if x not in model.__dict__.keys():
