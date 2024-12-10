@@ -17,5 +17,6 @@ router.register("property-name", PropertyNameView, basename="property-name")
 router.register("property-value", PropertyValueView, basename="property-value")
 router.register("order", OrderView, basename="order")
 router.register("order-item", OrderItemView, basename="order-item")
+router.register("active-orders", OrderItemView, basename="active-orders")
 
 urlpatterns = router.urls
