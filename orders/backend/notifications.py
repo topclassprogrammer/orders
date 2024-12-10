@@ -1,8 +1,10 @@
 import os
 import smtplib
 from email.message import EmailMessage
+from typing import Type
 
 from django.http import HttpResponseServerError
+from rest_framework.viewsets import ModelViewSet
 
 from backend import views
 
@@ -12,7 +14,7 @@ SENDER_EMAIL_ADDRESS = os.getenv('SENDER_EMAIL_ADDRESS')
 SENDER_EMAIL_PASSWORD = os.getenv('SENDER_EMAIL_PASSWORD')
 
 
-def get_message(view, action, **kwargs):
+def get_message(view: Type[ModelViewSet], action: str, **kwargs) -> str:
     msg = None
     if view == views.UserView:
         if action == views.UserView.create.__name__:
@@ -21,11 +23,13 @@ def get_message(view, action, **kwargs):
             msg = f"<p>Your password reset token key is <b>{kwargs['token'].key}</b></p>"
     elif view == views.OrderView:
         if action == views.OrderView.create.__name__:
-            msg = f"<p>You successfully made an order.</p><p>Your order ID is <b>{kwargs['order'].id}</b>.</p><p>The current state is <b>{kwargs['order'].state}</b>.</p>"
+            if kwargs.get('admin'):
+                msg = f"<p>You have a new order with ID <b>{kwargs['order'].id}</b> from a user with email <b>{kwargs['order'].user.email}</b>.</p>"
+            else:
+                msg = f"<p>You successfully made an order.</p><p>Your order ID is <b>{kwargs['order'].id}</b>.</p><p>The current state is <b>{kwargs['order'].state}</b>.</p>"
         elif action == views.OrderView.partial_update.__name__:
             msg = f"<p>The state for your order with ID <b>{kwargs['order'].id}</b> has been changed to <b>{kwargs['order'].state}</b></p>"
     return msg
-
 
 def get_subject(view, action):
     subject = None
