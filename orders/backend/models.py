@@ -114,12 +114,12 @@ class Item(models.Model):
     brand = models.ForeignKey("Brand", on_delete=models.CASCADE, related_name="items")
     model = models.ForeignKey("Model", on_delete=models.CASCADE, related_name="items")
     category = models.ForeignKey("Category", on_delete=models.CASCADE, related_name="items")
-    shop = models.ForeignKey(Shop, on_delete=models.CASCADE, related_name="items")
+    shop = models.ForeignKey(Shop, on_delete=models.CASCADE, related_name="items", db_index=True)
     description = models.TextField(null=True, blank=True)
-    image = models.ImageField(upload_to="images", null=True, blank=True)
+    image = models.ImageField(null=True, blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     quantity = models.PositiveSmallIntegerField(default=0)
-    slug = models.SlugField(max_length=64, unique=True, blank=True)
+    slug = models.SlugField(max_length=128, unique=True, blank=True)
 
     def clean(self):
         super().clean()
