@@ -345,6 +345,15 @@ class ItemView(ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_class = ItemFiler
 
+    def retrieve(self, request, *args, **kwargs):
+        pk = self.kwargs['pk']
+        pk = {"id": pk} if pk.isdigit() else {"slug": pk}
+        obj = Item.objects.filter(**pk).select_related("brand", "model", "category", "shop")
+        if not obj:
+            return Response(get_fail_msg(self.action, field=pk), status=status.HTTP_404_NOT_FOUND)
+        serializer = self.get_serializer_class()(obj, many=True)
+        return Response(get_success_msg(self.action, serializer), status=status.HTTP_200_OK)
+
     def create(self, request, *args, **kwargs):
         field = check_request_fields(request, Item)
         value = check_model_in_brand(Brand, request)
