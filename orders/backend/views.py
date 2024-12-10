@@ -2,6 +2,7 @@ import datetime
 import uuid
 from typing import List, Type
 
+import requests
 from django.db import IntegrityError
 from django.db.models import Q, Sum, F
 from django.db.transaction import set_autocommit, rollback, commit
@@ -24,7 +25,8 @@ from backend.serializers import UserSerializer, ActivationSerializer, PasswordRe
     OrderItemSerializer
 from backend.utils import hash_password, check_passwords, get_auth_token, get_object, get_success_msg, \
     get_fail_msg, check_request_fields, check_model_in_brand, slugify_item, check_item_owner, \
-    check_quantity, get_order, get_url_end_path, get_request_method, get_request_data
+    check_quantity, get_order, get_url_end_path, get_request_method, get_request_data, slugify_bulk_item
+from backend.validators import check_url
 
 
 class UserView(ModelViewSet):
@@ -404,6 +406,41 @@ class ItemView(ModelViewSet):
         obj = self.get_object()
         obj.delete()
         return Response(get_success_msg(self.action), status=status.HTTP_204_NO_CONTENT)
+
+    @action(methods=['POST'], detail=False, url_path="bulk-upload")
+    def bulk_upload(self, request):
+        url = request.data.get('url')
+        check_url(url)
+        content = requests.get(url).json()
+        shop = request.user.shop
+
+        for el in content:
+            try:
+                brand, _ = Brand.objects.get_or_create(name=el['brand'])
+                model, _ = Model.objects.get_or_create(name=el['model'], brand=brand)
+                category, _ = Category.objects.get_or_create(name=el['category'])
+                item, _ = Item.objects.get_or_create(
+                    brand=brand,
+                    model=model,
+                    category=category,
+                    shop=shop,
+                    description=el.get('description'),
+                    image=el.get('image'),
+                    price=el['price'],
+                    quantity=el['quantity'],
+                    slug=slugify_bulk_item(brand.name, model.name)
+                )
+                properties = el['properties']
+                for x in properties:
+                    property_name, _ = PropertyName.objects.get_or_create(name=x['name'])
+                    property_value, _ = PropertyValue.objects.get_or_create(item=item, property_name=property_name, value=x['value'])
+            except KeyError as err:
+                return Response({"status": False, "message": f"You must provide {err.__str__()} property"}, status=status.HTTP_400_BAD_REQUEST)
+            except IntegrityError:
+                # noinspection PyUnboundLocalVariable
+                return Response({"status": False, "message": f"Such item already exists in your stock: '{brand.name} {model.name}' in category '{category.name}'"}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({"status": True, "message": f"Successfully uploaded all items"}, status=status.HTTP_201_CREATED)
 
     def get_permissions(self):
         if self.action == 'create':
