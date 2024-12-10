@@ -126,6 +126,13 @@ class Item(models.Model):
         self.slug = slugify(self.brand.name + '-' + self.model.name)
         if Item.objects.filter(slug=self.slug):
             self.slug += ('-' + str(uuid.uuid4()))
+        if Item.objects.filter(image=self.image):
+            # noinspection PyUnresolvedReferences
+            image_split = self.image.split('.')
+            filename = image_split[-2]
+            ext = image_split[-1]
+            filename += ('-' + str(uuid.uuid4()))
+            self.image = filename + '.' + ext
 
     class Meta:
         constraints = [
