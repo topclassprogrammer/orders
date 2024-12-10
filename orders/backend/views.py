@@ -286,6 +286,7 @@ class ModelView(ModelViewSet):
     queryset = Model.objects.all()
     serializer_class = ModelSerializer
     authentication_classes = [TokenAuthentication]
+    permission_classes: List[Type[BasePermission]] = [IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
         field = check_request_fields(request, Model)
