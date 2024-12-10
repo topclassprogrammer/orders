@@ -26,7 +26,8 @@ from backend.serializers import UserSerializer, ActivationSerializer, PasswordRe
     OrderItemSerializer
 from backend.utils import hash_password, check_passwords, get_auth_token, get_object, get_success_msg, \
     get_fail_msg, check_request_fields, check_model_in_brand, slugify_item, check_item_owner, \
-    check_quantity, get_order, get_url_end_path, get_request_method, get_request_data, slugify_bulk_item
+    check_quantity, get_order, get_url_end_path, get_request_method, get_request_data, slugify_bulk_item, \
+    get_admin_emails
 from backend.validators import check_url
 
 
@@ -623,9 +624,13 @@ class OrderView(ModelViewSet):
         if field:
             return Response(get_fail_msg(self.action, field=field), status=status.HTTP_400_BAD_REQUEST)
 
-        order = get_order(request, Order, state=OrderChoices.CART)
-        if not isinstance(order, Order):
-            return Response(get_fail_msg(self.action, err=order), status=status.HTTP_404_NOT_FOUND)
+        try:
+            order = Order.objects.get(user=request.user, state=OrderChoices.CART)
+        except Order.DoesNotExist:
+            return Response({"status": False, "message": "You have not added any items into your cart yet"}, status=status.HTTP_404_NOT_FOUND)
+        except Order.MultipleObjectsReturned as err:
+            return Response({"status": False,
+                             "message": f"Unknown error occurred while making your order. You have to contact administrator(s): {get_admin_emails()} providing the following error: {err}"}, status=status.HTTP_400_BAD_REQUEST)
         order.state = OrderChoices.NEW
         order.address = Address.objects.get(id=request.data['address'])
 
@@ -635,9 +640,7 @@ class OrderView(ModelViewSet):
                 diff = el.item.quantity - el.quantity
                 if diff < 0:
                     return Response({"status": False,
-                                     "message": f"Insufficient quantity of item {el.item.brand.name} "
-                                                f"{el.item.model.name} in stock. You chose {el.quantity} "
-                                                f"but only {el.item.quantity} are available in stock"},
+                                     "message": f"Insufficient quantity of item {el.item.brand.name} {el.item.model.name} in stock. You chose {el.quantity} but only {el.item.quantity} are available in stock"},
                                     status=status.HTTP_400_BAD_REQUEST)
                 el.item.quantity = diff
                 el.item.save()
@@ -648,6 +651,8 @@ class OrderView(ModelViewSet):
                             status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         else:
             commit()
+            notify(order.user.email, self.__class__, self.action, order=order)
+            notify(get_admin_emails(), self.__class__, self.action, order=order, admin=True)
             return Response({"status": True, "message": "Order successfully made"}, status=status.HTTP_201_CREATED)
 
     def partial_update(self, request, *args, **kwargs):
