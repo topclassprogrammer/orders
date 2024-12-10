@@ -454,6 +454,7 @@ class PropertyNameView(ModelViewSet):
     queryset = PropertyName.objects.all()
     serializer_class = PropertyNameSerializer
     authentication_classes = [TokenAuthentication]
+    permission_classes: List[Type[BasePermission]] = [IsAuthenticated]
 
     def get_permissions(self):
         if self.request.user.role.name == RoleChoices.ADMIN:
