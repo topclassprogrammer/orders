@@ -301,12 +301,10 @@ class ModelView(ModelViewSet):
     def partial_update(self, request, *args, **kwargs):
         field = check_request_fields(request, Model)
         if field:
-            return Response(get_fail_msg(self.action, field=field), status=status.HTTP_400_BAD_REQUEST)
-        obj = self.get_object()
-        queryset = Model.objects.filter(id=obj.id)
+            return Response(get_fail_msg(self.action, field=field))
         try:
-            obj = queryset.update(**get_model_fields(self.get_serializer_class(), request))
-        except IntegrityError as err:
+            obj = Model.objects.filter(id=self.kwargs['pk']).update(**get_request_data(Model, request))
+        except ValueError as err:
             return Response(get_fail_msg(self.action, err=err), status=status.HTTP_400_BAD_REQUEST)
         return Response(get_success_msg(self.action, obj=obj), status=status.HTTP_206_PARTIAL_CONTENT)
 
