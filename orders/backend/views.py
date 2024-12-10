@@ -9,7 +9,7 @@ from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.permissions import BasePermission
 from rest_framework.response import Response
-from rest_framework.viewsets import ViewSet, ModelViewSet
+from rest_framework.viewsets import ModelViewSet
 
 from backend.auth import TokenAuthentication
 from backend.models import ActivationToken, AuthToken, PasswordResetToken, User, RoleChoices, Role, Shop, Address, \
@@ -21,8 +21,8 @@ from backend.serializers import UserSerializer, ActivationSerializer, PasswordRe
     CategorySerializer, ItemSerializer, PropertyNameSerializer, PropertyValueSerializer, OrderSerializer, \
     OrderItemSerializer
 from backend.utils import hash_password, check_passwords, get_auth_token, get_object, get_success_msg, \
-    get_fail_msg, get_model_fields, check_request_fields, check_model_in_brand, slugify_item, check_item_owner, \
-    check_quantity, get_order, get_url_end_path, get_request_method
+    get_fail_msg, check_request_fields, check_model_in_brand, slugify_item, check_item_owner, \
+    check_quantity, get_order, get_url_end_path, get_request_method, get_request_data
 
 
 class UserView(ModelViewSet):
@@ -293,8 +293,8 @@ class ModelView(ModelViewSet):
         if field:
             return Response(get_fail_msg(self.action, field=field), status=status.HTTP_400_BAD_REQUEST)
         try:
-            obj = Model.objects.create(**get_model_fields(self.get_serializer_class(), request))
-        except IntegrityError as err:
+            obj = Model.objects.create(**get_request_data(Model, request))
+        except (IntegrityError, ValueError) as err:
             return Response(get_fail_msg(self.action, err=err), status=status.HTTP_400_BAD_REQUEST)
         return Response(get_success_msg(self.action, obj=obj), status=status.HTTP_201_CREATED)
 
