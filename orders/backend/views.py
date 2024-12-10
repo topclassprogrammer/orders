@@ -571,11 +571,10 @@ class OrderItemView(ModelViewSet):
         return Response(get_success_msg(self.action), status=status.HTTP_204_NO_CONTENT)
 
     def get_permissions(self):
-        if self.request.user.role.name == RoleChoices.ADMIN:
-            return []
-        elif self.action in ['retrieve', 'partial_update', 'destroy']:
-            return [IsOwner()]
-        return []
+        if self.action in [self.__class__.list.__name__, self.__class__.retrieve.__name__]:
+            return OrderSerializer
+        elif self.action == self.__class__.create.__name__:
+            return OrderItemSerializer
 
     def get_serializer_class(self):
         if self.action in ['list', 'retrieve']:
