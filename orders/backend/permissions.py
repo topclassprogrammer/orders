@@ -2,7 +2,31 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import BasePermission
 
 from backend import models
-from backend.auth import perform_authentication
+
+
+class IsAdmin(BasePermission):
+    def has_permission(self, request, view):
+        if request.user.role.name != models.RoleChoices.ADMIN:
+            raise PermissionDenied('You cannot get and/or modify this object because you do not have admin role')
+        return True
+
+
+class HasShop(BasePermission):
+    def has_permission(self, request, view) -> bool:
+        if request.user.role.name != models.RoleChoices.SHOP:
+            raise PermissionDenied('You do not have shop role')
+        try:
+            models.Shop.objects.get(user=request.user)
+        except models.Shop.DoesNotExist:
+            raise PermissionDenied('You have not created any shop yet')
+        return True
+
+
+class HasShop(BasePermission):
+    def has_permission(self, request, view):
+        if request.user.role.name != models.RoleChoices.SHOP:
+            raise PermissionDenied('You do not have shop')
+        return True
 
 
 class IsAuthenticated(BasePermission):
@@ -54,21 +78,3 @@ class IsOwner(BasePermission):
         if eval(conditions[model_name]):
             raise PermissionDenied('You cannot get or modify object that does not belong to you')
         return True
-
-
-class HasShop(BasePermission):
-    def has_permission(self, request, view):
-        if request.user.role.name != models.RoleChoices.SHOP:
-            raise PermissionDenied('You do not have shop')
-        return True
-
-
-class IsAdmin(BasePermission):
-    def has_permission(self, request, view):
-        if request.user.role.name != models.RoleChoices.ADMIN:
-            raise PermissionDenied('You cannot get and/or modify this object because you do not have admin role')
-        return True
-
-
-
-
