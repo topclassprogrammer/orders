@@ -517,8 +517,7 @@ class OrderItemView(ModelViewSet):
     authentication_classes = [TokenAuthentication]
     permission_classes: List[Type[BasePermission]] = [IsAuthenticated]
 
-    def create(self, request, *args,
-               **kwargs):
+    def create(self, request, *args, **kwargs):
         field = check_request_fields(request, OrderItem)
         if field:
             return Response(get_fail_msg(self.action, field=field), status=status.HTTP_400_BAD_REQUEST)
@@ -541,7 +540,7 @@ class OrderItemView(ModelViewSet):
 
         order = get_order(request, Order, OrderChoices.CART)
         try:
-            obj = OrderItem.objects.create(**get_model_fields(self.get_serializer_class(), request), order=order)
+            obj = OrderItem.objects.create(**get_request_data(OrderItem, request), order=order)
         except (IntegrityError, ValueError) as err:
             return Response(get_fail_msg(self.action, err=err), status=status.HTTP_400_BAD_REQUEST)
 
