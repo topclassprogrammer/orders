@@ -356,14 +356,18 @@ class ItemView(ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         field = check_request_fields(request, Item)
-        value = check_model_in_brand(Brand, request)
-        if field or value:
-            return Response(get_fail_msg(self.action, field=field if field else value), status=status.HTTP_400_BAD_REQUEST)
-        request = slugify_item(Brand, Model, Item, request)
-        request.data['shop'] = request.user.shop.id
+        if field:
+            return Response(get_fail_msg(self.action, field=field), status=status.HTTP_400_BAD_REQUEST)
+        value = check_model_in_brand(Brand, Model, request)
+        if value:
+            return Response(get_fail_msg(self.action, err=value), status=status.HTTP_400_BAD_REQUEST)
+
+        slug = slugify_item(Brand, Model, Item, request)
+        request.data['slug'] = slug
+        request.data['shop_id'] = request.user.shop.id
         try:
-            obj = Item.objects.create(**get_model_fields(self.get_serializer_class(), request))
-        except IntegrityError as err:
+            obj = Item.objects.create(**get_request_data(Item, request))
+        except (IntegrityError, ValueError) as err:
             return Response(get_fail_msg(self.action, err=err), status=status.HTTP_400_BAD_REQUEST)
         return Response(get_success_msg(self.action, obj=obj), status=status.HTTP_201_CREATED)
 
