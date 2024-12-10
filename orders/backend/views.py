@@ -321,11 +321,11 @@ class ModelView(ModelViewSet):
         return [p() for p in self.permission_classes]
 
 
-
 class CategoryView(ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     authentication_classes = [TokenAuthentication]
+    permission_classes: List[Type[BasePermission]] = [IsAuthenticated]
 
     def get_permissions(self):
         if self.request.user.role.name == RoleChoices.ADMIN:
