@@ -571,12 +571,6 @@ class OrderItemView(ModelViewSet):
         obj.delete()
         return Response(get_success_msg(self.action), status=status.HTTP_204_NO_CONTENT)
 
-    def get_permissions(self):
-        if self.action in [self.__class__.list.__name__, self.__class__.retrieve.__name__]:
-            return OrderSerializer
-        elif self.action == self.__class__.create.__name__:
-            return OrderItemSerializer
-
     def get_serializer_class(self):
         if self.action in [self.__class__.list.__name__, self.__class__.retrieve.__name__]:
             return OrderSerializer
@@ -605,6 +599,18 @@ class OrderItemView(ModelViewSet):
             return queryset
         else:
             return OrderItem.objects.all()
+
+    def get_permissions(self):
+        if self.action == self.__class__.list.__name__:
+            self.permission_classes.append(IsAdmin)
+        elif self.action == self.__class__.retrieve.__name__:
+            if self.request.user.role.name == RoleChoices.ADMIN:
+                return []
+            else:
+                self.permission_classes.append(IsOwner)
+        elif self.action in [self.__class__.update.__name__, self.__class__.partial_update.__name__, self.__class__.destroy.__name__]:
+            self.permission_classes.append(IsOwner)
+        return [p() for p in self.permission_classes]
 
 
 class OrderView(ModelViewSet):
