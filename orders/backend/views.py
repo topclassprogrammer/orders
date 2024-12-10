@@ -476,10 +476,11 @@ class PropertyValueView(ModelViewSet):
             return Response(get_fail_msg(self.action, field=field), status=status.HTTP_400_BAD_REQUEST)
         value = check_item_owner(Item, request)
         if value:
-            return Response({"status": "False", "message": f"Item with id {value} doesn't belong to you"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(get_fail_msg(self.action, err=value if isinstance(value, Item.DoesNotExist) else f"Item with id {value} doesn't belong to you"), status=status.HTTP_400_BAD_REQUEST)
+
         try:
-            obj = PropertyValue.objects.create(**get_model_fields(self.get_serializer_class(), request))
-        except IntegrityError as err:
+            obj = PropertyValue.objects.create(**get_request_data(PropertyValue, request))
+        except (IntegrityError, ValueError) as err:
             return Response(get_fail_msg(self.action, err=err), status=status.HTTP_400_BAD_REQUEST)
         return Response(get_success_msg(self.action, obj=obj), status=status.HTTP_201_CREATED)
 
