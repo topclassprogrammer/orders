@@ -1,7 +1,7 @@
 import os
 import smtplib
 from email.message import EmailMessage
-from typing import Type
+from typing import Type, List
 
 from django.http import HttpResponseServerError
 from rest_framework.viewsets import ModelViewSet
@@ -47,11 +47,11 @@ def get_subject(view: Type[ModelViewSet], action: str, **kwargs) -> str:
     return subject
 
 
-def notify(user_email, view, action, **kwargs):
+def notify(receiver_email: str | List[str], view: Type[ModelViewSet], action: str, **kwargs):
     msg = EmailMessage()
     msg['Subject'] = get_subject(view, action)
     msg['From'] = SENDER_EMAIL_ADDRESS
-    msg['To'] = user_email
+    msg['To'] = receiver_email
     msg.set_content(get_message(view, action, **kwargs),  subtype='html')
     try:
         server = smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT)
@@ -60,4 +60,3 @@ def notify(user_email, view, action, **kwargs):
         server.quit()
     except (smtplib.SMTPAuthenticationError, smtplib.SMTPRecipientsRefused, TimeoutError) as err:
         return HttpResponseServerError({"status": False, "message": f"Error occurred while sending email to you: {err}"})
-
