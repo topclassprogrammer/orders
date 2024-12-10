@@ -5,6 +5,7 @@ from typing import List, Type
 from django.db import IntegrityError
 from django.db.models import Q, Sum, F
 from django.db.transaction import set_autocommit, rollback, commit
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.permissions import BasePermission
@@ -12,6 +13,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
 from backend.auth import TokenAuthentication
+from backend.filters import ItemFiler
 from backend.models import ActivationToken, AuthToken, PasswordResetToken, User, RoleChoices, Role, Shop, Address, \
     Brand, Model, Category, Item, PropertyName, PropertyValue, OrderItem, Order, OrderChoices
 from backend.notifications import notify
@@ -339,6 +341,9 @@ class ItemView(ModelViewSet):
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
     authentication_classes = [TokenAuthentication]
+    permission_classes: List[Type[BasePermission]] = [IsAuthenticated]
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = ItemFiler
 
     def create(self, request, *args, **kwargs):
         field = check_request_fields(request, Item)
