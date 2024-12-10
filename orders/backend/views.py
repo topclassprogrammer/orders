@@ -310,8 +310,7 @@ class ModelView(ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         obj = self.get_object()
-        queryset = Model.objects.filter(id=obj.id)
-        queryset.delete()
+        obj.delete()
         return Response(get_success_msg(self.action), status=status.HTTP_204_NO_CONTENT)
 
     def get_permissions(self):
