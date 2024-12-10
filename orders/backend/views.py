@@ -547,31 +547,23 @@ class OrderItemView(ModelViewSet):
         return Response(get_success_msg(self.action, obj=obj), status=status.HTTP_201_CREATED)
 
     def partial_update(self, request, *args, **kwargs):
+        obj = self.get_object()
         field = check_request_fields(request, OrderItem)
         if field:
             return Response(get_fail_msg(self.action, field=field), status=status.HTTP_400_BAD_REQUEST)
 
-        obj = self.get_object()
-        quantity = request.data['quantity']
-        quantity_err_msg = check_quantity(quantity, obj.item)
-        if quantity_err_msg:
-            return Response(quantity_err_msg, status=status.HTTP_400_BAD_REQUEST)
+        quantity = request.data.get('quantity')
+        if quantity:
+            quantity_err_msg = check_quantity(quantity, obj.item)
+            if quantity_err_msg:
+                return Response(quantity_err_msg, status=status.HTTP_400_BAD_REQUEST)
 
+        queryset = OrderItem.objects.filter(id=obj.id)
         try:
-            order = Order.objects.get(id=request.data['order'], user=request.user)
-        except (Order.DoesNotExist, ValueError) as err:
-            return Response(get_fail_msg(self.action, err=err, field=request.data['order']), status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            item = Item.objects.get(id=request.data['item'])
-        except (Item.DoesNotExist, ValueError) as err:
-            return Response(get_fail_msg(self.action, err=err, field=request.data['item']), status=status.HTTP_400_BAD_REQUEST)
-
-        obj.order = order
-        obj.item = item
-        obj.quantity = request.data['quantity']
-        obj.save()
-        return Response(get_success_msg(self.action, obj=obj), status=status.HTTP_201_CREATED)
+            obj = queryset.update(**get_request_data(OrderItem, request))
+        except (IntegrityError, ValueError) as err:
+            return Response(get_fail_msg(self.action, err=err), status=status.HTTP_400_BAD_REQUEST)
+        return Response(get_success_msg(self.action, obj=obj), status=status.HTTP_206_PARTIAL_CONTENT)
 
     def destroy(self, request, *args, **kwargs):
         obj = self.get_object()
