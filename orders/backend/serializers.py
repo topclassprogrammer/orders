@@ -15,7 +15,7 @@ class UserSerializer(serializers.ModelSerializer):
             'password': {'write_only': True},
         }
 
-    def validate_password(self, value):
+    def validate_password(self, value) -> str:
         return hash_password(value)
 
 
