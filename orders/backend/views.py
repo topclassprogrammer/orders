@@ -616,6 +616,7 @@ class OrderItemView(ModelViewSet):
 class OrderView(ModelViewSet):
     serializer_class = OrderSerializer
     authentication_classes = [TokenAuthentication]
+    permission_classes: List[Type[BasePermission]] = [IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
         field = check_request_fields(request, Order)
