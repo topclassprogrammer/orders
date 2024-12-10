@@ -61,7 +61,7 @@ class Shop(models.Model):
 
 
 class AuthToken(models.Model):
-    key = models.UUIDField()
+    key = models.UUIDField(db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="auth_tokens")
 
