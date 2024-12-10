@@ -31,7 +31,8 @@ def get_message(view: Type[ModelViewSet], action: str, **kwargs) -> str:
             msg = f"<p>The state for your order with ID <b>{kwargs['order'].id}</b> has been changed to <b>{kwargs['order'].state}</b></p>"
     return msg
 
-def get_subject(view, action):
+
+def get_subject(view: Type[ModelViewSet], action: str, **kwargs) -> str:
     subject = None
     if view == views.UserView:
         if action == views.UserView.create.__name__:
@@ -40,7 +41,7 @@ def get_subject(view, action):
             subject = "Password reset request for your account"
     elif view == views.OrderView:
         if action == views.OrderView.create.__name__:
-            subject = "You made a new order"
+            subject = "You received a new order" if kwargs.get('admin') else "You made a new order"
         elif action == views.OrderView.partial_update.__name__:
             subject = "New order state"
     return subject
