@@ -90,7 +90,7 @@ class Order(models.Model):
 
 
 class OrderItem(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="order_items")
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="order_items", db_index=True)
     item = models.ForeignKey("Item", on_delete=models.CASCADE, related_name="order_items")
     quantity = models.PositiveSmallIntegerField(default=0)
 
