@@ -577,9 +577,9 @@ class OrderItemView(ModelViewSet):
             return OrderItemSerializer
 
     def get_serializer_class(self):
-        if self.action in ['list', 'retrieve']:
+        if self.action in [self.__class__.list.__name__, self.__class__.retrieve.__name__]:
             return OrderSerializer
-        elif self.action in ['create']:
+        elif self.action == self.__class__.create.__name__:
             return OrderItemSerializer
 
     def get_queryset(self):
