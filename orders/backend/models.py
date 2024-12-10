@@ -6,8 +6,7 @@ from django.db import models
 from django.utils.text import slugify
 
 from backend.utils import hash_password
-from backend.validators import check_username, check_password, check_email, check_phone, check_url, \
-    check_shop_role
+from backend.validators import check_username, check_password, check_email, check_phone, check_url
 
 
 class RoleChoices(models.TextChoices):
@@ -23,7 +22,7 @@ class OrderChoices(models.TextChoices):
     PACKED = "packed", "Packed"
     DELIVERING = "delivering", "Delivering"
     DELIVERED = "delivered", "Delivered"
-    CANCELED = "сanceled", "Сanceled"
+    CANCELED = "canceled", "Canceled"
     RECEIVED = "received", "Received"
 
 
