@@ -84,9 +84,9 @@ class PasswordResetToken(models.Model):
 
 class Order(models.Model):
     state = models.CharField(choices=OrderChoices, default=OrderChoices.CART)
+    address = models.ForeignKey("Address", on_delete=models.CASCADE, related_name="orders", null=True, blank=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="orders", db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    address = models.ForeignKey("Address", on_delete=models.CASCADE, related_name="orders")
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="orders")
 
 
 class OrderItem(models.Model):
