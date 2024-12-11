@@ -1,67 +1,108 @@
 [
   {
-  "brand": "Samsung",
-  "model": "M05",
-  "category": "Смартфоны",
-  "description": "some random description",
-  "image": "images/some_pic_1.jpeg",
-  "price": "655.95",
-  "quantity": 97,
-  "properties": {
-    "name": "свойство_1",
-    "value": "значение_1"
+  "brand": "Apple",
+  "model": "iPhone 16 Pro",
+  "category": "Smartphones",
+  "description": "Description for Apple iPhone 16 Pro",
+  "price": "1199.95",
+  "quantity": "97",
+  "properties": [
+    {
+    "name": "display_diagonal",
+    "value": "6.3"
+    },
+    {
+    "name": "display_resolution",
+    "value": "1206 x 2622"
+    },
+    {
+    "name": "camera_back",
+    "value": "48"
+    },
+    {
+    "name": "camera_front",
+    "value": "12"
     }
+  ]
   },
   {
   "brand": "Samsung",
-  "model": "A06",
-  "category": "Смартфоны2",
-  "description": "some random description2",
-  "image": "images/some_pic_2.jpeg",
+  "model": "Galaxy A06",
+  "category": "Smartphones",
+  "description": "Description for Samsung Galaxy A06",
   "price": "548.49",
-  "quantity": 19,
-  "properties": {
-    "name": "свойство_1",
-    "value": "значение_1"
+  "quantity": "19",
+  "properties": [
+    {
+    "name": "display_diagonal",
+    "value": "6.7"
+    },
+    {
+    "name": "battery",
+    "value": "5000"
+    },
+    {
+    "name": "memory",
+    "value": "64"
     }
-  },
-  {
-  "brand": "Samsung",
-  "model": "A06",
-  "category": "Смартфоны3",
-  "description": "some random description3",
-  "image": "images/some_pic_3.jpeg",
-  "price": "412.57",
-  "quantity": 43,
-  "properties": {
-    "name": "свойство_1",
-    "value": "значение_2"
-    }
-  },
-  {
-  "brand": "Samsung",
-  "model": "A06",
-  "category": "Смартфоны3",
-  "description": "some random description3",
-  "image": "images/some_pic_5.jpeg",
-  "price": "899.99",
-  "quantity": 20,
-  "properties": {
-    "name": "свойство_2",
-    "value": "значение_1"
-    }
+  ]
   },
   {
   "brand": "Huawei",
-  "model": "Mate 70 Pro",
-  "category": "Супер смартфоны",
-  "description": "new description",
-  "image": "images/new_pic_0.png",
-  "price": "1234.05",
-  "quantity": 31,
-  "properties": {
-    "name": "свойство_2",
-    "value": "значение_2"
+  "model": "MatePad Pro 13.2",
+  "category": "Tablets",
+  "description": "Description for Huawei Pro 13.2",
+  "price": "412.57",
+  "quantity": "43",
+  "properties": [
+    {
+    "name": "display_resolution",
+    "value": "2880 x 1920"
+    },
+    {
+    "name": "year",
+    "value": "2023"
     }
+  ]
+  },
+  {
+  "brand": "Huawei",
+  "model": "MediaPad M5 lite",
+  "category": "Tablets",
+  "description": "Description for Huawei MediaPad M5 lite",
+  "price": "899.99",
+  "quantity": "20",
+  "properties": [
+    {
+    "name": "cpu_cores",
+    "value": "8"
+    },
+    {
+    "name": "camera_back",
+    "value": "8"
+    }
+  ]
+  },
+  {
+  "brand": "Samsung",
+  "model": "Galaxy Watch Ultra",
+  "category": "Smartwatches",
+  "description": "Description for Samsung Galaxy Watch Ultra",
+  "price": "610.05",
+  "quantity": "31",
+  "properties": [
+  {
+  "name": "display_diagonal",
+  "value": "1.5"
+  },
+  {
+  "name": "color",
+  "value": "gray"
+  },
+  {
+  "name": "year",
+  "value": "2024"
+  }
+  ]
   }
 ]
