@@ -41,7 +41,7 @@ def get_auth_token(request):
 def get_object(model, pk=None):
     try:
         obj = model.objects.get(id=pk)
-    except model.DoesNotExist:
+    except (model.DoesNotExist, ValueError):
         raise Http404({"status": False, "message": f"Object of model {model.__name__} with id {pk} does not exist in DB"})
     return obj
 
