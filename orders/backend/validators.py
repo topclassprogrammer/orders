@@ -3,6 +3,7 @@ import uuid
 
 from string import ascii_letters, digits, punctuation
 
+import bcrypt
 import requests
 from django.core.exceptions import ValidationError
 
@@ -52,3 +53,12 @@ def check_uuid_token(value: str):
         return False
     else:
         return True
+
+
+def check_passwords(password: str, saved_password: str) -> bool:
+    password = password.encode()
+    saved_password = saved_password.encode()
+    return bcrypt.checkpw(password, saved_password)
+
+
+
