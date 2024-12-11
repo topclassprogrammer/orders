@@ -165,6 +165,15 @@ def get_request_method(request):
     return request.environ.get('REQUEST_METHOD')
 
 
+def get_image_name(request) -> str:
+    uploaded_image_name = request.FILES['image'].name
+    image_name_split = uploaded_image_name.split('.')
+    image_name = image_name_split[-2]
+    ext = image_name_split[-1]
+    image_name += ('-' + str(uuid.uuid4())) + '.' + ext
+    return image_name
+
+
 def get_admin_emails() -> List[str]:
     admin_emails = models.User.objects.filter(role__name=models.RoleChoices.ADMIN).values_list('email')
     return list(*admin_emails)
