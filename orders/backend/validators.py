@@ -2,10 +2,13 @@ import re
 import uuid
 
 from string import ascii_letters, digits, punctuation
+from typing import Type
 
 import bcrypt
 import requests
 from django.core.exceptions import ValidationError
+
+from backend import models
 
 USERNAME_CHARS = ascii_letters + digits + "-_ "
 PASSWORD_CHARS = ascii_letters + digits + punctuation + " "
@@ -61,4 +64,9 @@ def check_passwords(password: str, saved_password: str) -> bool:
     return bcrypt.checkpw(password, saved_password)
 
 
-
+def check_request_fields(request, model: Type[models.Model]) -> str:
+    for k, v in request.data.items():
+        if k not in model.__dict__.keys():
+            return k
+        elif not v:
+            return f"{k} with its empty value"
