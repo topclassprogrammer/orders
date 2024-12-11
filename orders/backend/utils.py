@@ -99,6 +99,15 @@ def get_order(request, model, state):
     return order
 
 
+def slugify_item(brand, model, item, request):
+    brand_obj = brand.objects.get(id=request.data[brand.__name__.lower()])
+    model_obj = model.objects.get(id=request.data[model.__name__.lower()])
+    slug = slugify(brand_obj.name + '-' + model_obj.name)
+    if item.objects.filter(slug=slug):
+        slug += ('-' + str(uuid.uuid4()))
+    return slug
+
+
 def slugify_bulk_item(brand_name: str, model_name: str) -> str:
     brand_name = brand_name.lower().replace(' ', '-')
     model_name = model_name.lower().replace(' ', '-')
@@ -139,16 +148,6 @@ def check_quantity(quantity, item):
         return {"status": False, "message": f"Incorrect quantity value: {err}"}
     if quantity > item.quantity:
         return {"status": False, "message": "You chose more items than available in stock"}
-
-
-def slugify_item(brand, model, item, request):
-    brand_obj = brand.objects.get(id=request.data[brand.__name__.lower()])
-    model_obj = model.objects.get(id=request.data[model.__name__.lower()])
-    slug = slugify(brand_obj.name + '-' + model_obj.name)
-    if item.objects.filter(slug=slug):
-        slug += ('-' + str(uuid.uuid4()))
-    request.data['slug'] = slug
-    return request
 
 
 def get_url_end_path(request, basename):
