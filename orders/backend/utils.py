@@ -120,41 +120,6 @@ def get_url_end_path(request, basename: str) -> str:  # Выясняем на к
     return method_name
 
 
-def check_request_fields(request, model):
-    for x in request.data:
-        if x not in model.__dict__.keys():
-            return x
-
-
-def check_model_in_brand(brand_model, request):
-    brand_obj = brand_model.objects.get(id=request.data['brand'])
-    brand_models = list(brand_obj.models.values())
-    brand_models_ids = [x['id'] for x in brand_models]
-    model_id = request.data.get('model')
-    if model_id and model_id not in brand_models_ids:
-        return request.data['model']
-
-
-def check_item_owner(model, request):
-    try:
-        item_obj = model.objects.get(id=request.data[model.__name__.lower()])
-    except model.DoesNotExist as err:
-        return err
-    if item_obj.shop.user != request.user:
-        return item_obj.id
-
-
-def check_quantity(quantity, item):
-    try:
-        quantity = int(quantity)
-        if not 0 < quantity < 32767:
-            return {"status": False, "message": f"Incorrect quantity value: you must enter value 0 to 32767"}
-    except TypeError as err:
-        return {"status": False, "message": f"Incorrect quantity value: {err}"}
-    if quantity > item.quantity:
-        return {"status": False, "message": "You chose more items than available in stock"}
-
-
 def get_request_method(request):
     return request.environ.get('REQUEST_METHOD')
 
