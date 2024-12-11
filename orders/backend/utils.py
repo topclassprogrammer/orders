@@ -161,17 +161,6 @@ def check_quantity(quantity, item):
         return {"status": False, "message": "You chose more items than available in stock"}
 
 
-def get_url_end_path(request, basename):
-    from orders.urls import BASE_URL
-    path = request.environ.get('PATH_INFO')
-    strip_path = path.strip("/")
-    replace_path = BASE_URL + basename
-    if not strip_path.endswith('user'):
-        replace_path += '/'
-    method_name = strip_path.replace(replace_path, "")
-    return method_name
-
-
 def get_request_method(request):
     return request.environ.get('REQUEST_METHOD')
 
