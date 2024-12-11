@@ -4,7 +4,7 @@ from typing import Type, List
 import bcrypt
 import django.db.models
 from django.db import models as django_models
-from django.db.models import ForeignKey, ManyToManyField, OneToOneField
+from django.db.models import ForeignKey, ManyToManyField, OneToOneField, Q
 from django.http import Http404
 from django.utils.text import slugify
 from rest_framework.exceptions import ValidationError
@@ -87,6 +87,18 @@ def get_request_data(model: Type[django_models.Model], request) -> dict:  # До
     return data
 
 
+def get_order(request, model, state):
+    query = Q(user=request.user, state=state)
+    try:
+        order = model.objects.get(query)
+    except model.DoesNotExist:
+        order = model.objects.create(user=request.user)
+    else:
+        if request.data.get('order'):
+            request.data.pop('order')
+    return order
+
+
 def slugify_bulk_item(brand_name: str, model_name: str) -> str:
     brand_name = brand_name.lower().replace(' ', '-')
     model_name = model_name.lower().replace(' ', '-')
@@ -116,20 +128,6 @@ def check_item_owner(model, request):
         return err
     if item_obj.shop.user != request.user:
         return item_obj.id
-
-
-def get_order(request, model, state):
-    query = Q(user=request.user, state=state)
-    order_id = request.data.get('id')
-    if order_id:
-        query &= Q(id=order_id)
-    try:
-        order = model.objects.get(query)
-    except model.DoesNotExist as err:
-        if order_id:
-            return err
-        order = model.objects.create(user=request.user)
-    return order
 
 
 def check_quantity(quantity, item):
