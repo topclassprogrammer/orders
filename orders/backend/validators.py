@@ -100,6 +100,14 @@ def check_item_owner(model: Type[models.Model], request) -> int | str | None | M
         return item_obj.id
 
 
-
+def check_quantity(quantity: str | int, item) -> dict | None:
+    try:
+        quantity = int(quantity)
+        if not 0 < quantity < 32767:
+            return {"status": False, "message": "Incorrect quantity value: you must enter value from 0 to 32767"}
+    except TypeError as err:
+        return {"status": False, "message": f"Incorrect quantity value: {err}"}
+    if quantity > item.quantity:
+        return {"status": False, "message": f"You chose more items({quantity}) than available in stock({item.quantity})"}
 
 
