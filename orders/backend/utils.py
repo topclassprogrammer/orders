@@ -67,13 +67,12 @@ def get_success_msg(action, serializer=None, pk=None, obj=None):
 
 
 def get_fail_msg(action, serializer=None, err=None, field=None):
-    action = (action.lstrip('partial_').rstrip('e') + 'ing').capitalize()
+    action = (action.replace('partial_', '').rstrip('e') + 'ing').capitalize()
     if serializer:
         obj = serializer.Meta.model.__name__.lower()
         return {"status": False, "message": f"{action} {obj} failed: {serializer.errors}"}
     else:
-        return {"status": False, "message": f"{action} failed: "
-               f"{err if err else f'field/value `{field}` does not exist in model'}"}
+        return {"status": False, "message": f"{action} failed: {err if err else f'not found field/value `{field}`'}"}
 
 
 def get_request_data(model: Type[django_models.Model], request) -> dict:  # Добавляет _id к полям у которых есть внешний ключ
