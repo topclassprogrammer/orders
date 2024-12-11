@@ -115,6 +115,17 @@ def slugify_bulk_item(brand_name: str, model_name: str) -> str:
     return slug + '-' + str(uuid.uuid4())
 
 
+def get_url_end_path(request, basename: str) -> str:  # Выясняем на какой URL-путь отправляет запрос клиент, чтобы отбросить базовое имя(user) и получить имя метода(за исключением create(оно будет пустое)
+    from orders.urls import BASE_URL
+    path = request.environ.get('PATH_INFO')
+    strip_path = path.strip("/")
+    replace_path = BASE_URL + basename
+    if not strip_path.endswith('user'):
+        replace_path += '/'
+    method_name = strip_path.replace(replace_path, "")
+    return method_name
+
+
 def check_request_fields(request, model):
     for x in request.data:
         if x not in model.__dict__.keys():
