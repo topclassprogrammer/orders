@@ -7,6 +7,7 @@ from typing import Type
 import bcrypt
 import requests
 from django.core.exceptions import ValidationError
+from django.db.models.base import ModelBase
 
 from backend import models
 
@@ -79,12 +80,25 @@ def check_model_in_brand(brand_model: Type[models.Model], model_model: Type[mode
         brand_obj = brand_model.objects.get(id=brand_id)
         model_obj = model_model.objects.get(id=model_id)
     except (KeyError, ValueError, brand_model.DoesNotExist, model_model.DoesNotExist) as err:
-        return err  # Было: return err.__str__()
+        return err
     brand_models = list(brand_obj.models.values())
     brand_models_ids = [x['id'] for x in brand_models]
     model_id = model_obj.id
     if model_id not in brand_models_ids:
         return request.data['model']
+
+
+def check_item_owner(model: Type[models.Model], request) -> int | str | None | ModelBase:
+    try:
+        item_id = request.data.get(model.__name__.lower())
+        if not item_id:
+            return
+        item_obj = model.objects.get(id=item_id)
+    except (model.DoesNotExist, ValueError) as err:
+        return str(err)
+    if item_obj.shop.user != request.user:
+        return item_obj.id
+
 
 
 
