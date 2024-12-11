@@ -70,3 +70,22 @@ def check_request_fields(request, model: Type[models.Model]) -> str:
             return k
         elif not v:
             return f"{k} with its empty value"
+
+
+def check_model_in_brand(brand_model: Type[models.Model], model_model: Type[models.Model], request) -> int | str | Exception:
+    try:
+        brand_id = request.data['brand']
+        model_id = request.data['model']
+        brand_obj = brand_model.objects.get(id=brand_id)
+        model_obj = model_model.objects.get(id=model_id)
+    except (KeyError, ValueError, brand_model.DoesNotExist, model_model.DoesNotExist) as err:
+        return err  # Было: return err.__str__()
+    brand_models = list(brand_obj.models.values())
+    brand_models_ids = [x['id'] for x in brand_models]
+    model_id = model_obj.id
+    if model_id not in brand_models_ids:
+        return request.data['model']
+
+
+
+
