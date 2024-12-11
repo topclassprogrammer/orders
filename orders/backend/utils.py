@@ -20,12 +20,6 @@ def hash_password(value):
     return password
 
 
-def check_passwords(password, saved_password):
-    password = password.encode()
-    saved_password = saved_password.encode()
-    return bcrypt.checkpw(password, saved_password)
-
-
 def get_auth_token(request):
     token_header = request.META.get('HTTP_AUTHORIZATION')
     if not token_header:
