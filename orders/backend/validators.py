@@ -11,8 +11,8 @@ PASSWORD_CHARS = ascii_letters + digits + punctuation + " "
 
 
 def check_username(value):
-    if len(value) < 8:
-        raise ValidationError("Username contains less that 8 chars")
+    if len(value) < 4:
+        raise ValidationError("Username must contain at least 4 chars")
     if any(char not in USERNAME_CHARS for char in value):
         raise ValidationError("Not allowed char(s) in username field")
 
