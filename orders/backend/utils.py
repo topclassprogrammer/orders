@@ -26,16 +26,15 @@ def check_passwords(password, saved_password):
 
 
 def get_auth_token(request):
-    from backend.models import AuthToken
     token_header = request.META.get('HTTP_AUTHORIZATION')
     if not token_header:
         raise ValidationError("No token provided")
     token_list = token_header.split(" ")
     token = token_list[1]
     try:
-        auth_token = AuthToken.objects.get(key=uuid.UUID(token))
-    except AuthToken.DoesNotExist:
-        raise ValidationError("Your token does not exist in DB")
+        auth_token = models.AuthToken.objects.get(key=uuid.UUID(token))
+    except models.AuthToken.DoesNotExist:
+        raise ValidationError("Auth token not found")
     return auth_token
 
 
