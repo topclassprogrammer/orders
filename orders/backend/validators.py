@@ -19,7 +19,7 @@ def check_username(value):
 
 def check_password(value):
     if len(value) < 8:
-        raise ValidationError("Password contains less that 8 chars")
+        raise ValidationError("Password must contain at least 4 chars")
     if any(char not in PASSWORD_CHARS for char in value):
         raise ValidationError("Not allowed char(s) in password field")
 
