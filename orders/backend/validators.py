@@ -39,14 +39,10 @@ def check_phone(value):
 
 
 def check_url(value: str):
-    if not value.startswith("https://"):
-        raise ValidationError("URL should start with prefix 'https://'")
-    try:
-        response = requests.get(value)
-        if response.status_code in range(500, 599):
-            raise ValidationError(f"Server is down")
-    except requests.exceptions.RequestException as err:
-        raise ValidationError(f"URL is not reachable: {err}")
+    pattern = re.compile(r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))")
+    result = re.fullmatch(pattern, value)
+    if not result:
+        raise ValidationError("Incorrect shop URL")
 
 
 def check_uuid_token(value: str):
