@@ -8,6 +8,7 @@ from django.db.models import ForeignKey, ManyToManyField, OneToOneField
 from django.http import Http404
 from django.utils.text import slugify
 from rest_framework.exceptions import ValidationError
+from rest_framework.viewsets import ModelViewSet
 
 from backend import models
 
@@ -47,20 +48,21 @@ def get_object(model, pk=None):
 
 
 def get_success_msg(action, serializer=None, pk=None, obj=None):
-    if action in ['list', 'retrieve']:
+    from backend.views import ShopView
+    if action in [ModelViewSet.list.__name__, ModelViewSet.retrieve.__name__, ModelViewSet.retrieve.__name__, ShopView.get_active_orders.__name__]:
         return {"status": True, "message": serializer.data}
-    elif action in ['create', 'partial_update']:
+    elif action in [ModelViewSet.create.__name__, ModelViewSet.update.__name__, ModelViewSet.partial_update.__name__]:
         action_resp = (action.lstrip('partial_') + 'd').capitalize()
         if serializer:
             obj = serializer.Meta.model.__name__.lower()
             return {"status": True, "message": f"{action_resp} {obj}: {serializer.data}"}
-        else:  # Без сериализаторов - там где есть вложенные сериализаторы
-            if action == 'create':
-                obj.__dict__.pop('_state')  # Без сериализаторов: при create запросе должен выполняться pop, а при update - нет
+        else:
+            if action == ModelViewSet.create.__name__:
+                obj.__dict__.pop('_state')
                 return {"status": True, "message": f"Created object: {obj.__dict__}"}
-            elif action == 'partial_update':
+            elif action in [ModelViewSet.update.__name__, ModelViewSet.partial_update.__name__]:
                 return {"status": True, "message": f"Objects updated: {obj}"}
-    elif action == 'destroy':
+    elif action == ModelViewSet.destroy.__name__:
         return {"status": True, "message": f"Deleted object with id {pk}"}
 
 
