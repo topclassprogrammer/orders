@@ -9,7 +9,22 @@ from backend.validators import check_uuid_token
 
 
 class TokenAuthentication(BaseAuthentication):
+    """Custom authentication class that uses token-based authentication."""
     def authenticate(self, request) -> Tuple[User, AuthToken]:
+        """
+        Authenticate the user based on the token provided in the request.
+
+        Args:
+            request: The Django request object containing the authorization token.
+
+        Returns:
+            Tuple[User, AuthToken]: A tuple containing the authenticated user and
+                                     the associated authentication token.
+
+        Raises:
+            PermissionDenied: If the token is missing, incorrectly formatted,
+                              invalid, or if no corresponding user is found.
+        """
         token_str = request.META.get('HTTP_AUTHORIZATION')
         if not token_str:
             raise PermissionDenied('You must log in before proceeding')
