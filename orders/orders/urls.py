@@ -21,11 +21,15 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path, include
 
+from backend.views import ImageView
+
 BACKEND_BASE_URL = 'api/v1/'
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path(BACKEND_BASE_URL, include('backend.urls'))
+    path(BACKEND_BASE_URL, include('backend.urls')),
+    path("images/", ImageView.as_view({"get": "list"})),
+    path("images/<str:filename>", ImageView.as_view({"get": "retrieve"}))
 ] + debug_toolbar_urls()
 
 if settings.DEBUG:
