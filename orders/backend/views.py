@@ -3,9 +3,11 @@ import uuid
 from typing import List, Type
 
 import requests
+from django.conf import settings
 from django.db import IntegrityError
 from django.db.models import Q, Sum, F
 from django.db.transaction import set_autocommit, rollback, commit
+from django.http import FileResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status
 from rest_framework.decorators import action
@@ -718,3 +720,11 @@ class ImageView(ViewSet):
             image_link = request.META['wsgi.url_scheme'] + '://' + request.META['HTTP_HOST'] + request.META['PATH_INFO'] + image
             images_link_list.append(image_link)
         return Response({"status": True, f"message": f"List of all images: {', '.join(images_link_list)}"})
+
+    def retrieve(self, request, filename):
+        images_list = get_images_list()
+        if filename not in images_list:
+            return Response({"status": False, f"message": f"Image not found"}, status=status.HTTP_404_NOT_FOUND)
+        image_path = str(settings.BASE_DIR) + settings.MEDIA_URL + filename
+        image_file = open(image_path, 'rb')
+        return FileResponse(image_file)
