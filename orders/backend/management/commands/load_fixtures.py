@@ -13,7 +13,9 @@ FIXTURE_FILE_NAME = 'fixture.json'
 
 
 class Command(BaseCommand):
+    """Django management command for loading data fixtures."""
     def handle(self, *args, **options):
+        """Load data fixtures into the database."""
         fixture_path = str(settings.BASE_DIR) + '/' + FIXTURE_FILE_NAME
         with open(fixture_path, encoding='utf-8') as fixture_file:
             stream = json.load(fixture_file)
