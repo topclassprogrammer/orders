@@ -12,7 +12,7 @@ from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import BasePermission
 from rest_framework.response import Response
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import ModelViewSet, ViewSet
 
 from backend.auth import TokenAuthentication
 from backend.filters import ItemFiler
@@ -27,7 +27,7 @@ from backend.serializers import UserSerializer, ActivationSerializer, PasswordRe
 from backend.utils import hash_password, check_passwords, get_auth_token, get_object, get_success_msg, \
     get_fail_msg, check_request_fields, check_model_in_brand, slugify_item, check_item_owner, \
     check_quantity, get_order, get_url_end_path, get_request_method, get_request_data, slugify_bulk_item, \
-    get_admin_emails
+    get_admin_emails, get_images_list
 from backend.validators import check_url
 
 
@@ -709,3 +709,12 @@ class OrderView(ModelViewSet):
             self.permission_classes.append(IsAdmin)
         return [p() for p in self.permission_classes]
 
+
+class ImageView(ViewSet):
+    def list(self, request):
+        images_list = get_images_list()
+        images_link_list = []
+        for image in images_list:
+            image_link = request.META['wsgi.url_scheme'] + '://' + request.META['HTTP_HOST'] + request.META['PATH_INFO'] + image
+            images_link_list.append(image_link)
+        return Response({"status": True, f"message": f"List of all images: {', '.join(images_link_list)}"})
