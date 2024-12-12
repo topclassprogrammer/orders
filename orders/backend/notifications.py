@@ -15,6 +15,7 @@ SENDER_EMAIL_PASSWORD = os.getenv('SENDER_EMAIL_PASSWORD')
 
 
 def get_message(view: Type[ModelViewSet], action: str, **kwargs) -> str:
+    """Generate an HTML message for email notification based on user actions."""
     msg = None
     if view == views.UserView:
         if action == views.UserView.create.__name__:
@@ -33,6 +34,7 @@ def get_message(view: Type[ModelViewSet], action: str, **kwargs) -> str:
 
 
 def get_subject(view: Type[ModelViewSet], action: str, **kwargs) -> str:
+    """Generate a subject line for email notifications based on user actions."""
     subject = None
     if view == views.UserView:
         if action == views.UserView.create.__name__:
@@ -48,6 +50,7 @@ def get_subject(view: Type[ModelViewSet], action: str, **kwargs) -> str:
 
 
 def notify(receiver_email: str | List[str], view: Type[ModelViewSet], action: str, **kwargs):
+    """Send an email notification to the specified recipient."""
     msg = EmailMessage()
     msg['Subject'] = get_subject(view, action)
     msg['From'] = SENDER_EMAIL_ADDRESS
