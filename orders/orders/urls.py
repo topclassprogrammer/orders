@@ -21,11 +21,11 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path, include
 
-BASE_URL = 'api/v1/'
+BACKEND_BASE_URL = 'api/v1/'
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path(BASE_URL, include('backend.urls'))
+    path(BACKEND_BASE_URL, include('backend.urls'))
 ] + debug_toolbar_urls()
 
 if settings.DEBUG:
