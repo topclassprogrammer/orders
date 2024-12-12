@@ -1,0 +1,21 @@
+services:
+  db:
+    image: postgres:16.3-bookworm
+    volumes:
+      - ./scripts:/scripts
+    env_file:
+      - ./orders/.env
+    ports:
+      - "5431:5432"
+
+  orders:
+    build: .
+    volumes:
+      - ./orders:/app/orders
+    env_file:
+      - ./orders/.env
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    command: ./scripts/wait-for-it.sh db:5432 -- ./scripts/run_app.sh
