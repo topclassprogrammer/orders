@@ -1,8 +1,10 @@
+import os
 import uuid
 from typing import Type, List
 
 import bcrypt
 import django.db.models
+from django.conf import settings
 from django.db import models as django_models
 from django.db.models import ForeignKey, ManyToManyField, OneToOneField, Q
 from django.http import Http404
@@ -137,3 +139,7 @@ def get_admin_emails() -> List[str]:
     admin_emails = models.User.objects.filter(role__name=models.RoleChoices.ADMIN).values_list('email')
     return list(*admin_emails)
 
+
+def get_images_list() -> list:
+    images_path = str(settings.BASE_DIR) + settings.MEDIA_URL
+    return os.listdir(images_path)
