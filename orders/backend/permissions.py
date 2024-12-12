@@ -6,7 +6,7 @@ from backend import models, views
 
 
 class IsAdmin(BasePermission):
-    def has_permission(self, request, view):
+    def has_permission(self, request, view) -> bool:
         if request.user.role.name != models.RoleChoices.ADMIN:
             raise PermissionDenied('You cannot get and/or modify this object because you do not have admin role')
         return True
