@@ -6,14 +6,18 @@ from backend import models, views
 
 
 class IsAdmin(BasePermission):
+    """Allow access only to admin users."""
     def has_permission(self, request, view) -> bool:
+        """Determines if the request user has admin permissions."""
         if request.user.role.name != models.RoleChoices.ADMIN:
             raise PermissionDenied('You cannot get and/or modify this object because you do not have admin role')
         return True
 
 
 class HasShop(BasePermission):
+    """Allow access only to users with a shop role."""
     def has_permission(self, request, view) -> bool:
+        """Determines if the request user has shop permissions."""
         if request.user.role.name != models.RoleChoices.SHOP:
             raise PermissionDenied('You do not have shop role')
         try:
@@ -24,7 +28,9 @@ class HasShop(BasePermission):
 
 
 class IsOwner(BasePermission):
+    """Permission class to allow access only to resource owners."""
     def has_permission(self, request, view) -> bool:
+        """Determines if the request user can perform an action on the resource."""
         if isinstance(view, views.OrderView):
             if view.__dict__['action'] == ModelViewSet.create.__name__:
                 if 'address' not in request.data:
@@ -40,6 +46,7 @@ class IsOwner(BasePermission):
         return True
 
     def has_object_permission(self, request, view, obj) -> bool:
+        """Determines if the request user can access a specific resource object."""
         conditions = {
             'user': 'obj != request.user',
             'shop': 'obj.user != request.user',
