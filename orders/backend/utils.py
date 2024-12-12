@@ -15,7 +15,7 @@ from rest_framework.viewsets import ModelViewSet
 from backend import models
 
 
-def hash_password(value):
+def hash_password(value: str) -> str:
     password_bytes = value.encode()
     password = bcrypt.hashpw(password_bytes, bcrypt.gensalt())
     password = password.decode()
@@ -35,7 +35,7 @@ def get_auth_token(request):
     return auth_token
 
 
-def get_object(model, pk=None):
+def get_object(model: Type[django_models.Model], pk=None) -> django_models.Model:
     try:
         obj = model.objects.get(id=pk)
     except (model.DoesNotExist, ValueError):
@@ -43,7 +43,7 @@ def get_object(model, pk=None):
     return obj
 
 
-def get_success_msg(action, serializer=None, pk=None, obj=None):
+def get_success_msg(action: str, serializer=None, pk: int = None, obj=None) -> dict:
     from backend.views import ShopView
     if action in [ModelViewSet.list.__name__, ModelViewSet.retrieve.__name__, ModelViewSet.retrieve.__name__, ShopView.get_active_orders.__name__]:
         return {"status": True, "message": serializer.data}
@@ -62,7 +62,7 @@ def get_success_msg(action, serializer=None, pk=None, obj=None):
         return {"status": True, "message": f"Deleted object with id {pk}"}
 
 
-def get_fail_msg(action, serializer=None, err=None, field=None):
+def get_fail_msg(action: str, serializer=None, err: Exception | django.db.models.Model = None, field: str | dict = None) -> dict:
     action = (action.replace('partial_', '').rstrip('e') + 'ing').capitalize()
     if serializer:
         obj = serializer.Meta.model.__name__.lower()
@@ -71,7 +71,7 @@ def get_fail_msg(action, serializer=None, err=None, field=None):
         return {"status": False, "message": f"{action} failed: {err if err else f'not found field/value `{field}`'}"}
 
 
-def get_request_data(model: Type[django_models.Model], request) -> dict:  # Добавляет _id к полям у которых есть внешний ключ
+def get_request_data(model: Type[django_models.Model], request) -> dict:
     model_fields = model._meta.get_fields()
     data = {}
     id_fields = [field.name for field in model_fields if isinstance(field, (ForeignKey, ManyToManyField, OneToOneField))]
@@ -83,7 +83,7 @@ def get_request_data(model: Type[django_models.Model], request) -> dict:  # До
     return data
 
 
-def get_order(request, model, state):
+def get_order(request, model: Type[django_models.Model], state: str) -> django_models.Model:
     query = Q(user=request.user, state=state)
     try:
         order = model.objects.get(query)
@@ -95,7 +95,7 @@ def get_order(request, model, state):
     return order
 
 
-def slugify_item(brand, model, item, request):
+def slugify_item(brand: Type[django_models.Model], model: Type[django_models.Model], item: Type[django_models.Model], request) -> str:
     brand_obj = brand.objects.get(id=request.data[brand.__name__.lower()])
     model_obj = model.objects.get(id=request.data[model.__name__.lower()])
     slug = slugify(brand_obj.name + '-' + model_obj.name)
@@ -111,7 +111,7 @@ def slugify_bulk_item(brand_name: str, model_name: str) -> str:
     return slug + '-' + str(uuid.uuid4())
 
 
-def get_url_end_path(request, basename: str) -> str:  # Выясняем на какой URL-путь отправляет запрос клиент, чтобы отбросить базовое имя(user) и получить имя метода(за исключением create(оно будет пустое)
+def get_url_end_path(request, basename: str) -> str:
     from orders.urls import BACKEND_BASE_URL
     path = request.environ.get('PATH_INFO')
     strip_path = path.strip("/")
@@ -122,7 +122,7 @@ def get_url_end_path(request, basename: str) -> str:  # Выясняем на к
     return method_name
 
 
-def get_request_method(request):
+def get_request_method(request) -> str:
     return request.environ.get('REQUEST_METHOD')
 
 
