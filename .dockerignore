@@ -1,0 +1,13 @@
+.venv
+client_requests.py
+curl
+db_schema.jpg
+.git
+.gitignore
+orders/backend/__pycache__
+orders/backend/migrations
+orders/images
+orders/.env.example
+orders/bulk_upload_items.json
+orders/fixture.json
+static
