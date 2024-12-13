@@ -25,11 +25,15 @@ def get_message(view: Type[ModelViewSet], action: str, **kwargs) -> str:
     elif view == views.OrderView:
         if action == views.OrderView.create.__name__:
             if kwargs.get('admin'):
-                msg = f"<p>You have a new order with ID <b>{kwargs['order'].id}</b> from a user with email <b>{kwargs['order'].user.email}</b>.</p>"
+                msg = f"<p>You have a new order with ID <b>{kwargs['order'].id}</b> " \
+                      f"from a user with email <b>{kwargs['order'].user.email}</b>.</p>"
             else:
-                msg = f"<p>You successfully made an order.</p><p>Your order ID is <b>{kwargs['order'].id}</b>.</p><p>The current state is <b>{kwargs['order'].state}</b>.</p>"
+                msg = f"<p>You successfully made an order.</p><p>Your order ID is " \
+                      f"<b>{kwargs['order'].id}</b>.</p><p>The current state is <b>" \
+                      f"{kwargs['order'].state}</b>.</p>"
         elif action == views.OrderView.partial_update.__name__:
-            msg = f"<p>The state for your order with ID <b>{kwargs['order'].id}</b> has been changed to <b>{kwargs['order'].state}</b></p>"
+            msg = f"<p>The state for your order with ID <b>{kwargs['order'].id}</b> " \
+                  f"has been changed to <b>{kwargs['order'].state}</b></p>"
     return msg
 
 
