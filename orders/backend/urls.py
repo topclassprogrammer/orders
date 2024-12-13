@@ -1,8 +1,8 @@
 from rest_framework.routers import DefaultRouter
 
-
-from backend.views import UserView, RoleView, ShopView, AddressView, ModelView, BrandView, CategoryView, ItemView, \
-    PropertyNameView, PropertyValueView, OrderView, OrderItemView
+from backend.views import AddressView, BrandView, CategoryView, ItemView, \
+    ModelView, OrderItemView, OrderView, PropertyNameView, PropertyValueView, \
+    RoleView, ShopView, UserView
 
 router = DefaultRouter()
 router.register("user", UserView, basename="user")
