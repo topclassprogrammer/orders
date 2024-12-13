@@ -1,7 +1,8 @@
 from rest_framework import serializers
 
-from backend.models import User, ActivationToken, PasswordResetToken, Role, Shop, Address, Brand, Model, Category, Item, \
-    PropertyName, PropertyValue, Order, OrderItem
+from backend.models import ActivationToken, Address, Brand, Category, Item, \
+    Model, Order, OrderItem, PasswordResetToken, PropertyName, PropertyValue, \
+    Role, Shop, User
 from backend.utils import hash_password
 from backend.validators import check_password, check_username
 
