@@ -1,13 +1,11 @@
 import json
 
-from django.core.exceptions import ValidationError
-from django.core.management.base import BaseCommand
-from django.db.transaction import set_autocommit, commit, rollback
-from django.db.utils import IntegrityError
-
 from backend.models import Role, User
 from django.conf import settings
-
+from django.core.exceptions import ValidationError
+from django.core.management.base import BaseCommand
+from django.db.transaction import commit, rollback, set_autocommit
+from django.db.utils import IntegrityError
 
 FIXTURE_FILE_NAME = 'fixture.json'
 
@@ -34,4 +32,3 @@ class Command(BaseCommand):
             print(f"Cannot apply any fixtures because of error: {err}")
         else:
             commit()
-
