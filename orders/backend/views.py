@@ -5,32 +5,36 @@ from typing import List, Type
 import requests
 from django.conf import settings
 from django.db import IntegrityError
-from django.db.models import Q, Sum, F
-from django.db.transaction import set_autocommit, rollback, commit
+from django.db.models import F, Q, Sum
+from django.db.transaction import commit, rollback, set_autocommit
 from django.http import FileResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
-from rest_framework.permissions import BasePermission
+from rest_framework.permissions import BasePermission, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ViewSet
 
 from backend.auth import TokenAuthentication
 from backend.filters import ItemFiler
-from backend.models import ActivationToken, AuthToken, PasswordResetToken, User, RoleChoices, Role, Shop, Address, \
-    Brand, Model, Category, Item, PropertyName, PropertyValue, OrderItem, Order, OrderChoices
+from backend.models import ActivationToken, Address, AuthToken, Brand, \
+    Category, Item, Model, Order, OrderChoices, OrderItem, \
+    PasswordResetToken, PropertyName, PropertyValue, Role, RoleChoices, \
+    Shop, User
 from backend.notifications import notify
-from backend.permissions import IsOwner, IsAdmin, HasShop, IsAuthenticated
-from backend.serializers import UserSerializer, ActivationSerializer, PasswordResetSerializer, \
-    LogInSerializer, RoleSerializer, ShopSerializer, AddressSerializer, BrandSerializer, ModelSerializer, \
-    CategorySerializer, ItemSerializer, PropertyNameSerializer, PropertyValueSerializer, OrderSerializer, \
-    OrderItemSerializer
-from backend.utils import hash_password, check_passwords, get_auth_token, get_object, get_success_msg, \
-    get_fail_msg, check_request_fields, check_model_in_brand, slugify_item, check_item_owner, \
-    check_quantity, get_order, get_url_end_path, get_request_method, get_request_data, slugify_bulk_item, \
-    get_admin_emails, get_images_list
-from backend.validators import check_url
+from backend.permissions import HasShop, IsAdmin, IsOwner
+from backend.serializers import ActivationSerializer, AddressSerializer, \
+    BrandSerializer, CategorySerializer, ItemSerializer, LogInSerializer, \
+    ModelSerializer, OrderItemSerializer, OrderSerializer, \
+    PasswordResetSerializer, PropertyNameSerializer, PropertyValueSerializer, \
+    RoleSerializer, ShopSerializer, UserSerializer
+from backend.utils import get_admin_emails, get_auth_token, get_fail_msg, \
+    get_image_name, get_images_list, get_object, get_order, get_request_data, \
+    get_request_method, get_success_msg, get_url_end_path, hash_password, \
+    slugify_bulk_item, slugify_item
+from backend.validators import check_item_owner, check_model_in_brand, \
+    check_passwords, check_quantity, check_request_fields, check_url
 
 
 class UserView(ModelViewSet):
