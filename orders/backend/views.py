@@ -58,7 +58,10 @@ class UserView(ModelViewSet):
             user = serializer.save(role=default_role)
             token = ActivationToken.objects.create(key=uuid.uuid4(), user=user)
             notify(user.email, self.__class__, self.action, token=token)
-            return Response({"status": True, "message": f"You successfully created account: {serializer.data}. Your activation token sent to your email: {token.user.email}"}, status=status.HTTP_201_CREATED)
+            return Response({"status": True,
+                             "message": f"You successfully created account: {serializer.data}. "
+                            f"Your activation token sent to your email: {token.user.email}"},
+                            status=status.HTTP_201_CREATED)
         return Response(get_fail_msg(self.action, serializer), status=status.HTTP_400_BAD_REQUEST)
 
     def partial_update(self, request, *args, pk=None, **kwargs):
@@ -117,8 +120,10 @@ class UserView(ModelViewSet):
             token.user.is_active = True
             token.user.save()
             token.delete()
-            return Response({"status": True, "message": f"Account with ID {token.user.id} successfully activated"}, status=status.HTTP_200_OK)
-        return Response({"status": False, "message": f"Activation failed: {serializer.errors}"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"status": True, "message": f"Account with ID {token.user.id} successfully activated"},
+                            status=status.HTTP_200_OK)
+        return Response({"status": False, "message": f"Activation failed: {serializer.errors}"},
+                        status=status.HTTP_400_BAD_REQUEST)
 
     @action(methods=['POST'], detail=False, url_path="log-in")
     def log_in(self, request):
@@ -153,7 +158,8 @@ class UserView(ModelViewSet):
             AuthToken.objects.create(key=uuid.uuid4(), user=user)
             user.last_login = datetime.datetime.now()
             user.save()
-            return Response({"status": True, "message": "You just logged in"}, status=status.HTTP_200_OK)
+            return Response({"status": True, "message": f"You just logged in. Your auth token is {token.key}"},
+                            status=status.HTTP_200_OK)
         return Response({"status": False, "message": f"Incorrect username or/and password input: {serializer.errors}"},
                         status=status.HTTP_400_BAD_REQUEST)
 
@@ -187,7 +193,9 @@ class UserView(ModelViewSet):
         user = self.request.user
         token = PasswordResetToken.objects.create(key=uuid.uuid4(), user=user)
         notify(user.email, self.__class__, self.action, token=token)
-        return Response({"status": True, "message": f"Password reset token has been successfully sent to your email: {token.user.email}"},
+        return Response({"status": True,
+                         "message": f"Password reset token has been successfully "
+                        f"sent to your email: {token.user.email}"},
                         status=status.HTTP_200_OK)
 
     @action(methods=['POST'], detail=False, url_path='set-new-password')
@@ -223,14 +231,16 @@ class UserView(ModelViewSet):
         """Get a list of authentication classes to be used for the request."""
         url_end = get_url_end_path(self.request, self.basename)
         request_method = get_request_method(self.request)
-        if url_end in ['', self.__class__.log_in.url_path, self.__class__.activate.url_path] and request_method == 'POST':
+        if url_end in ['', self.__class__.log_in.url_path,
+                       self.__class__.activate.url_path] and request_method == 'POST':
             return []
         else:
             return [TokenAuthentication()]
 
     def get_serializer_class(self):
         """Get the serializer class for the current action."""
-        if self.action in [self.__class__.list.__name__, self.__class__.retrieve.__name__, self.__class__.create.__name__, self.__class__.partial_update.__name__]:
+        if self.action in [self.__class__.list.__name__, self.__class__.retrieve.__name__,
+                           self.__class__.create.__name__, self.__class__.partial_update.__name__]:
             return UserSerializer
         elif self.action == self.__class__.log_in.__name__:
             return LogInSerializer
@@ -242,11 +252,13 @@ class UserView(ModelViewSet):
     def get_permissions(self):
         """Get the permissions for the current action."""
         permissions = [IsAuthenticated]
-        if self.action in [self.__class__.create.__name__, self.__class__.log_in.__name__, self.__class__.activate.__name__]:
+        if self.action in [self.__class__.create.__name__, self.__class__.log_in.__name__,
+                           self.__class__.activate.__name__]:
             return []
         elif self.action == self.__class__.list.__name__:
             permissions.append(IsAdmin)
-        elif self.action in [self.__class__.update.__name__, self.__class__.partial_update.__name__, self.__class__.destroy.__name__]:
+        elif self.action in [self.__class__.update.__name__, self.__class__.partial_update.__name__,
+                             self.__class__.destroy.__name__]:
             permissions.append(IsOwner)
         else:
             pass
