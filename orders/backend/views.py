@@ -966,10 +966,13 @@ class OrderView(ModelViewSet):
         try:
             order = Order.objects.get(user=request.user, state=OrderChoices.CART)
         except Order.DoesNotExist:
-            return Response({"status": False, "message": "You have not added any items into your cart yet"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"status": False, "message": "You have not added any items into your cart yet"},
+                            status=status.HTTP_404_NOT_FOUND)
         except Order.MultipleObjectsReturned as err:
-            return Response({"status": False,
-                             "message": f"Unknown error occurred while making your order. You have to contact administrator(s): {get_admin_emails()} providing the following error: {err}"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"status": False, "message": f"Unknown error occurred while making your order. "
+                            f"You have to contact administrator(s): {get_admin_emails()} "
+                            f"providing the following error: {err}"},
+                            status=status.HTTP_400_BAD_REQUEST)
         order.state = OrderChoices.NEW
         order.address = Address.objects.get(id=request.data['address'])
 
@@ -979,7 +982,9 @@ class OrderView(ModelViewSet):
                 diff = el.item.quantity - el.quantity
                 if diff < 0:
                     return Response({"status": False,
-                                     "message": f"Insufficient quantity of item {el.item.brand.name} {el.item.model.name} in stock. You chose {el.quantity} but only {el.item.quantity} are available in stock"},
+                                     "message": f"Insufficient quantity of item "
+                                    f"{el.item.brand.name} {el.item.model.name} in stock. "
+                                    f"You chose {el.quantity} but only {el.item.quantity} are available in stock"},
                                     status=status.HTTP_400_BAD_REQUEST)
                 el.item.quantity = diff
                 el.item.save()
@@ -1007,9 +1012,13 @@ class OrderView(ModelViewSet):
         obj = self.get_object()
         state = request.data.get('state')
         if not state:
-            return Response({"status": False, "message": "You must provide field 'state'"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"status": False, "message": "You must provide field 'state'"},
+                            status=status.HTTP_400_BAD_REQUEST)
         if state not in OrderChoices.values:
-            return Response({"status": False, "message": f"Unknown state provided. You must provide one of the following states: {[x[0] for x in OrderChoices.choices]}"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"status": False,
+                             "message": f"Unknown state provided. You must provide one of the following states: "
+                            f"{[x[0] for x in OrderChoices.choices]}"},
+                            status=status.HTTP_404_NOT_FOUND)
 
         obj.state = getattr(OrderChoices, state.upper())
         obj.save()
@@ -1048,7 +1057,8 @@ class OrderView(ModelViewSet):
                 obj = get_object(Order, pk)
                 query &= Q(id=obj.id)
 
-            queryset = Order.objects.filter(query).prefetch_related("order_items__item__brand", "order_items__item__model", "order_items__item__category"). \
+            queryset = Order.objects.filter(query).prefetch_related(
+                "order_items__item__brand", "order_items__item__model", "order_items__item__category"). \
                 select_related("address").annotate(sum=Sum(F("order_items__quantity") * F("order_items__item__price")))
             return queryset
 
