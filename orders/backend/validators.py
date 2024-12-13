@@ -86,7 +86,9 @@ def check_url(value: str):
     Raises:
         ValidationError: If the URL is incorrectly formatted.
     """
-    pattern = re.compile(r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))")
+    pattern = re.compile(r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)"
+                         r"(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()"
+                         r"<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))")
     result = re.fullmatch(pattern, value)
     if not result:
         raise ValidationError("Incorrect shop URL")
@@ -144,7 +146,8 @@ def check_request_fields(request, model: Type[models.Model]) -> str:
             return f"{k} with its empty value"
 
 
-def check_model_in_brand(brand_model: Type[models.Model], model_model: Type[models.Model], request) -> int | str | Exception:
+def check_model_in_brand(brand_model: Type[models.Model], model_model: Type[models.Model], request) \
+        -> int | str | Exception:
     """
     Check if the provided model belongs to the specified brand.
 
@@ -215,4 +218,5 @@ def check_quantity(quantity: str | int, item) -> dict | None:
     except TypeError as err:
         return {"status": False, "message": f"Incorrect quantity value: {err}"}
     if quantity > item.quantity:
-        return {"status": False, "message": f"You chose more items({quantity}) than available in stock({item.quantity})"}
+        return {"status": False, "message": f"You chose more items({quantity}) than "
+                                 f"available in stock({item.quantity})"}
