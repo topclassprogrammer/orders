@@ -34,10 +34,20 @@ from backend.validators import check_url
 
 
 class UserView(ModelViewSet):
+    """View for managing user accounts."""
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
     def create(self, request, *args, **kwargs):
+        """
+        Create a new user account.
+
+        Args:
+            request (Request): The Django request object containing user data for account creation.
+
+        Returns:
+            Response: The Django response object containing the status and message of the account creation process.
+        """
         serializer = self.get_serializer_class()(data=request.data)
         if serializer.is_valid():
             default_role = Role.objects.get(name=RoleChoices.CLIENT)
@@ -48,6 +58,15 @@ class UserView(ModelViewSet):
         return Response(get_fail_msg(self.action, serializer), status=status.HTTP_400_BAD_REQUEST)
 
     def partial_update(self, request, *args, pk=None, **kwargs):
+        """
+        Partially update an existing user account.
+
+        Args:
+            request (Request): The Django request object containing user data for the update.
+
+        Returns:
+            Response: The Django response object indicating the result of the update process.
+        """
         obj = self.get_object()
         serializer = self.get_serializer_class()(obj, request.data, partial=True)
         if serializer.is_valid():
@@ -56,12 +75,30 @@ class UserView(ModelViewSet):
         return Response(get_fail_msg(self.action, serializer), status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, *args, pk=None, **kwargs):
+        """
+        Delete an existing user account.
+
+        Args:
+            request (Request): The Django request object.
+
+        Returns:
+            Response: The Django response object indicating the result of the deletion process.
+        """
         obj = self.get_object()
         obj.delete()
         return Response(get_success_msg(self.action, pk=pk), status=status.HTTP_204_NO_CONTENT)
 
     @action(methods=['POST'], detail=False, url_path='activate')
     def activate(self, request):
+        """
+        Activate a user account using the provided activation token.
+
+        Args:
+            request (Request): The Django request object containing the activation token key.
+
+        Returns:
+            Response: The Django response object indicating the status of the activation process.
+        """
         serializer = self.get_serializer_class()(data=request.data)
         if serializer.is_valid():
             key = request.data['key']
@@ -81,6 +118,15 @@ class UserView(ModelViewSet):
 
     @action(methods=['POST'], detail=False, url_path="log-in")
     def log_in(self, request):
+        """
+        Log in a user with the provided credentials.
+
+        Args:
+            request (Request): The Django request object containing the username and password.
+
+        Returns:
+            Response: The Django response object indicating the status of the login process.
+        """
         serializer = self.get_serializer_class()(data=request.data)
         if serializer.is_valid():
             username = request.data['username']
@@ -109,12 +155,31 @@ class UserView(ModelViewSet):
 
     @action(methods=['POST'], detail=False, url_path='log-out')
     def log_out(self, request):
+        """
+        Log out the currently authenticated user.
+
+        Args:
+            request (Request): The Django request object.
+
+        Returns:
+            Response: The Django response object indicating the status of the logout process.
+        """
         token = get_auth_token(request)
         token.delete()
         return Response({"status": True, "message": "You just logged out"}, status=status.HTTP_200_OK)
 
     @action(methods=['POST'], detail=False, url_path='request-new-password')
     def request_new_password(self, request):
+        """
+        Request a new password reset token for the currently authenticated user.
+
+        Args:
+            request (Request): The Django request object.
+
+        Returns:
+            Response: The Django response object indicating that
+            the password reset token has been sent to the user's email.
+        """
         user = self.request.user
         token = PasswordResetToken.objects.create(key=uuid.uuid4(), user=user)
         notify(user.email, self.__class__, self.action, token=token)
@@ -123,6 +188,15 @@ class UserView(ModelViewSet):
 
     @action(methods=['POST'], detail=False, url_path='set-new-password')
     def set_new_password(self, request):
+        """
+        Set a new password for the authenticated user using the provided reset token.
+
+        Args:
+            request (Request): The Django request object containing the new password and reset token key.
+
+        Returns:
+            Response: The Django response object indicating the status of the password change process.
+        """
         serializer = self.get_serializer_class()(data=request.data)
         if serializer.is_valid():
             key = request.data['key']
@@ -142,6 +216,7 @@ class UserView(ModelViewSet):
                         status=status.HTTP_400_BAD_REQUEST)
 
     def get_authenticators(self):
+        """Get a list of authentication classes to be used for the request."""
         url_end = get_url_end_path(self.request, self.basename)
         request_method = get_request_method(self.request)
         if url_end in ['', self.__class__.log_in.url_path, self.__class__.activate.url_path] and request_method == 'POST':
@@ -150,6 +225,7 @@ class UserView(ModelViewSet):
             return [TokenAuthentication()]
 
     def get_serializer_class(self):
+        """Get the serializer class for the current action."""
         if self.action in [self.__class__.list.__name__, self.__class__.retrieve.__name__, self.__class__.create.__name__, self.__class__.partial_update.__name__]:
             return UserSerializer
         elif self.action == self.__class__.log_in.__name__:
@@ -160,6 +236,7 @@ class UserView(ModelViewSet):
             return PasswordResetSerializer
 
     def get_permissions(self):
+        """Get the permissions for the current action."""
         permissions = [IsAuthenticated]
         if self.action in [self.__class__.create.__name__, self.__class__.log_in.__name__, self.__class__.activate.__name__]:
             return []
@@ -173,6 +250,7 @@ class UserView(ModelViewSet):
 
 
 class RoleView(ModelViewSet):
+    """View for managing user roles."""
     queryset = Role.objects.all()
     serializer_class = RoleSerializer
     authentication_classes = [TokenAuthentication]
@@ -180,11 +258,21 @@ class RoleView(ModelViewSet):
 
 
 class ShopView(ModelViewSet):
+    """View for managing shops."""
     serializer_class = ShopSerializer
     authentication_classes = [TokenAuthentication]
     permission_classes: List[Type[BasePermission]] = [IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
+        """
+        Create a new shop associated with the authenticated user.
+
+        Args:
+            request (Request): The Django request object containing shop data.
+
+        Returns:
+            Response: The Django response object indicating the success or failure of the shop creation
+        """
         serializer = self.get_serializer_class()(data=request.data)
         if serializer.is_valid():
             user = request.user
@@ -197,6 +285,15 @@ class ShopView(ModelViewSet):
         return Response(get_fail_msg(self.action, serializer), status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, *args, **kwargs):
+        """
+        Delete the shop associated with the authenticated user.
+
+        Args:
+            request (Request): The Django request object.
+
+        Returns:
+            Response: The Django response object indicating the success of the deletion
+        """
         obj = self.get_object()
         obj.delete()
         user = request.user
@@ -206,6 +303,15 @@ class ShopView(ModelViewSet):
 
     @action(methods=['POST'], detail=True, url_path="switch-accept-orders")
     def switch_accept_orders(self, request):
+        """
+        Toggle the acceptance of orders for the user's shop.
+
+        Args:
+            request (Request): The Django request object.
+
+        Returns:
+            Response: The Django response object indicating the new status of order acceptance for the shop.
+        """
         token = get_auth_token(request)
         shop = token.user.shop
         shop.accept_orders = not shop.accept_orders
@@ -216,11 +322,21 @@ class ShopView(ModelViewSet):
 
     @action(methods=['GET'], detail=False, url_path="active-orders")
     def get_active_orders(self, request):
+        """
+        Retrieve all active orders for the authenticated user's shop.
+
+        Args:
+            request (Request): The Django request object.
+
+        Returns:
+            Response: The Django response object containing the serialized active orders.
+        """
         queryset = self.get_queryset()
         serializer = OrderSerializer(queryset, many=True)
         return Response(get_success_msg(self.action, serializer), status=status.HTTP_200_OK)
 
     def get_queryset(self):
+        """Get the queryset for the current action."""
         if self.action == self.__class__.get_active_orders.__name__:
             token = get_auth_token(self.request)
             inactive_state_orders = [OrderChoices.CART, OrderChoices.CANCELED]
@@ -236,6 +352,7 @@ class ShopView(ModelViewSet):
             return Shop.objects.all()
 
     def get_permissions(self):
+        """Get the permissions for the current action."""
         if self.action == self.__class__.get_active_orders.__name__:
             if self.request.user.role.name == RoleChoices.ADMIN:
                 return []
@@ -247,12 +364,22 @@ class ShopView(ModelViewSet):
 
 
 class AddressView(ModelViewSet):
+    """View for managing user addresses."""
     queryset = Address.objects.all()
     serializer_class = AddressSerializer
     authentication_classes = [TokenAuthentication]
     permission_classes: List[Type[BasePermission]] = [IsAuthenticated]
 
     def list(self, request, *args, **kwargs):
+        """
+        Retrieve a list of addresses for the authenticated user.
+
+        Args:
+            request (Request): The Django request object.
+
+        Returns:
+            Response: The Django response object containing the serialized addresses for the user.
+        """
         if request.user.role.name == RoleChoices.ADMIN:
             queryset = self.get_queryset()
         else:
@@ -261,6 +388,15 @@ class AddressView(ModelViewSet):
         return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):
+        """
+        Create a new address for the authenticated user.
+
+        Args:
+            request (Request): The Django request object containing address data.
+
+        Returns:
+            Response: The Django response object indicating the success or failure of the address creation.
+        """
         serializer = self.get_serializer_class()(data=request.data)
         if serializer.is_valid():
             queryset = Address.objects.filter(**request.data, user=request.user)
@@ -271,18 +407,21 @@ class AddressView(ModelViewSet):
         return Response(get_fail_msg(self.action, serializer), status=status.HTTP_400_BAD_REQUEST)
 
     def get_permissions(self):
+        """Get the permissions for the current action."""
         if self.action in [self.__class__.retrieve.__name__, self.__class__.update.__name__, self.__class__.partial_update.__name__, self.__class__.destroy.__name__]:
             self.permission_classes.append(IsOwner)
         return [p() for p in self.permission_classes]
 
 
 class BrandView(ModelViewSet):
+    """View for managing item brands."""
     queryset = Brand.objects.all()
     serializer_class = BrandSerializer
     authentication_classes = [TokenAuthentication]
     permission_classes: List[Type[BasePermission]] = [IsAuthenticated]
 
     def get_permissions(self):
+        """Get the permissions for the current action."""
         if self.action == self.__class__.create.__name__:
             self.permission_classes.append(HasShop)
         elif self.action in [self.__class__.update.__name__, self.__class__.partial_update.__name__, self.__class__.destroy.__name__]:
@@ -291,12 +430,22 @@ class BrandView(ModelViewSet):
 
 
 class ModelView(ModelViewSet):
+    """View for managing item models."""
     queryset = Model.objects.all()
     serializer_class = ModelSerializer
     authentication_classes = [TokenAuthentication]
     permission_classes: List[Type[BasePermission]] = [IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
+        """
+        Create a new item model.
+
+        Args:
+            request (Request): The Django request object containing model data.
+
+        Returns:
+            Response: The Django response object indicating the success or failure of the model creation.
+        """
         field = check_request_fields(request, Model)
         if field:
             return Response(get_fail_msg(self.action, field=field), status=status.HTTP_400_BAD_REQUEST)
@@ -307,6 +456,15 @@ class ModelView(ModelViewSet):
         return Response(get_success_msg(self.action, obj=obj), status=status.HTTP_201_CREATED)
 
     def partial_update(self, request, *args, **kwargs):
+        """
+        Partially update an existing item model.
+
+       Args:
+           request (Request): The Django request object containing updated model data.
+
+       Returns:
+           Response: The Django response object indicating the success or failure of the model update.
+       """
         field = check_request_fields(request, Model)
         if field:
             return Response(get_fail_msg(self.action, field=field))
@@ -317,11 +475,21 @@ class ModelView(ModelViewSet):
         return Response(get_success_msg(self.action, obj=obj), status=status.HTTP_206_PARTIAL_CONTENT)
 
     def destroy(self, request, *args, **kwargs):
+        """
+        Delete the specified item model.
+
+        Args:
+            request (Request): The Django request object.
+
+        Returns:
+            Response: The Django response object indicating the success of the deletion operation.
+        """
         obj = self.get_object()
         obj.delete()
         return Response(get_success_msg(self.action), status=status.HTTP_204_NO_CONTENT)
 
     def get_permissions(self):
+        """Get the permissions for the current action."""
         if self.action == self.__class__.create.__name__:
             self.permission_classes.append(HasShop)
         elif self.action in [self.__class__.update.__name__, self.__class__.partial_update.__name__, self.__class__.destroy.__name__]:
@@ -330,12 +498,14 @@ class ModelView(ModelViewSet):
 
 
 class CategoryView(ModelViewSet):
+    """View for managing item categories."""
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     authentication_classes = [TokenAuthentication]
     permission_classes: List[Type[BasePermission]] = [IsAuthenticated]
 
     def get_permissions(self):
+        """Get the permissions for the current action."""
         if self.action == self.__class__.create.__name__:
             self.permission_classes.append(HasShop)
         elif self.action in [self.__class__.update.__name__, self.__class__.partial_update.__name__, self.__class__.destroy.__name__]:
@@ -344,6 +514,7 @@ class CategoryView(ModelViewSet):
 
 
 class ItemView(ModelViewSet):
+    """View for managing items."""
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
     authentication_classes = [TokenAuthentication]
@@ -352,6 +523,15 @@ class ItemView(ModelViewSet):
     filterset_class = ItemFiler
 
     def retrieve(self, request, *args, **kwargs):
+        """
+        Retrieve an item by its primary key or slug.
+
+        Args:
+            request (Request): The Django request object.
+
+        Returns:
+            Response: The Django response object containing the item data or an error message if the item is not found.
+        """
         pk = self.kwargs['pk']
         pk = {"id": pk} if pk.isdigit() else {"slug": pk}
         obj = Item.objects.filter(**pk).select_related("brand", "model", "category", "shop")
@@ -361,6 +541,15 @@ class ItemView(ModelViewSet):
         return Response(get_success_msg(self.action, serializer), status=status.HTTP_200_OK)
 
     def create(self, request, *args, **kwargs):
+        """
+        Create a new item.
+
+        Args:
+            request (Request): The Django request object containing item data.
+
+        Returns:
+            Response: The Django response object indicating the success or failure of item creation.
+        """
         field = check_request_fields(request, Item)
         if field:
             return Response(get_fail_msg(self.action, field=field), status=status.HTTP_400_BAD_REQUEST)
@@ -378,6 +567,15 @@ class ItemView(ModelViewSet):
         return Response(get_success_msg(self.action, obj=obj), status=status.HTTP_201_CREATED)
 
     def partial_update(self, request, *args, **kwargs):
+        """
+        Partially update an existing item.
+
+        Args:
+            request (Request): The Django request object containing item data for the update.
+
+        Returns:
+            Response: The Django response object indicating the success or failure of the update.
+        """
         obj = self.get_object()
         if request.FILES.get('image'):
             request.FILES['image'].name = get_image_name(request)
@@ -407,12 +605,30 @@ class ItemView(ModelViewSet):
             return Response(get_success_msg(self.action, obj=obj), status=status.HTTP_206_PARTIAL_CONTENT)
 
     def destroy(self, request, *args, **kwargs):
+        """
+        Delete an item.
+
+        Args:
+            request (Request): The Django request object.
+
+        Returns:
+            Response: The Django response object indicating the success of the deletion.
+        """
         obj = self.get_object()
         obj.delete()
         return Response(get_success_msg(self.action), status=status.HTTP_204_NO_CONTENT)
 
     @action(methods=['POST'], detail=False, url_path="bulk-upload")
     def bulk_upload(self, request):
+        """
+        Upload multiple items from a given URL.
+
+        Args:
+            request (Request): The Django request object containing the URL for the bulk upload.
+
+        Returns:
+            Response: The Django response object indicating the success or failure of the bulk upload.
+        """
         url = request.data.get('url')
         check_url(url)
         content = requests.get(url).json()
@@ -447,6 +663,7 @@ class ItemView(ModelViewSet):
         return Response({"status": True, "message": f"Successfully uploaded all items"}, status=status.HTTP_201_CREATED)
 
     def get_permissions(self):
+        """Get the permissions for the current action."""
         if self.action in [self.__class__.create.__name__, self.__class__.bulk_upload.__name__]:
             self.permission_classes.append(HasShop)
         elif self.action in [self.__class__.update.__name__, self.__class__.partial_update.__name__, self.__class__.destroy.__name__]:
@@ -455,12 +672,14 @@ class ItemView(ModelViewSet):
 
 
 class PropertyNameView(ModelViewSet):
+    """View for managing property names."""
     queryset = PropertyName.objects.all()
     serializer_class = PropertyNameSerializer
     authentication_classes = [TokenAuthentication]
     permission_classes: List[Type[BasePermission]] = [IsAuthenticated]
 
     def get_permissions(self):
+        """Get the permissions for the current action."""
         if self.action in [self.__class__.create.__name__]:
             self.permission_classes.append(HasShop)
         elif self.action in [self.__class__.update.__name__, self.__class__.partial_update.__name__, self.__class__.destroy.__name__]:
@@ -469,12 +688,22 @@ class PropertyNameView(ModelViewSet):
 
 
 class PropertyValueView(ModelViewSet):
+    """View for managing property values."""
     queryset = PropertyValue.objects.all()
     serializer_class = PropertyValueSerializer
     authentication_classes = [TokenAuthentication]
     permission_classes: List[Type[BasePermission]] = [IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
+        """
+        Create a new property value.
+
+        Args:
+            request (Request): The Django request object containing property value data.
+
+        Returns:
+            Response: The Django response object indicating the success or failure of the property value creation
+        """
         field = check_request_fields(request, PropertyValue)
         if field:
             return Response(get_fail_msg(self.action, field=field), status=status.HTTP_400_BAD_REQUEST)
@@ -489,6 +718,15 @@ class PropertyValueView(ModelViewSet):
         return Response(get_success_msg(self.action, obj=obj), status=status.HTTP_201_CREATED)
 
     def partial_update(self, request, *args, **kwargs):
+        """
+        Partially update an existing property value.
+
+        Args:
+            request (Request): The Django request object containing property value data.
+
+        Returns:
+            Response: The Django response object indicating the success or failure of the update.
+        """
         obj = self.get_object()
         field = check_request_fields(request, PropertyValue)
         if field:
@@ -505,11 +743,20 @@ class PropertyValueView(ModelViewSet):
         return Response(get_success_msg(self.action, obj=obj), status=status.HTTP_206_PARTIAL_CONTENT)
 
     def destroy(self, request, *args, **kwargs):
+        """Delete a property value.
+
+        Args:
+            request (Request): The Django request object.
+
+        Returns:
+            Response: The Django response object indicating the success of the deletion.
+        """
         obj = self.get_object()
         obj.delete()
         return Response(get_success_msg(self.action), status=status.HTTP_204_NO_CONTENT)
 
     def get_permissions(self):
+        """Get the permissions for the current action."""
         if self.action in [self.__class__.create.__name__]:
             self.permission_classes.append(HasShop)
         elif self.action in [self.__class__.update.__name__, self.__class__.partial_update.__name__, self.__class__.destroy.__name__]:
@@ -518,10 +765,20 @@ class PropertyValueView(ModelViewSet):
 
 
 class OrderItemView(ModelViewSet):
+    """View for managing order items in the cart."""
     authentication_classes = [TokenAuthentication]
     permission_classes: List[Type[BasePermission]] = [IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
+        """
+        Add an item to the cart.
+
+        Args:
+           request (Request): The Django request object containing item and quantity data.
+
+        Returns:
+            Response: The Django response object indicating the success or failure of adding the item to the cart.
+        """
         field = check_request_fields(request, OrderItem)
         if field:
             return Response(get_fail_msg(self.action, field=field), status=status.HTTP_400_BAD_REQUEST)
@@ -551,6 +808,15 @@ class OrderItemView(ModelViewSet):
         return Response(get_success_msg(self.action, obj=obj), status=status.HTTP_201_CREATED)
 
     def partial_update(self, request, *args, **kwargs):
+        """
+        Update an existing item in the cart.
+
+        Args:
+            request (Request): The Django request object containing updated item and quantity data.
+
+        Returns:
+            Response: The Django response object indicating the success or failure of the update.
+        """
         obj = self.get_object()
         field = check_request_fields(request, OrderItem)
         if field:
@@ -570,17 +836,28 @@ class OrderItemView(ModelViewSet):
         return Response(get_success_msg(self.action, obj=obj), status=status.HTTP_206_PARTIAL_CONTENT)
 
     def destroy(self, request, *args, **kwargs):
+        """
+        Remove an item from the cart.
+
+        Args:
+            request (Request): The Django request object.
+
+        Returns:
+            Response: The Django response object indicating the success of the item deletion.
+        """
         obj = self.get_object()
         obj.delete()
         return Response(get_success_msg(self.action), status=status.HTTP_204_NO_CONTENT)
 
     def get_serializer_class(self):
+        """Get the serializer class for the current action."""
         if self.action in [self.__class__.list.__name__, self.__class__.retrieve.__name__]:
             return OrderSerializer
         elif self.action == self.__class__.create.__name__:
             return OrderItemSerializer
 
     def get_queryset(self):
+        """Get the queryset for the current action."""
         if self.action in [self.__class__.list.__name__, self.__class__.retrieve.__name__]:
             query = Q(state=OrderChoices.CART)
             if self.request.user.role.name == RoleChoices.ADMIN:
@@ -604,6 +881,7 @@ class OrderItemView(ModelViewSet):
             return OrderItem.objects.all()
 
     def get_permissions(self):
+        """Get the permissions for the current action."""
         if self.action == self.__class__.list.__name__:
             self.permission_classes.append(IsAdmin)
         elif self.action == self.__class__.retrieve.__name__:
@@ -617,11 +895,22 @@ class OrderItemView(ModelViewSet):
 
 
 class OrderView(ModelViewSet):
+    """View for managing orders."""
     serializer_class = OrderSerializer
     authentication_classes = [TokenAuthentication]
     permission_classes: List[Type[BasePermission]] = [IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
+        """
+        Confirm and complete the order by changing its state from CART to NEW, and deducts the quantity of ordered
+        items from the available stock.
+
+        Args:
+            request (Request): The Django request object containing order confirmation data.
+
+        Returns:
+            Response: The Django response object indicating the success or failure of the order confirmation.
+        """
         field = check_request_fields(request, Order)
         if field:
             return Response(get_fail_msg(self.action, field=field), status=status.HTTP_400_BAD_REQUEST)
@@ -658,6 +947,15 @@ class OrderView(ModelViewSet):
             return Response({"status": True, "message": "Order successfully made"}, status=status.HTTP_201_CREATED)
 
     def partial_update(self, request, *args, **kwargs):
+        """
+        Update the status of an existing order.
+
+        Args:
+            request (Request): The Django request object containing the new order state.
+
+        Returns:
+            Response: The Django response object indicating the success or failure of the state update.
+        """
         obj = self.get_object()
         state = request.data.get('state')
         if not state:
@@ -671,11 +969,21 @@ class OrderView(ModelViewSet):
         return Response(get_success_msg(self.action, obj=obj), status=status.HTTP_206_PARTIAL_CONTENT)
 
     def destroy(self, request, *args, **kwargs):
+        """
+        Delete an order.
+
+        Args:
+            request (Request): The Django request object.
+
+        Returns:
+            Response: The Django response object indicating the success of the order deletion.
+        """
         obj = self.get_object()
         obj.delete()
         return Response(get_success_msg(self.action), status=status.HTTP_204_NO_CONTENT)
 
     def get_queryset(self):
+        """Get the queryset for the current action."""
         if self.action in [self.__class__.list.__name__, self.__class__.retrieve.__name__]:
             query = ~Q(state=OrderChoices.CART)
             if self.request.user.role.name == RoleChoices.ADMIN:
@@ -700,6 +1008,7 @@ class OrderView(ModelViewSet):
             return Order.objects.all()
 
     def get_permissions(self):
+        """Get the permissions for the current action."""
         if self.action in [self.__class__.retrieve.__name__]:
             if self.request.user.role.name == RoleChoices.ADMIN:
                 return []
@@ -713,7 +1022,17 @@ class OrderView(ModelViewSet):
 
 
 class ImageView(ViewSet):
+    """ViewSet for managing images"""
     def list(self, request):
+        """
+        Retrieve a list of all available images.
+
+        Args:
+            request: The Django request object.
+
+        Returns:
+            Response: The Django response object containing the list of image URLs.
+        """
         images_list = get_images_list()
         images_link_list = []
         for image in images_list:
@@ -722,6 +1041,16 @@ class ImageView(ViewSet):
         return Response({"status": True, f"message": f"List of all images: {', '.join(images_link_list)}"})
 
     def retrieve(self, request, filename):
+        """
+        Retrieve a specific image by filename.
+
+        Args:
+            request: The Django request object.
+            filename (str): The name of the image file to retrieve.
+
+        Returns:
+            Response: The Django response object with the image file if found, or a 404 error message if not found.
+        """
         images_list = get_images_list()
         if filename not in images_list:
             return Response({"status": False, f"message": f"Image not found"}, status=status.HTTP_404_NOT_FOUND)
