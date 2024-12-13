@@ -74,7 +74,8 @@ def get_object(model: Type[django_models.Model], pk=None) -> django_models.Model
     try:
         obj = model.objects.get(id=pk)
     except (model.DoesNotExist, ValueError):
-        raise Http404({"status": False, "message": f"Object of model {model.__name__} with id {pk} does not exist in DB"})
+        raise Http404({"status": False, "message":
+              f"Object of model {model.__name__} with id {pk} does not exist in DB"})
     return obj
 
 
@@ -87,7 +88,7 @@ def get_success_msg(action: str, serializer=None, pk: int = None, obj=None) -> d
 
     """
     from backend.views import ShopView
-    if action in [ModelViewSet.list.__name__, ModelViewSet.retrieve.__name__, ModelViewSet.retrieve.__name__, ShopView.get_active_orders.__name__]:
+    if action in [ModelViewSet.list.__name__, ModelViewSet.retrieve.__name__, ShopView.get_active_orders.__name__]:
         return {"status": True, "message": serializer.data}
     elif action in [ModelViewSet.create.__name__, ModelViewSet.update.__name__, ModelViewSet.partial_update.__name__]:
         action_resp = (action.lstrip('partial_') + 'd').capitalize()
