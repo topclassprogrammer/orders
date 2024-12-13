@@ -684,14 +684,19 @@ class ItemView(ModelViewSet):
                 properties = el['properties']
                 for x in properties:
                     property_name, _ = PropertyName.objects.get_or_create(name=x['name'])
-                    property_value, _ = PropertyValue.objects.get_or_create(item=item, property_name=property_name, value=x['value'])
+                    property_value, _ = PropertyValue.objects.get_or_create(
+                        item=item, property_name=property_name, value=x['value'])
             except KeyError as err:
-                return Response({"status": False, "message": f"You must provide {err.__str__()} property"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"status": False, "message": f"You must provide {err.__str__()} property"},
+                                status=status.HTTP_400_BAD_REQUEST)
             except IntegrityError:
                 # noinspection PyUnboundLocalVariable
-                return Response({"status": False, "message": f"Such item already exists in your stock: '{brand.name} {model.name}' in category '{category.name}'"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"status": False, "message": f"Such item already exists in your stock: "
+                                f"'{brand.name} {model.name}' in category '{category.name}'"},
+                                status=status.HTTP_400_BAD_REQUEST)
 
-        return Response({"status": True, "message": f"Successfully uploaded all items"}, status=status.HTTP_201_CREATED)
+        return Response({"status": True, "message": f"Successfully uploaded all items"},
+                            status=status.HTTP_201_CREATED)
 
     def get_permissions(self):
         """Get the permissions for the current action."""
