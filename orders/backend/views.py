@@ -292,8 +292,11 @@ class ShopView(ModelViewSet):
         serializer = self.get_serializer_class()(data=request.data)
         if serializer.is_valid():
             user = request.user
-            if hasattr(user, 'shop'):
-                return Response({"status": False, "message": f"Cannot create shop because you already have it"}, status=status.HTTP_400_BAD_REQUEST)
+            user_shop = Shop.objects.filter(user=user)
+            if user_shop:
+                return Response({"status": False, "message": f"Cannot create shop because you already have it"},
+                                status=status.HTTP_400_BAD_REQUEST)
+
             serializer.save(user=user)
             user.role = Role.objects.get(name=RoleChoices.SHOP)
             user.save()
