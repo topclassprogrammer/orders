@@ -61,9 +61,10 @@ def notify(receiver_email: str | List[str], view: Type[ModelViewSet], action: st
     msg['To'] = receiver_email
     msg.set_content(get_message(view, action, **kwargs),  subtype='html')
     try:
-        server = smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT)
+        server = smtplib.SMTP_SSL(SMTP_SERVER, int(SMTP_PORT))
         server.login(SENDER_EMAIL_ADDRESS, SENDER_EMAIL_PASSWORD)
         server.send_message(msg)
         server.quit()
-    except (smtplib.SMTPAuthenticationError, smtplib.SMTPRecipientsRefused, TimeoutError) as err:
-        return HttpResponseServerError({"status": False, "message": f"Error occurred while sending email to you: {err}"})
+    except (smtplib.SMTPAuthenticationError, smtplib.SMTPRecipientsRefused, TimeoutError, TypeError) as err:
+        return HttpResponseServerError(
+            {"status": False, "message": f"Error occurred while sending email to you: {err}"})
