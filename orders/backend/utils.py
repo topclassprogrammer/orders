@@ -1,6 +1,6 @@
 import os
 import uuid
-from typing import Type, List
+from typing import List, Type
 
 import bcrypt
 import django.db.models
