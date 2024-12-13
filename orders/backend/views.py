@@ -423,7 +423,8 @@ class AddressView(ModelViewSet):
         if serializer.is_valid():
             queryset = Address.objects.filter(**request.data, user=request.user)
             if queryset:
-                return Response({"status": False, "message": f"You already have this address"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"status": False, "message": f"You already have this address"},
+                                status=status.HTTP_400_BAD_REQUEST)
             serializer.save(user=request.user)
             return Response(get_success_msg(self.action, serializer), status=status.HTTP_201_CREATED)
         return Response(get_fail_msg(self.action, serializer), status=status.HTTP_400_BAD_REQUEST)
