@@ -105,7 +105,8 @@ def get_success_msg(action: str, serializer=None, pk: int = None, obj=None) -> d
         return {"status": True, "message": f"Deleted object with id {pk}"}
 
 
-def get_fail_msg(action: str, serializer=None, err: Exception | django.db.models.Model = None, field: str | dict = None) -> dict:
+def get_fail_msg(action: str, serializer=None, err: Exception | django.db.models.Model = None,
+                 field: str | dict = None) -> dict:
     """
         Generate a success message based on the action performed.
 
@@ -135,7 +136,8 @@ def get_request_data(model: Type[django_models.Model], request) -> dict:
     """
     model_fields = model._meta.get_fields()
     data = {}
-    id_fields = [field.name for field in model_fields if isinstance(field, (ForeignKey, ManyToManyField, OneToOneField))]
+    id_fields = [field.name for field in model_fields if isinstance(
+        field, (ForeignKey, ManyToManyField, OneToOneField))]
     for k, v in request.data.items():
         if k in id_fields:
             data.setdefault(k + "_id", v)
