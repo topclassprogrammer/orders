@@ -834,8 +834,8 @@ class OrderItemView(ModelViewSet):
             return Response(get_fail_msg(self.action, err=err), status=status.HTTP_400_BAD_REQUEST)
 
         if item.shop.accept_orders is False:
-            return Response({"status": False,
-                             "message": "You can't choose this item because the shop cannot accept any orders at this time"},
+            return Response({"status": False, "message":
+                             "You can't choose this item because the shop cannot accept any orders at this time"},
                             status=status.HTTP_400_BAD_REQUEST)
 
         quantity = request.data['quantity']
@@ -913,13 +913,15 @@ class OrderItemView(ModelViewSet):
                 try:
                     pk = int(self.kwargs['pk'])
                 except ValueError:
-                    raise ValidationError({"status": False, "message": "You must provide integer value for order item id"})
+                    raise ValidationError(
+                        {"status": False, "message": "You must provide integer value for order item id"})
 
                 obj = get_object(Order, pk)
                 query &= Q(id=obj.id)
 
-            queryset = Order.objects.filter(query).prefetch_related("order_items__item__brand", "order_items__item__model", "order_items__item__category"). \
-                select_related("address").annotate(sum=Sum(F("order_items__quantity") * F("order_items__item__price")))  # Если выполнять queryset.first().order_items.all().first().item.brand.name, то обращений к БД не будет, т.к. все связанные сущности уже были предзагружены из SQL в Python
+            queryset = Order.objects.filter(query).prefetch_related(
+                "order_items__item__brand", "order_items__item__model", "order_items__item__category"). \
+                select_related("address").annotate(sum=Sum(F("order_items__quantity") * F("order_items__item__price")))
             return queryset
         else:
             return OrderItem.objects.all()
