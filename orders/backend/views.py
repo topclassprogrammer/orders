@@ -1096,9 +1096,11 @@ class ImageView(ViewSet):
         images_list = get_images_list()
         images_link_list = []
         for image in images_list:
-            image_link = request.META['wsgi.url_scheme'] + '://' + request.META['HTTP_HOST'] + request.META['PATH_INFO'] + image
+            image_link = request.META['wsgi.url_scheme'] + '://' + request.META['HTTP_HOST'] + \
+                         request.META['PATH_INFO'] + image
             images_link_list.append(image_link)
-        return Response({"status": True, f"message": f"List of all images: {', '.join(images_link_list)}"})
+        return Response({"status": True, f"message": f"List of all images: {', '.join(images_link_list)}"},
+                        status=status.HTTP_200_OK)
 
     def retrieve(self, request, filename):
         """
