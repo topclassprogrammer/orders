@@ -798,12 +798,14 @@ class PropertyValueView(ModelViewSet):
         return Response(get_success_msg(self.action), status=status.HTTP_204_NO_CONTENT)
 
     def get_permissions(self):
+        permissions = [*self.permission_classes]
         """Get the permissions for the current action."""
         if self.action in [self.__class__.create.__name__]:
-            self.permission_classes.append(HasShop)
-        elif self.action in [self.__class__.update.__name__, self.__class__.partial_update.__name__, self.__class__.destroy.__name__]:
-            self.permission_classes.append(IsOwner)
-        return [p() for p in self.permission_classes]
+            permissions.append(HasShop)
+        elif self.action in [self.__class__.update.__name__, self.__class__.partial_update.__name__,
+                             self.__class__.destroy.__name__]:
+            permissions.append(IsOwner)
+        return [p() for p in permissions]
 
 
 class OrderItemView(ModelViewSet):
