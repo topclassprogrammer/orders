@@ -1,7 +1,7 @@
 import os
 import smtplib
 from email.message import EmailMessage
-from typing import Type, List
+from typing import List, Type
 
 from django.http import HttpResponseServerError
 from rest_framework.viewsets import ModelViewSet
@@ -9,7 +9,7 @@ from rest_framework.viewsets import ModelViewSet
 from backend import views
 
 SMTP_SERVER = os.getenv('SMTP_SERVER')
-SMTP_PORT = int(os.getenv('SMTP_PORT'))
+SMTP_PORT = os.getenv('SMTP_PORT')
 SENDER_EMAIL_ADDRESS = os.getenv('SENDER_EMAIL_ADDRESS')
 SENDER_EMAIL_PASSWORD = os.getenv('SENDER_EMAIL_PASSWORD')
 
