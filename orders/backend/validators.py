@@ -1,15 +1,12 @@
 import re
 import uuid
-
 from string import ascii_letters, digits, punctuation
 from typing import Type
 
 import bcrypt
-import requests
 from django.core.exceptions import ValidationError
+from django.db import models
 from django.db.models.base import ModelBase
-
-from backend import models
 
 USERNAME_CHARS = ascii_letters + digits + "-_ "
 PASSWORD_CHARS = ascii_letters + digits + punctuation + " "
