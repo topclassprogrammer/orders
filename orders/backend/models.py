@@ -6,7 +6,8 @@ from django.db import models
 from django.utils.text import slugify
 
 from backend.utils import hash_password
-from backend.validators import check_username, check_password, check_email, check_phone, check_url
+from backend.validators import check_email, check_password, check_phone, \
+    check_url, check_username
 
 
 class RoleChoices(models.TextChoices):
