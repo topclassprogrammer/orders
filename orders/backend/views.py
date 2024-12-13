@@ -336,7 +336,8 @@ class ShopView(ModelViewSet):
         shop.accept_orders = not shop.accept_orders
         shop.save()
         return Response(
-            {"status": True, "message": f"Accept orders switched from {not shop.accept_orders} to {shop.accept_orders}"},
+            {"status": True,
+             "message": f"Accept orders switched from {not shop.accept_orders} to {shop.accept_orders}"},
             status=status.HTTP_200_OK)
 
     @action(methods=['GET'], detail=False, url_path="active-orders")
@@ -372,14 +373,16 @@ class ShopView(ModelViewSet):
 
     def get_permissions(self):
         """Get the permissions for the current action."""
+        permissions = [*self.permission_classes]
         if self.action == self.__class__.get_active_orders.__name__:
             if self.request.user.role.name == RoleChoices.ADMIN:
                 return []
             else:
-                self.permission_classes.extend([HasShop, IsOwner])
-        if self.action in [self.__class__.update.__name__, self.__class__.partial_update.__name__, self.__class__.destroy.__name__, self.__class__.switch_accept_orders.__name__]:
-            self.permission_classes.extend([HasShop, IsOwner])
-        return [p() for p in self.permission_classes]
+                permissions.extend([HasShop, IsOwner])
+        if self.action in [self.__class__.update.__name__, self.__class__.partial_update.__name__,
+                           self.__class__.destroy.__name__, self.__class__.switch_accept_orders.__name__]:
+            permissions.extend([HasShop, IsOwner])
+        return [p() for p in permissions]
 
 
 class AddressView(ModelViewSet):
