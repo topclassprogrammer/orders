@@ -700,11 +700,13 @@ class ItemView(ModelViewSet):
 
     def get_permissions(self):
         """Get the permissions for the current action."""
+        permissions = [*self.permission_classes]
         if self.action in [self.__class__.create.__name__, self.__class__.bulk_upload.__name__]:
-            self.permission_classes.append(HasShop)
-        elif self.action in [self.__class__.update.__name__, self.__class__.partial_update.__name__, self.__class__.destroy.__name__]:
-            self.permission_classes.append(IsOwner)
-        return [p() for p in self.permission_classes]
+            permissions.append(HasShop)
+        elif self.action in [self.__class__.update.__name__, self.__class__.partial_update.__name__,
+                             self.__class__.destroy.__name__]:
+            permissions.append(IsOwner)
+        return [p() for p in permissions]
 
 
 class PropertyNameView(ModelViewSet):
