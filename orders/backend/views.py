@@ -1017,7 +1017,7 @@ class OrderView(ModelViewSet):
         except IntegrityError:
             rollback()
             return Response({"status": False, "message": "Unknown error occurred. Please try again later"},
-                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                            status=status.HTTP_400_BAD_REQUEST)
         else:
             commit()
             notify(order.user.email, self.__class__, self.action, order=order)
