@@ -511,7 +511,14 @@ class ModelView(ModelViewSet):
        """
         field = check_request_fields(request, Model)
         if field:
-            return Response(get_fail_msg(self.action, field=field))
+            return Response(get_fail_msg(self.action, field=field), status=status.HTTP_400_BAD_REQUEST)
+
+        brand_id = request.data.get('brand')
+        if brand_id:
+            try:
+                Brand.objects.get(id=brand_id)
+            except (Brand.DoesNotExist, ValueError) as err:
+                return Response(get_fail_msg(self.action, err=err), status=status.HTTP_400_BAD_REQUEST)
         try:
             obj = Model.objects.filter(id=self.kwargs['pk']).update(**get_request_data(Model, request))
         except ValueError as err:
