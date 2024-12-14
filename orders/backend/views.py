@@ -690,7 +690,6 @@ class ItemView(ModelViewSet):
         check_url(url)
         content = requests.get(url).json()
         shop = request.user.shop
-
         for el in content:
             try:
                 brand, _ = Brand.objects.get_or_create(name=el['brand'])
@@ -722,7 +721,7 @@ class ItemView(ModelViewSet):
                                 status=status.HTTP_400_BAD_REQUEST)
 
         return Response({"status": True, "message": f"Successfully uploaded all items"},
-                            status=status.HTTP_201_CREATED)
+                        status=status.HTTP_201_CREATED)
 
     def get_permissions(self):
         """Get the permissions for the current action."""
