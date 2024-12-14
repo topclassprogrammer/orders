@@ -169,7 +169,8 @@ def get_order(request, model: Type[django_models.Model], state: str) -> django_m
     return order
 
 
-def slugify_item(brand: Type[django_models.Model], model: Type[django_models.Model], item: Type[django_models.Model], request) -> str:
+def slugify_item(brand: Type[django_models.Model], model: Type[django_models.Model],
+                 item: Type[django_models.Model], request) -> str:
     """
     Generate a unique slug for an item based on brand and model names.
 
