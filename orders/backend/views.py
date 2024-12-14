@@ -424,7 +424,7 @@ class AddressView(ModelViewSet):
         else:
             queryset = Address.objects.filter(user=request.user)
         serializer = self.get_serializer_class()(queryset, many=True)
-        return Response(serializer.data)
+        return Response(get_success_msg(self.action,  serializer=serializer), status=status.HTTP_200_OK)
 
     def create(self, request, *args, **kwargs):
         """
