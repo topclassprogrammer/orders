@@ -91,7 +91,7 @@ def check_url(value: str):
                          r"<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))")
     result = re.fullmatch(pattern, value)
     if not result:
-        raise ValidationError("Incorrect shop URL")
+        raise ValidationError("Incorrect shop URL. Make sure it starts with https:// , http:// or www.")
 
 
 def check_uuid_token(value: str) -> bool:
