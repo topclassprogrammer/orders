@@ -635,28 +635,31 @@ class ItemView(ModelViewSet):
             request.FILES['image'].name = get_image_name(request)
             obj.image = request.FILES['image']
             obj.save()
-            return Response(get_success_msg(self.action, obj=obj))
-        elif len(request.data) == 1 and 'description' in request.data.keys():
-            obj.description = request.data['description']
-            obj.save()
-            return Response(get_success_msg(self.action, obj=obj))
+            return Response(get_success_msg(self.action, obj=obj), status=status.HTTP_206_PARTIAL_CONTENT)
         else:
             field = check_request_fields(request, Item)
             if field:
                 return Response(get_fail_msg(self.action, field=field),
                                 status=status.HTTP_400_BAD_REQUEST)
 
+        brand = request.data.get('brand')
+        model = request.data.get('model')
+        if brand and model:
             value = check_model_in_brand(Brand, Model, request)
             if value:
-                return Response(get_fail_msg(self.action, err=value),
-                                status=status.HTTP_400_BAD_REQUEST)
+                return Response(get_fail_msg(self.action, err=value), status=status.HTTP_400_BAD_REQUEST)
+            slug = slugify_item(Brand, Model, Item, request)
+        else:
+            slug = str(uuid.uuid4())
 
-            queryset = Item.objects.filter(id=obj.id)
-            try:
-                obj = queryset.update(**get_request_data(Item, request))
-            except (IntegrityError, ValueError) as err:
-                return Response(get_fail_msg(self.action, err=err), status=status.HTTP_400_BAD_REQUEST)
-            return Response(get_success_msg(self.action, obj=obj), status=status.HTTP_206_PARTIAL_CONTENT)
+        request_data = get_request_data(Item, request)
+        request_data.update({"slug": slug})
+        queryset = Item.objects.filter(id=obj.id)
+        try:
+            obj = queryset.update(**request_data)
+        except (IntegrityError, ValueError) as err:
+            return Response(get_fail_msg(self.action, err=err), status=status.HTTP_400_BAD_REQUEST)
+        return Response(get_success_msg(self.action, obj=obj), status=status.HTTP_206_PARTIAL_CONTENT)
 
     def destroy(self, request, *args, **kwargs):
         """
