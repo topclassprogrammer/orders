@@ -121,7 +121,8 @@ class Address(models.Model):
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['country', 'region', 'city', 'street', 'house', 'apartment', 'user'], name='unique_address'),
+            models.UniqueConstraint(fields=['country', 'region', 'city', 'street', 'house', 'apartment', 'user'],
+                                    name='unique_address'),
         ]
 
 
