@@ -1,4 +1,5 @@
 import datetime
+import os
 import uuid
 from typing import List, Type
 
@@ -64,7 +65,7 @@ class UserView(ModelViewSet):
                             status=status.HTTP_201_CREATED)
         return Response(get_fail_msg(self.action, serializer), status=status.HTTP_400_BAD_REQUEST)
 
-    def partial_update(self, request, *args, pk=None, **kwargs):
+    def partial_update(self, request, *args, **kwargs):
         """
         Partially update an existing user account.
 
