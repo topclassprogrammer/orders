@@ -50,7 +50,7 @@ def get_subject(view: Type[ModelViewSet], action: str, **kwargs) -> str:
             subject = "Password reset request for your account"
     elif view == views.OrderView:
         if action == views.OrderView.create.__name__:
-            subject = "You received a new order" if kwargs.get('admin') else "You made a new order"
+            subject = "You have a new order" if kwargs.get('admin') else "You made a new order"
         elif action == views.OrderView.partial_update.__name__:
             subject = "New order state"
     return subject
