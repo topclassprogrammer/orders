@@ -613,10 +613,9 @@ class ItemView(ModelViewSet):
             return Response(get_fail_msg(self.action, err=value), status=status.HTTP_400_BAD_REQUEST)
 
         slug = slugify_item(Brand, Model, Item, request)
-        request.data['slug'] = slug
-        request.data['shop_id'] = request.user.shop.id
+        shop = request.user.shop
         try:
-            obj = Item.objects.create(**get_request_data(Item, request))
+            obj = Item.objects.create(**get_request_data(Item, request), slug=slug, shop=shop)
         except (IntegrityError, ValueError) as err:
             return Response(get_fail_msg(self.action, err=err), status=status.HTTP_400_BAD_REQUEST)
         return Response(get_success_msg(self.action, obj=obj), status=status.HTTP_201_CREATED)
