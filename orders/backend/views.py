@@ -113,8 +113,9 @@ class UserView(ModelViewSet):
             try:
                 token = ActivationToken.objects.get(key=uuid.UUID(key))
             except ActivationToken.DoesNotExist:
-                return Response({"status": False, "message": "Activation token key not found in DB"},
+                return Response({"status": False, "message": "Activation token key not found"},
                                 status=status.HTTP_404_NOT_FOUND)
+
             if token.user.is_active:
                 return Response({"status": False, "message": "Account is already activated"},
                                 status=status.HTTP_400_BAD_REQUEST)
