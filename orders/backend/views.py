@@ -222,6 +222,12 @@ class UserView(ModelViewSet):
 
             user = request.user
             password = request.data['password']
+            if check_passwords(password, user.password):
+                return Response({"status": False,
+                                 "message": "Your current and new passwords are the same. "
+                                            "You have to provide a password that is not the current one"},
+                                status=status.HTTP_400_BAD_REQUEST)
+
             user.password = hash_password(password)
             user.save()
             reset_token.delete()
