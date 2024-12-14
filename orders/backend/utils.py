@@ -254,7 +254,7 @@ def get_image_name(request) -> str:
     """
     uploaded_image_name = request.FILES['image'].name
     image_name_split = uploaded_image_name.split('.')
-    image_name = image_name_split[-2]
+    image_name = ".".join(image_name_split[:-1])
     ext = image_name_split[-1]
     image_name += ('-' + str(uuid.uuid4())) + '.' + ext
     return image_name
