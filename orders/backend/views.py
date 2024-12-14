@@ -1147,3 +1147,36 @@ class ImageView(ViewSet):
         image_path = str(settings.BASE_DIR) + settings.MEDIA_URL + filename
         image_file = open(image_path, 'rb')
         return FileResponse(image_file, status=status.HTTP_200_OK)
+
+    def destroy(self, request, filename):
+        """Delete a specific image by filename.
+
+        Args:
+            request (Request): The Django request object.
+            filename (str): The name of the image file to delete.
+
+        Returns:
+            Response: The Django response object indicating the success or failure of the image deletion.
+        """
+        images_list = get_images_list()
+        if filename not in images_list:
+            return Response({"status": False, f"message": f"Image not found in folder"},
+                            status=status.HTTP_404_NOT_FOUND)
+        try:
+            item = Item.objects.get(image=filename)
+        except Item.DoesNotExist as err:
+            return Response({"status": False,
+                             "message": "Image not found in DB but exists in image folder. To resolve this issue "
+                                        f"you have to contact administrator(s): {get_admin_emails()} "
+                                        f"providing the following error: {err}"},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        if request.user.role.name == RoleChoices.ADMIN:
+            pass
+        elif item.shop.user != request.user:
+            return Response({"status": False, f"message": f"This image does not belong to you"},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        image_path = str(settings.BASE_DIR) + settings.MEDIA_URL + filename
+        os.remove(image_path)
+        return Response({"status": True, f"message": f"Image successfully deleted"}, status=status.HTTP_204_NO_CONTENT)
