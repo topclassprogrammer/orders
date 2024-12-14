@@ -1146,4 +1146,4 @@ class ImageView(ViewSet):
             return Response({"status": False, f"message": f"Image not found"}, status=status.HTTP_404_NOT_FOUND)
         image_path = str(settings.BASE_DIR) + settings.MEDIA_URL + filename
         image_file = open(image_path, 'rb')
-        return FileResponse(image_file)
+        return FileResponse(image_file, status=status.HTTP_200_OK)
