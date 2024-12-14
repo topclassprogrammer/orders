@@ -59,7 +59,7 @@ def get_subject(view: Type[ModelViewSet], action: str, **kwargs) -> str:
 def notify(receiver_email: str | List[str], view: Type[ModelViewSet], action: str, **kwargs):
     """Send an email notification to the specified recipient."""
     msg = EmailMessage()
-    msg['Subject'] = get_subject(view, action)
+    msg['Subject'] = get_subject(view, action, **kwargs)
     msg['From'] = SENDER_EMAIL_ADDRESS
     msg['To'] = receiver_email
     msg.set_content(get_message(view, action, **kwargs),  subtype='html')
