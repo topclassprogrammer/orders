@@ -146,18 +146,18 @@ class UserView(ModelViewSet):
                 user = User.objects.get(username=username)
             except User.DoesNotExist:
                 return Response({"status": False, "message": "Wrong username or/and password"},
-                                status=status.HTTP_404_NOT_FOUND)
+                                status=status.HTTP_400_BAD_REQUEST)
 
             password = request.data['password']
             user_password = user.password
             if not check_passwords(password, user_password):
                 return Response({"status": False, "message": "Wrong username or/and password"},
-                                status=status.HTTP_404_NOT_FOUND)
+                                status=status.HTTP_400_BAD_REQUEST)
             if not user.is_active:
                 return Response({"status": False, "message": "You must activate your account before logging in"},
                                 status=status.HTTP_400_BAD_REQUEST)
 
-            AuthToken.objects.create(key=uuid.uuid4(), user=user)
+            token = AuthToken.objects.create(key=uuid.uuid4(), user=user)
             user.last_login = datetime.datetime.now()
             user.save()
             return Response({"status": True, "message": f"You just logged in. Your auth token is {token.key}"},
