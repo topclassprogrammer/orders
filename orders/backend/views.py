@@ -337,7 +337,7 @@ class ShopView(ModelViewSet):
         user.save()
         return Response(get_success_msg(self.action, obj.id), status=status.HTTP_204_NO_CONTENT)
 
-    @action(methods=['POST'], detail=True, url_path="switch-accept-orders")
+    @action(methods=['POST'], detail=False, url_path="switch-accept-orders")
     def switch_accept_orders(self, request):
         """
         Toggle the acceptance of orders for the user's shop.
