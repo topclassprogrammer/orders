@@ -7,6 +7,7 @@ from django.http import HttpResponseServerError
 from rest_framework.viewsets import ModelViewSet
 
 from backend import views
+from backend.utils import get_admin_emails
 
 SMTP_SERVER = os.getenv('SMTP_SERVER')
 SMTP_PORT = os.getenv('SMTP_PORT')
@@ -28,9 +29,11 @@ def get_message(view: Type[ModelViewSet], action: str, **kwargs) -> str:
                 msg = f"<p>You have a new order with ID <b>{kwargs['order'].id}</b> " \
                       f"from a user with email <b>{kwargs['order'].user.email}</b>.</p>"
             else:
-                msg = f"<p>You successfully made an order.</p><p>Your order ID is " \
+                msg = f"<p>You made an order.</p><p>Your order ID is " \
                       f"<b>{kwargs['order'].id}</b>.</p><p>The current state is <b>" \
-                      f"{kwargs['order'].state}</b>.</p>"
+                      f"{kwargs['order'].state}</b>.</p><p>For any questions " \
+                      "regarding your order you should contact administrators: " \
+                      f"{', '.join(get_admin_emails())}</p>"
         elif action == views.OrderView.partial_update.__name__:
             msg = f"<p>The state for your order with ID <b>{kwargs['order'].id}</b> " \
                   f"has been changed to <b>{kwargs['order'].state}</b></p>"
