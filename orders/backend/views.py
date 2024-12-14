@@ -1108,6 +1108,9 @@ class OrderView(ModelViewSet):
 
 class ImageView(ViewSet):
     """ViewSet for managing images"""
+    authentication_classes = [TokenAuthentication]
+    permission_classes: List[Type[BasePermission]] = [IsAuthenticated]
+
     def list(self, request):
         """
         Retrieve a list of all available images.
