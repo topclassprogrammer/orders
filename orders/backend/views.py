@@ -82,7 +82,7 @@ class UserView(ModelViewSet):
             return Response(get_success_msg(self.action, serializer), status=status.HTTP_206_PARTIAL_CONTENT)
         return Response(get_fail_msg(self.action, serializer), status=status.HTTP_400_BAD_REQUEST)
 
-    def destroy(self, request, *args, pk=None, **kwargs):
+    def destroy(self, request, *args, **kwargs):
         """
         Delete an existing user account.
 
@@ -94,7 +94,7 @@ class UserView(ModelViewSet):
         """
         obj = self.get_object()
         obj.delete()
-        return Response(get_success_msg(self.action, pk=pk), status=status.HTTP_204_NO_CONTENT)
+        return Response(get_success_msg(self.action, pk=obj.id), status=status.HTTP_204_NO_CONTENT)
 
     @action(methods=['POST'], detail=False, url_path='activate')
     def activate(self, request):
