@@ -28,8 +28,8 @@ BACKEND_BASE_URL = 'api/v1/'
 urlpatterns = [
     path('admin/', admin.site.urls),
     path(BACKEND_BASE_URL, include('backend.urls')),
-    path("images/", ImageView.as_view({"get": "list"})),
-    path("images/<str:filename>", ImageView.as_view({"get": "retrieve"}))
+    path("image/", ImageView.as_view({"get": "list"})),
+    path("image/<str:filename>", ImageView.as_view({"get": "retrieve", "delete": "destroy"}))
 ] + debug_toolbar_urls()
 
 if settings.DEBUG:
