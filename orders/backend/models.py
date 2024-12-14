@@ -194,6 +194,3 @@ class Model(models.Model):
 class Category(models.Model):
     """Model representing a category of items."""
     name = models.CharField(max_length=32, unique=True)
-
-
-
