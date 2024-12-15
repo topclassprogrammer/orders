@@ -256,8 +256,9 @@ class UserView(ModelViewSet):
         """Get a list of authentication classes to be used for the request."""
         url_end = get_url_end_path(self.request, self.basename)
         request_method = get_request_method(self.request)
-        if url_end in ['', self.__class__.log_in.url_path,
-                       self.__class__.activate.url_path] and request_method == 'POST':
+        if url_end in ['', self.__class__.log_in.url_path, self.__class__.activate.url_path,
+                       self.__class__.request_new_password.url_path, self.__class__.set_new_password.url_path] \
+                and request_method == 'POST':
             return []
         else:
             return [TokenAuthentication()]
