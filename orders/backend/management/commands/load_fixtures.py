@@ -1,14 +1,15 @@
 import json
 import os
 
-from dotenv import load_dotenv
-
 from backend.models import Role, User
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.management.base import BaseCommand
 from django.db.transaction import commit, rollback, set_autocommit
 from django.db.utils import IntegrityError
+from dotenv import load_dotenv
+
+from backend.utils import hash_password
 
 load_dotenv()
 
@@ -28,7 +29,8 @@ class Command(BaseCommand):
             [el.full_clean() for el in role_objs]
             Role.objects.bulk_create(role_objs)
 
-            User.objects.create(**stream['user'][0], email=os.getenv('ADMIN_EMAIL'))
+            User.objects.create(**stream['user'][0], password=hash_password('password'),
+                                email=os.getenv('ADMIN_EMAIL'), is_active=True)
         except (IntegrityError, TypeError, ValidationError) as err:
             rollback()
             print(f"Cannot apply any fixtures because of error: {err}")
