@@ -6,6 +6,7 @@ from typing import List, Type
 import requests
 from django.conf import settings
 from django.db import IntegrityError
+from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db.models import F, Q, Sum
 from django.db.transaction import commit, rollback, set_autocommit
 from django.http import FileResponse
@@ -35,7 +36,7 @@ from backend.utils import get_admin_emails, get_auth_token, get_fail_msg, \
     get_request_method, get_success_msg, get_url_end_path, hash_password, \
     slugify_bulk_item, slugify_item
 from backend.validators import check_item_owner, check_model_in_brand, \
-    check_passwords, check_quantity, check_request_fields, check_url
+    check_passwords, check_quantity, check_request_fields, check_url, check_email
 
 
 class UserView(ModelViewSet):
