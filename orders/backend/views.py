@@ -1186,8 +1186,8 @@ class ImageView(ViewSet):
         except Item.DoesNotExist as err:
             return Response({"status": False,
                              "message": "Image not found in DB but exists in image folder. To resolve this issue "
-                                        f"you have to contact administrator(s): {get_admin_emails()} "
-                                        f"providing the following error: {err}"},
+                            f"you have to contact administrator(s): {get_admin_emails()} "
+                            f"providing the following error: {err}"},
                             status=status.HTTP_400_BAD_REQUEST)
 
         if request.user.role.name == RoleChoices.ADMIN:
