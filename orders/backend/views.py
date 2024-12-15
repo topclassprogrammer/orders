@@ -184,16 +184,29 @@ class UserView(ModelViewSet):
     @action(methods=['POST'], detail=False, url_path='request-new-password')
     def request_new_password(self, request):
         """
-        Request a new password reset token for the currently authenticated user.
+        Request a new password reset token for the user.
 
         Args:
-            request (Request): The Django request object.
+            request (Request): The Django request object containing user email.
 
         Returns:
-            Response: The Django response object indicating that
-            the password reset token has been sent to the user's email.
+            Response: The Django response object indicating the success or failure of the
+                  password reset token request.
         """
-        user = self.request.user
+        email = request.data.get('email')
+        if not email:
+            return Response(get_fail_msg(action=self.action, field="email"))
+
+        try:
+            check_email(email)
+        except DjangoValidationError as err:
+            return Response(get_fail_msg(action=self.action, err=err))
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response({"status": False, "message": "User with this email not found"})
+
         token = PasswordResetToken.objects.create(key=uuid.uuid4(), user=user)
         notify(user.email, self.__class__, self.action, token=token)
         return Response({"status": True,
