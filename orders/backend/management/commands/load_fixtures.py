@@ -1,4 +1,7 @@
 import json
+import os
+
+from dotenv import load_dotenv
 
 from backend.models import Role, User
 from django.conf import settings
@@ -6,6 +9,8 @@ from django.core.exceptions import ValidationError
 from django.core.management.base import BaseCommand
 from django.db.transaction import commit, rollback, set_autocommit
 from django.db.utils import IntegrityError
+
+load_dotenv()
 
 FIXTURE_FILE_NAME = 'fixture.json'
 
@@ -23,10 +28,7 @@ class Command(BaseCommand):
             [el.full_clean() for el in role_objs]
             Role.objects.bulk_create(role_objs)
 
-            user_objs = [User(**el) for el in stream['user']]
-            [el.full_clean() for el in user_objs]
-            User.objects.bulk_create(user_objs)
-
+            User.objects.create(**stream['user'][0], email=os.getenv('ADMIN_EMAIL'))
         except (IntegrityError, TypeError, ValidationError) as err:
             rollback()
             print(f"Cannot apply any fixtures because of error: {err}")
