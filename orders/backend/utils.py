@@ -1,6 +1,6 @@
 import os
 import uuid
-from typing import List, Type
+from typing import List, Type, Any
 
 import bcrypt
 import django.db.models
@@ -106,7 +106,7 @@ def get_success_msg(action: str, serializer=None, pk: int = None, obj=None) -> d
 
 
 def get_fail_msg(action: str, serializer=None, err: Exception | django.db.models.Model = None,
-                 field: str | dict = None) -> dict:
+                 field: Any = None) -> dict:
     """
         Generate a success message based on the action performed.
 
