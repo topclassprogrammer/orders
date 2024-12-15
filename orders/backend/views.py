@@ -217,24 +217,27 @@ class UserView(ModelViewSet):
     @action(methods=['POST'], detail=False, url_path='set-new-password')
     def set_new_password(self, request):
         """
-        Set a new password for the authenticated user using the provided reset token.
+        Set a new password for the user using the provided reset token.
 
         Args:
-            request (Request): The Django request object containing the new password and reset token key.
+            request (Request): The Django request object containing the
+                reset token key and the new password.
 
         Returns:
-            Response: The Django response object indicating the status of the password change process.
+            Response:
+                - The Django response object indicating the success or failure of
+                  the password change.
         """
         serializer = self.get_serializer_class()(data=request.data)
         if serializer.is_valid():
             key = request.data['key']
             try:
-                reset_token = PasswordResetToken.objects.get(key=uuid.UUID(key))
+                token = PasswordResetToken.objects.get(key=uuid.UUID(key))
             except PasswordResetToken.DoesNotExist:
                 return Response({"status": False, "message": "PasswordResetToken key not found in DB"},
                                 status=status.HTTP_404_NOT_FOUND)
 
-            user = request.user
+            user = token.user
             password = request.data['password']
             if check_passwords(password, user.password):
                 return Response({"status": False,
@@ -244,7 +247,7 @@ class UserView(ModelViewSet):
 
             user.password = hash_password(password)
             user.save()
-            reset_token.delete()
+            token.delete()
             return Response({"status": True, "message": "Password successfully changed"}, status=status.HTTP_200_OK)
         return Response({"status": False, "message": f"Incorrect key or/and password provided: {serializer.errors}"},
                         status=status.HTTP_400_BAD_REQUEST)
