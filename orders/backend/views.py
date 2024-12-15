@@ -279,7 +279,8 @@ class UserView(ModelViewSet):
         """Get the permissions for the current action."""
         permissions = [IsAuthenticated]
         if self.action in [self.__class__.create.__name__, self.__class__.log_in.__name__,
-                           self.__class__.activate.__name__]:
+                           self.__class__.activate.__name__, self.__class__.request_new_password.__name__,
+                           self.__class__.set_new_password.__name__]:
             return []
         elif self.action == self.__class__.list.__name__:
             permissions.append(IsAdmin)
