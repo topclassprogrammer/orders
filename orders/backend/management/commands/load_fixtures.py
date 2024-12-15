@@ -29,7 +29,8 @@ class Command(BaseCommand):
             [el.full_clean() for el in role_objs]
             Role.objects.bulk_create(role_objs)
 
-            User.objects.create(**stream['user'][0], password=hash_password('password'),
+            User.objects.create(**stream['user'][0], username=os.getenv('ADMIN_USERNAME'),
+                                password=hash_password(os.getenv('ADMIN_PASSWORD')),
                                 email=os.getenv('ADMIN_EMAIL'), is_active=True)
         except (IntegrityError, TypeError, ValidationError) as err:
             rollback()
