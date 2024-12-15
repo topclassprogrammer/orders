@@ -1186,8 +1186,8 @@ class ImageView(ViewSet):
         except Item.DoesNotExist as err:
             return Response({"status": False,
                              "message": "Image not found in DB but exists in image folder. To resolve this issue "
-                            f"you have to contact administrator(s): {get_admin_emails()} "
-                            f"providing the following error: {err}"},
+                                        f"you have to contact administrator(s): {get_admin_emails()} "
+                                        f"providing the following error: {err}"},
                             status=status.HTTP_400_BAD_REQUEST)
 
         if request.user.role.name == RoleChoices.ADMIN:
@@ -1195,6 +1195,9 @@ class ImageView(ViewSet):
         elif item.shop.user != request.user:
             return Response({"status": False, f"message": f"This image does not belong to you"},
                             status=status.HTTP_400_BAD_REQUEST)
+
+        item.image = None
+        item.save()
 
         image_path = str(settings.BASE_DIR) + settings.MEDIA_URL + filename
         os.remove(image_path)
