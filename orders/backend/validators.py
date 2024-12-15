@@ -1,7 +1,7 @@
 import re
 import uuid
 from string import ascii_letters, digits, punctuation
-from typing import Type
+from typing import Type, Any
 
 import bcrypt
 from django.core.exceptions import ValidationError
@@ -174,7 +174,7 @@ def check_model_in_brand(brand_model: Type[models.Model], model_model: Type[mode
         return request.data['model']
 
 
-def check_item_owner(model: Type[models.Model], request) -> int | str | None | ModelBase:
+def check_item_owner(model: Type[models.Model], request) -> Any:
     """
     Check ownership of the specified item by the current user.
 
