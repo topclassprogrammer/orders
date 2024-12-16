@@ -679,6 +679,18 @@ class ItemView(ModelViewSet):
         else:
             slug = str(uuid.uuid4())
 
+        quantity = request.data.get('quantity')
+        if quantity:
+            quantity_err_msg = check_quantity(request.data['quantity'])
+            if quantity_err_msg:
+                return Response(get_fail_msg(self.action, err=quantity_err_msg), status=status.HTTP_400_BAD_REQUEST)
+
+        price = request.data.get('price')
+        if price:
+            price_err_msg = check_price(request.data['price'])
+            if price_err_msg:
+                return Response(get_fail_msg(self.action, err=price_err_msg), status=status.HTTP_400_BAD_REQUEST)
+
         request_data = get_request_data(Item, request)
         request_data.update({"slug": slug})
         queryset = Item.objects.filter(id=obj.id)
