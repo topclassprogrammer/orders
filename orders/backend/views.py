@@ -388,7 +388,7 @@ class ShopView(ModelViewSet):
             Response: The Django response object containing the serialized active orders.
         """
         queryset = self.get_queryset()
-        serializer = OrderSerializer(queryset, many=True)
+        serializer = OrderItemSerializer(queryset, many=True)
         return Response(get_success_msg(self.action, serializer), status=status.HTTP_200_OK)
 
     def get_queryset(self):
