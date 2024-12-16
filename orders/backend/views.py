@@ -397,12 +397,11 @@ class ShopView(ModelViewSet):
             token = get_auth_token(self.request)
             inactive_state_orders = [OrderChoices.CART, OrderChoices.CANCELED]
             active_state_orders = [x[0] for x in OrderChoices.choices if x[0] not in inactive_state_orders]
-            query = Q(state__in=active_state_orders)
+            query = Q(order__state__in=active_state_orders)
             if self.request.user.role.name == RoleChoices.SHOP:
-                query &= Q(user__shop=token.user.shop)
-            queryset = Order.objects.filter(query).prefetch_related(
-                "order_items__item__brand", "order_items__item__model", "order_items__item__category"). \
-                select_related("address").annotate(sum=Sum(F("order_items__quantity") * F("order_items__item__price")))
+                query &= Q(item__shop=token.user.shop)
+            queryset = OrderItem.objects.filter(query).prefetch_related(
+                "item__brand", "item__model", "item__category").select_related("order")
             return queryset
         else:
             return Shop.objects.all()
