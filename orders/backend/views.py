@@ -1133,15 +1133,15 @@ class OrderView(ModelViewSet):
     def get_permissions(self):
         """Get the permissions for the current action."""
         permissions = [*self.permission_classes]
-        if self.action in [self.__class__.retrieve.__name__]:
+        if self.action in [self.__class__.list.__name__, self.__class__.retrieve.__name__]:
             if self.request.user.role.name == RoleChoices.ADMIN:
                 return []
             else:
                 permissions.append(IsOwner)
         elif self.action in [self.__class__.create.__name__]:
             permissions.append(IsOwner)
-        elif self.action in [self.__class__.list.__name__, self.__class__.update.__name__,
-                             self.__class__.partial_update.__name__, self.__class__.destroy.__name__]:
+        elif self.action in [self.__class__.update.__name__,self.__class__.partial_update.__name__,
+                             self.__class__.destroy.__name__]:
             permissions.append(IsAdmin)
         return [p() for p in permissions]
 
