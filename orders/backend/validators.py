@@ -205,7 +205,7 @@ def check_quantity(quantity: str | int, item=None) -> dict | None:
 
     Args:
         quantity (str | int): The quantity of items to validate.
-        item: The item object against which the quantity is checked.
+        item (optional): The item object against which the quantity is checked.
 
     Returns:
         dict | None: A dictionary containing status and message if validation fails,
