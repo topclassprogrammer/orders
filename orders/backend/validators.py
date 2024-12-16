@@ -224,6 +224,17 @@ def check_quantity(quantity: str | int, item=None) -> dict | None:
 
 
 def check_price(price: str | float) -> dict | None:
+    """
+    Check if the provided price does not exceed a maximum of 10 digits
+    before the decimal point and 2 digits after the decimal point.
+
+    Args:
+        price (str | float): The price to validate
+
+    Returns:
+        dict | None: A dictionary containing status and message if validation fails,
+                      None if validation is successful.
+    """
     try:
         decimal_price = price.split('.')
         if len(decimal_price) != 1:
@@ -231,9 +242,9 @@ def check_price(price: str | float) -> dict | None:
             decimal_places = decimal_price[1]
             if len(decimal_digits) > 10 or len(decimal_places) > 2:
                 return {"status": False, "message": f"Incorrect price value. "
-                        f"It must have 10 digits and 2 decimal places at maximum"}
+                                                    f"It must have 10 digits and 2 decimal places at maximum"}
         elif len(decimal_price) == 1 and len(str(price)) > 10:
             return {"status": False, "message": f"Incorrect price value. "
-                    f"It must have 10 digits at maximum"}
+                                                f"It must have 10 digits at maximum"}
     except (TypeError, ValueError, IndexError) as err:
         return {"status": False, "message": f"Incorrect price value: {err}"}
