@@ -160,16 +160,20 @@ class OrderSerializer(serializers.ModelSerializer):
     address = AddressSerializer()
     user = UserSerializer(read_only=True)
     sum = serializers.DecimalField(max_digits=15, decimal_places=2)
+    order_items = serializers.SerializerMethodField()
 
     class Meta:
         model = Order
-        fields = ['id', 'state', 'address', 'user', 'sum', 'created_at']
-        read_only_fields = ['id', 'state', 'user', 'sum' 'created_at']
+        fields = ['id', 'state', 'address', 'user', 'sum', 'order_items', 'created_at']
+        read_only_fields = ['id', 'state', 'user', 'sum', 'order_items', 'created_at']
+
+    def get_order_items(self, obj):
+        items = obj.order_items.all()
+        return OrderItemSerializer(items, many=True).data
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
     """Serializer for the OrderItem model."""
-    order = OrderSerializer()
     item = ItemSerializer()
 
     class Meta:
