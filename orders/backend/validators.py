@@ -221,3 +221,16 @@ def check_quantity(quantity: str | int, item=None) -> dict | None:
         if quantity > item.quantity:
             return {"status": False, "message": f"You chose more items({quantity}) than "
                                      f"available in stock({item.quantity})"}
+
+
+def check_price(price: str | float) -> dict | None:
+    try:
+        decimal_price = price.split('.')
+        if len(decimal_price) != 1:
+            digits = decimal_price[0]
+            decimal_places = decimal_price[1]
+            if len(digits) > 10 or len(decimal_places) > 2:
+                return {"status": False, "message": f"Incorrect price value. "
+                        f"It must have 10 digits and 2 decimal places at maximum"}
+    except (TypeError, ValueError, IndexError) as err:
+        return {"status": False, "message": f"Incorrect price value: {err}"}
