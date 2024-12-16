@@ -92,6 +92,9 @@ class AddressSerializer(serializers.ModelSerializer):
         model = Address
         fields = ['id', 'country', 'region', 'city', 'street', 'house', 'apartment', 'user']
         read_only_fields = ['id', 'user']
+        extra_kwargs = {
+            'apartment': {'required': False}
+        }
 
 
 class BrandSerializer(serializers.ModelSerializer):
