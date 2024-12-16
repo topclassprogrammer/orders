@@ -629,7 +629,15 @@ class ItemView(ModelViewSet):
             return Response(get_fail_msg(self.action, field=field), status=status.HTTP_400_BAD_REQUEST)
         value = check_model_in_brand(Brand, Model, request)
         if value:
-            return Response(get_fail_msg(self.action, err=value), status=status.HTTP_400_BAD_REQUEST)
+            return Response(get_fail_msg(self.action, field=value), status=status.HTTP_400_BAD_REQUEST)
+
+        quantity_err_msg = check_quantity(request.data['quantity'])
+        if quantity_err_msg:
+            return Response(get_fail_msg(self.action, err=quantity_err_msg), status=status.HTTP_400_BAD_REQUEST)
+
+        price_err_msg = check_price(request.data['price'])
+        if price_err_msg:
+            return Response(get_fail_msg(self.action, err=price_err_msg), status=status.HTTP_400_BAD_REQUEST)
 
         slug = slugify_item(Brand, Model, Item, request)
         shop = request.user.shop
