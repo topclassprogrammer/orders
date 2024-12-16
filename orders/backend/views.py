@@ -35,8 +35,8 @@ from backend.utils import get_admin_emails, get_auth_token, get_fail_msg, \
     get_image_name, get_images_list, get_object, get_order, get_request_data, \
     get_request_method, get_success_msg, get_url_end_path, hash_password, \
     slugify_bulk_item, slugify_item
-from backend.validators import check_item_owner, check_model_in_brand, \
-    check_passwords, check_quantity, check_request_fields, check_url, check_email
+from backend.validators import check_email, check_item_owner, check_model_in_brand, \
+    check_passwords, check_price, check_quantity, check_request_fields
 
 
 class UserView(ModelViewSet):
