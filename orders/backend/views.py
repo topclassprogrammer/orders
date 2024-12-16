@@ -706,8 +706,10 @@ class ItemView(ModelViewSet):
             Response: The Django response object indicating the success or failure of the bulk upload.
         """
         url = request.data.get('url')
-        check_url(url)
-        content = requests.get(url).json()
+        try:
+            content = requests.get(url).json()
+        except requests.exceptions.RequestException:
+            return Response({"status": False, "message": "Error occurred while accessing JSON data in URL"}, status=status.HTTP_400_BAD_REQUEST)
         shop = request.user.shop
         for el in content:
             try:
