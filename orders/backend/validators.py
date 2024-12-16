@@ -231,6 +231,9 @@ def check_price(price: str | float) -> dict | None:
             decimal_places = decimal_price[1]
             if len(digits) > 10 or len(decimal_places) > 2:
                 return {"status": False, "message": f"Incorrect price value. "
-                        f"It must have 10 digits and 2 decimal places at maximum"}
+                                                    f"It must have 10 digits and 2 decimal places at maximum"}
+        elif len(decimal_price) == 1 and len(str(price)) > 10:
+            return {"status": False, "message": f"Incorrect price value. "
+                                                f"It must have 10 digits at maximum"}
     except (TypeError, ValueError, IndexError) as err:
         return {"status": False, "message": f"Incorrect price value: {err}"}
