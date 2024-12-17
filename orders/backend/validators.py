@@ -235,16 +235,24 @@ def check_price(price: str | float) -> dict | None:
         dict | None: A dictionary containing status and message if validation fails,
                       None if validation is successful.
     """
+    base_msg = "Incorrect price value."
+    price = str(price)
+    if price.startswith('.') or price.endswith('.'):
+        return {"status": False, "message": f"{base_msg} Number cannot begin or end with a point mark."}
+    elif price.count('.') > 1:
+        return {"status": False, "message": f"{base_msg} Multiple point marks in a number"}
+    elif any(x not in '1234567890.' for x in price):
+        return {"status": False, "message": f"{base_msg} You have to provide a number."}
     try:
         decimal_price = price.split('.')
-        if len(decimal_price) != 1:
+        if len(decimal_price) == 2:
             decimal_digits = decimal_price[0]
             decimal_places = decimal_price[1]
             if len(decimal_digits) > 10 or len(decimal_places) > 2:
-                return {"status": False, "message": f"Incorrect price value. "
-                                                    f"It must have 10 digits and 2 decimal places at maximum"}
+                return {"status": False, "message": f"{base_msg} "
+                        f"It must have 10 digits and 2 decimal places at maximum"}
         elif len(decimal_price) == 1 and len(str(price)) > 10:
-            return {"status": False, "message": f"Incorrect price value. "
-                                                f"It must have 10 digits at maximum"}
+            return {"status": False, "message": f"{base_msg} "
+                    f"It must have 10 digits at maximum"}
     except (TypeError, ValueError, IndexError) as err:
-        return {"status": False, "message": f"Incorrect price value: {err}"}
+        return {"status": False, "message": f"{base_msg}: {err}"}
