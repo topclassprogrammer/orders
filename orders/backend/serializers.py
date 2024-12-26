@@ -90,6 +90,8 @@ class ShopSerializer(serializers.ModelSerializer):
 
 class AddressSerializer(serializers.ModelSerializer):
     """Serializer for address model management."""
+    apartment = serializers.IntegerField()
+
     class Meta:
         model = Address
         fields = ['id', 'country', 'region', 'city', 'street', 'house', 'apartment', 'user']
