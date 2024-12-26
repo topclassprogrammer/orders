@@ -80,6 +80,8 @@ class RoleSerializer(serializers.ModelSerializer):
 
 class ShopSerializer(serializers.ModelSerializer):
     """Serializer for shop model management."""
+    accept_orders = serializers.BooleanField(default=True)
+
     class Meta:
         model = Shop
         fields = ['id', 'name', 'url', 'accept_orders', 'user']
