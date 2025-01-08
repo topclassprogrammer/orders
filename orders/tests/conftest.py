@@ -11,3 +11,13 @@ USER_DATA = {
     'email': 'test@email.com',
     'phone': '+70123456789'
 }
+
+
+def django_test_setup():
+    os.environ['DJANGO_SETTINGS_MODULE'] = "orders.settings"
+    django.setup()
+
+
+django_test_setup()
+
+
