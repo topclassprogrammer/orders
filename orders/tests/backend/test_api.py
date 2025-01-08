@@ -74,3 +74,13 @@ def test_user(client, create_roles, subtests):
         })
         assert response.status_code == 200
 
+
+@pytest.mark.django_db
+def test_anon_throttle(client, create_roles, anon_throttle_rate):
+    for rate in range(1, anon_throttle_rate + 2):
+        response = client.post(reverse('user-list'), format='json')
+        if response.status_code == 400:
+            continue
+        assert response.status_code == 429
+
+
