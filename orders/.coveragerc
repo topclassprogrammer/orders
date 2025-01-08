@@ -1,0 +1,2 @@
+[run]
+omit=.pytest_cache/*, images/*, orders/*, static/*, tests/*, backend/management/*, backend/migrations/*, backend/__init__.py, backend/admin.py, backend/apps.py, backend/auth.py, backend/filters.py, backend/models.py, backend/notifications.py, backend/permissions.py, backend/serializers.py, backend/tests.py, backend/urls.py, backend/utils.py, backend/validators.py, manage.py, schema.py
