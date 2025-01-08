@@ -1,0 +1,7 @@
+FROM python:3.12-bookworm
+COPY /requirements-tests.txt /
+RUN pip install -r /requirements-tests.txt
+COPY /orders /orders
+COPY /scripts/run_tests.sh /
+WORKDIR /orders
+ENTRYPOINT ["bash", "/run_tests.sh"]
