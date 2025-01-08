@@ -410,7 +410,7 @@ class ShopView(ModelViewSet):
         """Get the permissions for the current action."""
         permissions = [*self.permission_classes]
         if self.action == self.__class__.get_active_orders.__name__:
-            if self.request.user.role.name == RoleChoices.ADMIN:
+            if hasattr(self.request.user, 'role') and self.request.user.role.name == RoleChoices.ADMIN:
                 return []
             else:
                 permissions.extend([HasShop, IsOwner])
