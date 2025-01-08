@@ -13,7 +13,7 @@ USER_DATA = {
 }
 
 
-def django_test_setup():
+def django_test_setup() -> None:
     """Set up the Django test environment."""
     os.environ['DJANGO_SETTINGS_MODULE'] = "orders.settings"
     django.setup()
@@ -35,7 +35,7 @@ def client():
 
 
 @pytest.fixture
-def create_roles():
+def create_roles() -> None:
     """Create predefined roles for testing purposes."""
     from backend.models import Role
     Role.objects.create(name='admin')
@@ -57,7 +57,7 @@ def user():
 
 
 @pytest.fixture
-def user_throttle_rate():
+def user_throttle_rate() -> int:
     """
     Return the user's throttle rate from settings.
 
@@ -70,7 +70,7 @@ def user_throttle_rate():
 
 
 @pytest.fixture
-def anon_throttle_rate():
+def anon_throttle_rate() -> int:
     """
     Return the anonymous user's throttle rate from settings.
 
