@@ -21,3 +21,12 @@ def django_test_setup():
 django_test_setup()
 
 
+@pytest.fixture
+def client():
+    from rest_framework.test import APIClient
+    return APIClient()
+
+
+
+
+
