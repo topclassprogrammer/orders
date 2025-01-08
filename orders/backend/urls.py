@@ -1,4 +1,7 @@
+from django.urls import path
 from rest_framework.routers import DefaultRouter
+
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 from backend.views import AddressView, BrandView, CategoryView, ItemView, \
     ModelView, OrderItemView, OrderView, PropertyNameView, PropertyValueView, \
@@ -17,6 +20,8 @@ router.register("property-name", PropertyNameView, basename="property-name")
 router.register("property-value", PropertyValueView, basename="property-value")
 router.register("order", OrderView, basename="order")
 router.register("order-item", OrderItemView, basename="order-item")
-router.register("active-orders", OrderItemView, basename="active-orders")
 
-urlpatterns = router.urls
+urlpatterns = router.urls + [
+    path('schema/', SpectacularAPIView.as_view(), name='schema'),
+    path('swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui')
+]
