@@ -42,4 +42,12 @@ def user():
     return user
 
 
+@pytest.fixture
+def user_throttle_rate():
+    user_rate_str = settings.__dict__['REST_FRAMEWORK']['DEFAULT_THROTTLE_RATES']['user']
+    user_rate = int(user_rate_str.split('/')[0])
+    return user_rate
+
+
+
 
