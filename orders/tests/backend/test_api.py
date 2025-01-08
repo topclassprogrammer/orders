@@ -84,3 +84,11 @@ def test_anon_throttle(client, create_roles, anon_throttle_rate):
         assert response.status_code == 429
 
 
+@pytest.mark.django_db
+def test_user_throttle(client, create_roles, user, user_throttle_rate):
+    auth_token = AuthToken.objects.create(user=user, key=uuid.uuid4())
+    for rate in range(1, user_throttle_rate + 2):
+        response = client.get(reverse('item-list'), headers={'Authorization': f'Token {auth_token.key}'}, format='json')
+        if response.status_code == 200:
+            continue
+        assert response.status_code == 429
