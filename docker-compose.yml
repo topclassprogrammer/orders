@@ -19,3 +19,12 @@ services:
     depends_on:
       - db
     command: ./scripts/wait-for-it.sh db:5432 -- ./scripts/run_app.sh
+
+  tests:
+    build:
+      context: .
+      dockerfile: Dockerfile_tests
+    depends_on:
+      - orders
+    volumes:
+      - ./orders/tests:/tests
