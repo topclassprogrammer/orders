@@ -997,7 +997,7 @@ class OrderItemView(ModelViewSet):
         if self.action == self.__class__.list.__name__:
             permissions.append(IsAdmin)
         elif self.action == self.__class__.retrieve.__name__:
-            if self.request.user.role.name == RoleChoices.ADMIN:
+            if hasattr(self.request.user, 'role') and self.request.user.role.name == RoleChoices.ADMIN:
                 return []
             else:
                 permissions.append(IsOwner)
