@@ -13,7 +13,6 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
-
 load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -45,7 +44,8 @@ INSTALLED_APPS = [
     'debug_toolbar',
     'backend',
     'rest_framework',
-    'django_filters'
+    'django_filters',
+    'drf_spectacular',
 ]
 
 MIDDLEWARE = [
