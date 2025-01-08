@@ -35,3 +35,11 @@ def create_roles():
     Role.objects.create(name='shop')
 
 
+@pytest.fixture
+def user():
+    from backend.models import User, Role, RoleChoices
+    user = User.objects.create(**USER_DATA, is_active=True, role=Role.objects.get(name=RoleChoices.CLIENT))
+    return user
+
+
+
