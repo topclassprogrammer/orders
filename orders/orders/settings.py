@@ -151,3 +151,16 @@ REST_FRAMEWORK = {
         'anon': '10/minute',
     }
    }
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Orders API',
+    'DESCRIPTION': 'Orders project',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'AUTHENTICATION_CLASSES': (
+        'backend.auth.TokenAuthentication',
+    ),
+    'SWAGGER_UI_SETTINGS': {
+        'persistAuthorization': True,
+    },
+}
