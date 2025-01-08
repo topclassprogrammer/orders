@@ -49,5 +49,8 @@ def user_throttle_rate():
     return user_rate
 
 
-
-
+@pytest.fixture
+def anon_throttle_rate():
+    anon_rate_str = settings.__dict__['REST_FRAMEWORK']['DEFAULT_THROTTLE_RATES']['anon']
+    anon_rate = int(anon_rate_str.split('/')[0])
+    return anon_rate
