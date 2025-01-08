@@ -231,7 +231,7 @@ def get_url_end_path(request, basename: str) -> str | None:  # Выясняем 
     return method_name
 
 
-def get_request_method(request) -> str:
+def get_request_method(request) -> str | None:
     """
     Retrieve the HTTP request method from the request object.
 
@@ -241,6 +241,8 @@ def get_request_method(request) -> str:
     Returns:
         str: The HTTP request method.
     """
+    if not request:
+        return None
     return request.environ.get('REQUEST_METHOD')
 
 
