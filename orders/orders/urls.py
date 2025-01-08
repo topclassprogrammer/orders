@@ -23,14 +23,16 @@ from django.urls import path, include
 
 from backend.views import ImageView
 
+
 BACKEND_BASE_URL = 'api/v1/'
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path(BACKEND_BASE_URL, include('backend.urls')),
     path("image/", ImageView.as_view({"get": "list"})),
-    path("image/<str:filename>", ImageView.as_view({"get": "retrieve", "delete": "destroy"}))
+    path("image/<str:filename>", ImageView.as_view({"get": "retrieve", "delete": "destroy"})),
 ] + debug_toolbar_urls()
+
 
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
