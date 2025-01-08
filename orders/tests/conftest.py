@@ -27,6 +27,11 @@ def client():
     return APIClient()
 
 
-
+@pytest.fixture
+def create_roles():
+    from backend.models import Role
+    Role.objects.create(name='admin')
+    Role.objects.create(name='client')
+    Role.objects.create(name='shop')
 
 
