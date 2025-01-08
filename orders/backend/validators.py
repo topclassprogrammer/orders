@@ -39,7 +39,7 @@ def check_password(value: str):
         ValidationError: If the password is too short or contains disallowed characters.
     """
     if len(value) < 8:
-        raise ValidationError("Password must contain at least 4 chars")
+        raise ValidationError("Password must contain at least 8 chars")
     if any(char not in PASSWORD_CHARS for char in value):
         raise ValidationError("Not allowed char(s) in password field")
 
