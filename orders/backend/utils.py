@@ -208,7 +208,7 @@ def slugify_bulk_item(brand_name: str, model_name: str) -> str:
     return slug + '-' + str(uuid.uuid4())
 
 
-def get_url_end_path(request, basename: str) -> str:
+def get_url_end_path(request, basename: str) -> str | None:  # Выясняем на какой URL-путь отправляет запрос клиент, чтобы отбросить базовое имя(user) и получить имя метода(за исключением create(оно будет пустое)
     """
     Retrieve the method name from the request URL path.
 
@@ -220,6 +220,8 @@ def get_url_end_path(request, basename: str) -> str:
         str: The method name extracted from the URL path.
     """
     from orders.urls import BACKEND_BASE_URL
+    if not request:
+        return None
     path = request.environ.get('PATH_INFO')
     strip_path = path.strip("/")
     replace_path = BACKEND_BASE_URL + basename
