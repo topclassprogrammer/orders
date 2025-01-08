@@ -8,6 +8,21 @@ from tests.conftest import USER_DATA
 
 @pytest.mark.django_db
 def test_user(client, create_roles, subtests):
+    """
+    This test verifies the complete user lifecycle including:
+        - User registration
+        - Activation of the user account via an activation token
+        - User login
+        - User logout
+        - Requesting a new password
+        - Setting a new password
+        - Logging in with the new password
+
+    Args:
+        client (APIClient): The API client used for making requests.
+        create_roles (fixture): Fixture that sets up user roles in the database.
+        subtests (SubTest): Fixture that provides support for subtests.
+    """
     response = client.post(reverse('user-list'), USER_DATA, format='json')
     assert response.status_code == 201
 
@@ -77,6 +92,14 @@ def test_user(client, create_roles, subtests):
 
 @pytest.mark.django_db
 def test_anon_throttle(client, create_roles, anon_throttle_rate):
+    """
+    Test the anonymous user throttle rate functionality.
+
+    Args:
+        client (APIClient): The API client used for making requests.
+        create_roles (fixture): Fixture that sets up user roles in the database.
+        anon_throttle_rate (int): The maximum number of allowed requests for anonymous users.
+    """
     for rate in range(1, anon_throttle_rate + 2):
         response = client.post(reverse('user-list'), format='json')
         if response.status_code == 400:
@@ -86,6 +109,15 @@ def test_anon_throttle(client, create_roles, anon_throttle_rate):
 
 @pytest.mark.django_db
 def test_user_throttle(client, create_roles, user, user_throttle_rate):
+    """
+    Test the user throttle rate functionality.
+
+    Args:
+        client (APIClient): The API client used for making requests.
+        create_roles (fixture): Fixture that sets up user roles in the database.
+        user (User): The user instance created for testing.
+        user_throttle_rate (int): The maximum number of allowed requests for registered users.
+    """
     auth_token = AuthToken.objects.create(user=user, key=uuid.uuid4())
     for rate in range(1, user_throttle_rate + 2):
         response = client.get(reverse('item-list'), headers={'Authorization': f'Token {auth_token.key}'}, format='json')
