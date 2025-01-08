@@ -62,7 +62,7 @@ class UserView(ModelViewSet):
             notify(user.email, self.__class__, self.action, token=token)
             return Response({"status": True,
                              "message": f"You successfully created account: {serializer.data}. "
-                            f"Your activation token sent to your email: {token.user.email}"},
+                            f"Your activation token is {token.key} that was also sent to your email: {token.user.email}"},
                             status=status.HTTP_201_CREATED)
         return Response(get_fail_msg(self.action, serializer), status=status.HTTP_400_BAD_REQUEST)
 
