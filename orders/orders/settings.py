@@ -152,6 +152,13 @@ REST_FRAMEWORK = {
     }
    }
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': 'redis://redis:6379/1',
+    }
+}
+
 SPECTACULAR_SETTINGS = {
     'TITLE': 'Orders API',
     'DESCRIPTION': 'Orders project',
