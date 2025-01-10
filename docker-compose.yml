@@ -28,3 +28,8 @@ services:
       - orders
     volumes:
       - ./orders/tests:/tests
+
+  redis:
+    image: redis:7.0.0-alpine3.15
+    ports:
+      - "6379:6379"
